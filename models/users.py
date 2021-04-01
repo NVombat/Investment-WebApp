@@ -4,7 +4,7 @@ def create_user():
     conn = s.connect("app.db")
     cur = conn.cursor()
 
-    tbl = 'CREATE TABLE IF NOT EXISTS user(Name TEXT, Email TEXT, Password TEXT)'
+    tbl = 'CREATE TABLE IF NOT EXISTS user(Email TEXT, Name TEXT, Password TEXT)'
     cur.execute(tbl)
     conn.commit()
 
@@ -36,3 +36,12 @@ def getname(email: tuple):
     cur.execute(cmnd)
     res = cur.fetchall()
     return res[0][0]
+
+def getemail():
+    conn = sqlite3.connect("app.db")
+    cur = conn.cursor()
+
+    gml = 'SELECT Email FROM user'
+    cur.execute(gml)
+    emails = cur.fetchall()
+    return emails

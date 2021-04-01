@@ -1,6 +1,6 @@
 import sqlite3 as s
 
-def create_tbl():
+def create_tbl(path : str):
     conn = s.connect("app.db")
     cur = conn.cursor()
 
