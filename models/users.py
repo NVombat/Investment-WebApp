@@ -1,5 +1,6 @@
 import sqlite3 as s
 
+
 def create_user():
     conn = s.connect("app.db")
     cur = conn.cursor()
@@ -8,7 +9,8 @@ def create_user():
     cur.execute(tbl)
     conn.commit()
 
-def insert(tablename : str, data : tuple):
+
+def insert(tablename: str, data: tuple):
     conn = s.connect("app.db")
     cur = conn.cursor()
 
@@ -16,16 +18,18 @@ def insert(tablename : str, data : tuple):
     cur.execute(insrt)
     conn.commit()
 
-def checkpwd(pwd : str, email : str):
+
+def checkpwd(pwd: str, email: str):
     conn = s.connect("app.db")
     cur = conn.cursor()
 
     check = f"SELECT * FROM user where Password='{pwd}' AND Email='{email}'"
     cur.execute(check)
     res = cur.fetchall()
-    if len(res)>0 :
+    if len(res) > 0:
         return True
     return False
+
 
 def getname(email: tuple):
     email = email[0];
@@ -37,8 +41,9 @@ def getname(email: tuple):
     res = cur.fetchall()
     return res[0][0]
 
+
 def getemail():
-    conn = sqlite3.connect("app.db")
+    conn = s.connect("app.db")
     cur = conn.cursor()
 
     gml = 'SELECT Email FROM user'
