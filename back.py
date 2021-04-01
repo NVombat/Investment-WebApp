@@ -22,15 +22,13 @@ from models.contact import (
 
 import os 
 
-app = Flask(__name__)
+templates_path = os.path.abspath('./templates')
+app = Flask(__name__, template_folder=templates_path)
 app.secret_key = 'somekey'
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
 create_user()
 create_tbl("app.db")
-
-templates_path = os.path.abspath('./templates')
-app = Flask(__name__, template_folder=templates_path)
 
 @app.before_request
 def execute():
