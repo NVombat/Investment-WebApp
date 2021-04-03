@@ -1,11 +1,11 @@
 import configparser
-from configparser import ConfigParser
 import json
 import requests
 
 
 def apicall(key: int, symbol: str, date_from: str, date_to: str, limit: int = 1) -> dict:
     """
+
 
     :param key:
     :param symbol:
@@ -44,11 +44,16 @@ def getdata(symbol: str, date_from: str = "2020-08-21",
     """
     values = []
 
-    cfg: ConfigParser = configparser.ConfigParser()
+    cfg: configparser.ConfigParser = configparser.ConfigParser()
     cfg.read('configuration.cfg')
     key = cfg.get("API KEY", "key")
 
-    data_dict = apicall(key, symbol, date_from=date_from, date_to=date_to)["data"][0]
+    data_list: list = apicall(key, symbol, date_from=date_from, date_to=date_to)["data"]
+    if data_list:
+        data_dict = data_list[0]
+
+    else:
+        raise ValueError("Entered dates are not correct")
 
     for _, varg in kwargs.items():
         if varg in data_dict.keys():
@@ -60,4 +65,4 @@ def getdata(symbol: str, date_from: str = "2020-08-21",
 if __name__ == '__main__':
     symbol = "GOOGL"
     print(getdata(low='low', high='high', symbol=symbol,
-                  date_from="2020-09-25", date_to="2020-10-26", highadj="said"))
+                  date_from="2021-03-01", date_to="2021-03-02", close="close"))
