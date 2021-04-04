@@ -23,11 +23,11 @@
             <form action novalidate method="post">
                 <input type="radio" name="rg" id="sign-in" checked/>
                 <input type="radio" name="rg" id="sign-up" />
-                <input type="radio" name="rg" id="reset" />        
+                <!-- <input type="radio" name="rg" id="reset" />         -->
         
                 <label for="sign-in">Sign In</label>
                 <label for="sign-up">Sign Up</label>
-                <label for="reset">Reset</label>  
+                <!-- <label for="reset">Reset</label>   -->
         
                 <input class="sign-up sign-in" type="text" placeholder="Name" name="name" />
                 <input class="sign-up sign-in reset" type="email" placeholder="Email" name="email" />
@@ -36,7 +36,7 @@
                     
                 <button>Submit</button>         
             </form>
-            {{error}}
+            <h1> {{error}} </h1>
         </div>
     </section>
 

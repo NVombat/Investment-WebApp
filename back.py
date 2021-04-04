@@ -36,7 +36,7 @@ def security():
 
 @app.route('/', methods=["GET", "POST"])
 def home():
-    # TODO: make reset method
+    flag = True
     if request.method == "POST":
 
         name = request.form['name']
@@ -50,6 +50,8 @@ def home():
                 print("login")
                 if users.checkpwd(password, email):
                     return render_template('index.html')
+                else:
+                    flag=False
 
         if password and repeat_password:
             print("sign in")
@@ -57,12 +59,14 @@ def home():
                 users.insert('user', (email, name, password))
                 return render_template('login.html')
             else:
-                return render_template('login.html', error="password and retyped password not same")
+                return render_template('login.html', error="Password and Retyped Password not same")
         if not name:
-            print("reset password")
-
-    return render_template('login.html')
-
+            print("Reset Password")
+    if flag:
+        return render_template('login.html')
+    else:
+        return render_template('login.html', error="Incorrect Password")
+    
 
 @app.route('/about')
 def about():
@@ -71,6 +75,10 @@ def about():
 
 @app.route('/contact')
 def contact():
+    # if request.method == "POST":
+    #     #TODO
+
+
     return render_template('contact.html')
 
 
