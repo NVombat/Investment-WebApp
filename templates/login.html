@@ -20,7 +20,7 @@
 
     <section>
         <div class="flex-wrap">
-            <form action novalidate>
+            <form action novalidate method="post">
                 <input type="radio" name="rg" id="sign-in" checked/>
                 <input type="radio" name="rg" id="sign-up" />
                 <input type="radio" name="rg" id="reset" />        
@@ -29,13 +29,14 @@
                 <label for="sign-up">Sign Up</label>
                 <label for="reset">Reset</label>  
         
-                <input class="sign-up sign-in" type="text" placeholder="Name" />
-                <input class="sign-up sign-in reset" type="email" placeholder="Email" />
-                <input class="sign-up sign-in" type="password" placeholder ="Password" />
-                <input class="sign-up" type="password" placeholder ="Repeat Password" />
+                <input class="sign-up sign-in" type="text" placeholder="Name" name="name" />
+                <input class="sign-up sign-in reset" type="email" placeholder="Email" name="email" />
+                <input class="sign-up sign-in" type="password" placeholder ="Password" name="password" />
+                <input class="sign-up" type="password" placeholder ="Repeat Password" name="rpassword"/>
                     
                 <button>Submit</button>         
             </form>
+            {{error}}
         </div>
     </section>
 

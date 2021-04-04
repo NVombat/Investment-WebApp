@@ -7,18 +7,7 @@ from flask import (
     redirect
 )
 
-from models.users import (
-    checkpwd,
-    create_user,
-    insert,
-    getname,
-    getemail
-)
-
-from models.contact import (
-    create_tbl,
-    insert
-)
+from models import users, contact
 
 import os
 
@@ -27,12 +16,12 @@ app = Flask(__name__, template_folder=templates_path)
 app.secret_key = 'somekey'
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
-create_user()
-create_tbl("app.db")
+users.create_user()
+contact.create_tbl("app.db")
 
 
 @app.before_request
-def execute():
+def security():
     g.user = None
     for i in session:
         print(session[i])
@@ -45,29 +34,32 @@ def execute():
             print("failed")
 
 
-@app.route('/', methods=['GET', 'POST'])
-def login():
-    print("IN LOGIN")
-    session.pop("user_email", None)
+@app.route('/', methods=["GET", "POST"])
+def home():
+    # TODO: make reset method
     if request.method == "POST":
-        email = request.form["email"]
-        try:
-            name = request.form['name']
-        except Exception as e:
-            name = None
 
+        name = request.form['name']
+        email = request.form['email']
         password = request.form['password']
 
-        if name != None:
-            insert("user", values=(email, name, password))
-            session['user_email'] = email
-            return redirect('upload')
+        repeat_password = request.form['rpassword']
 
-        if name == None:
-            if checkpwd(password, email):
-                session['user_email'] = email  ## session makes a cookie
-                return redirect('index.html')
-        return redirect("/")
+        if password:
+            if len(repeat_password) == 0:
+                print("login")
+                if users.checkpwd(password, email):
+                    return render_template('index.html')
+
+        if password and repeat_password:
+            print("sign in")
+            if password == repeat_password:
+                users.insert('user', (email, name, password))
+                return render_template('login.html')
+            else:
+                return render_template('login.html', error="password and retyped password not same")
+        if not name:
+            print("reset password")
 
     return render_template('login.html')
 

@@ -63,6 +63,6 @@ def getdata(symbol: str, date_from: str = "2020-08-21",
 
 
 if __name__ == '__main__':
-    symbol = "GOOGL"
+    symbol = "NVDA"
     print(getdata(low='low', high='high', symbol=symbol,
                   date_from="2021-03-01", date_to="2021-03-02", close="close"))
