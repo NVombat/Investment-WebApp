@@ -61,7 +61,7 @@ Insert Description
 ## Preview
 
 
-![1](https://user-images.githubusercontent.com/68011962/111877927-a4222680-89cb-11eb-8392-400e62fb9aba.jpeg)
+![1]
 
 ![2]
 
