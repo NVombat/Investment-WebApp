@@ -7,7 +7,7 @@ from flask import (
     redirect
 )
 
-from models import users, contactus
+from models import users, contactus, stock
 
 import os
 
@@ -18,6 +18,7 @@ app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
 users.create_user()
 contactus.create_tbl("app.db")
+stock.make_tbl("app.db")
 
 
 @app.before_request
@@ -80,8 +81,10 @@ def inv():
 
 @app.route('/trade')
 def trade():
+
     return render_template('trade.html')
 
+print(stock.query("ronaldo72emiway@gmail.com", "app.db"))
 
 @app.route('/about')
 def about():
@@ -105,6 +108,13 @@ def contact():
         return render_template('contact.html', error="Thank you, We will get back to you shortly")
 
     return render_template('contact.html')
+
+@app.route('/logout', methods=["GET", "POST"])
+def logout():
+    if request.method()=="POST":
+        session.pop()
+        g.user = None
+        return redirect("/")
 
 if __name__ == '__main__':
     app.run(debug=True, port=8000)
