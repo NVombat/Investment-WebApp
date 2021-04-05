@@ -1,8 +1,8 @@
-# 'Code'Vid19 (#code)
+# 'Code'Vid19
 
 
 ![FrontEnd1](https://user-images.githubusercontent.com/63743496/113564327-d320d500-9626-11eb-8c8d-01ab34f99ba7.jpeg)
-
+- [Stock Project](#code)
 > This is a project made as a Submission for our SEPM Course
 
 ---
@@ -54,7 +54,7 @@ Insert Description
 3. SQL
 
 
-[Back To The Top](#'Code'Vid19)
+[Back To The Top](#code)
 
 ---
 
@@ -70,7 +70,7 @@ Insert Description
 ![4]
 
 ![5]
-[Back To The Top](#'Code'Vid19)
+[Back To The Top](#code)
 
 ---
 
