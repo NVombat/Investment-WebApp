@@ -28,6 +28,10 @@ p{
     margin: 10px 0;
 }
 
+img{
+    image-rendering: pixelated;
+}
+
 /* Utility Classes */
 .container{
     margin: auto;
@@ -180,9 +184,10 @@ p{
 
 /* Showcase */
 #showcase{
-    background: url(../img/stk2.svg) no-repeat center/cover;
-    height: 650px;
-    background-size: contain;
+    background: url(../img/stock3.jpg) no-repeat center/cover;
+    height: 600px;
+    filter: contrast(80%);
+    /* background-size: contain; */
 }
 #showcase .showcase-content{
     color: #ffffff;
