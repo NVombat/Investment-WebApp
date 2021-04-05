@@ -54,7 +54,7 @@ Insert Description
 3. SQL
 
 
-[Back To The Top](#code)
+[Back To The Top]
 
 ---
 
