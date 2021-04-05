@@ -61,13 +61,7 @@ p{
     background: #333;
     padding: 12px 20px;
     border: none;
-}
-#btn1{
-    position: relative;
-    margin-top: 20px;
-    left: 30%;
-    right: 30%;
-    padding: 15px 30px;
+    transition-duration: 0.4s;
 }
 .btn:hover{
     background: #f7c08a;
@@ -99,6 +93,13 @@ p{
 .l-heading{
     margin-top: 30px;
     font-size: 40px;
+}
+
+.d-button{
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    margin: 20px 0px;
 }
 
 /* Padding */
@@ -136,15 +137,44 @@ p{
 #navbar ul li{
     float: left;
 }
-#navbar ul li a {
+#navbar ul li a,
+#navbar ul li #sign-out {
     font-size: 1.1rem;
-    display: block;
+    display: inline-block;
     padding: 20px;
     text-align: center;
 }
-#navbar ul li a:hover, 
+#navbar ul li a:hover,
 #navbar ul li a.current{
     background: #444;
+    color: #f7c08a;
+    transition-duration: 0.5s;
+}
+
+/* #sign-out{
+    font-family: inherit;
+    background: #333;
+    color: #ffffff;
+    overflow: auto;
+    border: none;
+} */
+
+#sign-out{
+    border: none;
+    background-color: #333;
+    color: white;
+    padding: 16px 32px;
+    font-family: inherit;
+    text-align: center;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    transition-duration: 1s;
+    cursor: pointer;
+}
+
+#sign-out:hover{
+    background-color: #444;
     color: #f7c08a;
 }
 
@@ -261,6 +291,10 @@ p{
 }
 
 /* Contact Form */
+.contact-form1{
+    height: 500px;
+}
+
 #contact-form .form-group{
     font-family: 'Montserrat';
     margin-bottom: 20px;
@@ -292,7 +326,6 @@ p{
 
 .contain{
     display: block;
-    /* max-width: 1200px; */
     overflow: auto;
     padding: 60px 30%;
 }
@@ -317,6 +350,46 @@ p{
 #trade-form textarea:focus{
     outline: none;
     border-color: #f7c08a;
+}
+
+/* Table */
+.stock-table{
+    width: 100%;
+    margin-bottom: 110px;
+    border-collapse: collapse;
+}
+
+th{
+    padding: 15px;
+    text-align: left;
+}
+
+td{
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid #666;
+}
+
+tr:nth-child(even){
+    background-color: #ebebeb;
+}
+
+.heading th{
+    font-size: 1.3rem;
+    color: #555;
+    padding: 20px 15px;
+}
+
+.stock-table .data:hover{
+    background-color: #666;
+    color: #ebebeb;
+}
+
+/* Error / Notif */
+
+#error-msg{
+    color: rgba(255, 0, 0, 0.589);
+    font-size: 20px;
 }
 
 /* Footer */
