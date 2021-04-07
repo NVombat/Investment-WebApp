@@ -11,6 +11,8 @@ import datetime as d
 from models import users, contactus, stock
 
 import os
+
+#Path used for all tables
 path = "app.db"
 
 templates_path = os.path.abspath('./templates')
@@ -93,31 +95,27 @@ def trade():
             print("SYMBOL", symb)
             price = 0
             quant = request.form["amount"]
+            quant = int(quant)
             print("AMOUNT", quant)
             user_email = users.getemail().pop()
             user_email = user_email[0]
             print("USER EMAIL:", user_email)
             stock.buy("stock", (date, symb, price, quant, user_email), path)
-            return render_template('trade.html')
+            return render_template('trade.html', error="Bought Successfully!")
         
         elif request.form.get("s1"):
             print("SELLING")
             symb = request.form["stockid"]
             print("DELETING SYMBOL:", symb)
-            stock.sell("stock", symb, path)
-            return render_template('trade.html')
+            quant = request.form["amount"]
+            quant = int(quant)
+            print("AMOUNT", quant)
+            stock.sell("stock", symb, quant, path)
+            return render_template('trade.html', error="Sold Successfully!")
 
     return render_template('trade.html')
 
-# date = d.datetime.now()
-# date = date.strftime("%m/%d/%Y, %H:%M:%S")
-# print(date)
 #print(stock.query("ronaldo72emiway@gmail.com", "app.db"))
-
-@app.route('/about')
-def about():
-    return render_template('about.html')
-
 
 @app.route('/contact', methods=["GET", "POST"])
 def contact():
