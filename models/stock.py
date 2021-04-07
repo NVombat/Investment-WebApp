@@ -9,6 +9,7 @@ def make_tbl(path : str):
     conn.commit()
 
 def buy(tablename : str, data : tuple, path : str):
+    print(tablename, data, path)
     conn = s.connect(path)
     cur = conn.cursor()
 
@@ -20,7 +21,14 @@ def sell(tablename : str, sym : str, path : str):
     conn = s.connect(path)
     cur = conn.cursor()
 
-    sel = f"DELETE FROM {tablename} WHERE Stock_Symbol={sym}"
+    rem = f"SELECT * FROM {tablename} WHERE Stock_Symbol='{sym}'"
+    cur.execute(rem)
+    res = cur.fetchall()
+    quant = res[0][4]
+    print(quant)
+    print(res)
+    
+    sel = f"DELETE FROM {tablename} WHERE Stock_Symbol='{sym}'"
     cur.execute(sel)
     conn.commit()
 

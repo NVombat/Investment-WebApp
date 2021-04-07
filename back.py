@@ -7,9 +7,11 @@ from flask import (
     redirect
 )
 
+import datetime as d
 from models import users, contactus, stock
 
 import os
+path = "app.db"
 
 templates_path = os.path.abspath('./templates')
 app = Flask(__name__, template_folder=templates_path)
@@ -79,12 +81,38 @@ def inv():
     return render_template('inv.html')
 
 
-@app.route('/trade')
+@app.route('/trade', methods=["GET", "POST"])
 def trade():
+    if request.method == "POST":
+        if request.form.get("b1"):
+            print("BUYING")
+            date = d.datetime.now()
+            date = date.strftime("%m/%d/%Y, %H:%M:%S")
+            print(date)
+            symb = request.form["stockid"]
+            print("SYMBOL", symb)
+            price = 0
+            quant = request.form["amount"]
+            print("AMOUNT", quant)
+            user_email = users.getemail().pop()
+            user_email = user_email[0]
+            print("USER EMAIL:", user_email)
+            stock.buy("stock", (date, symb, price, quant, user_email), path)
+            return render_template('trade.html')
+        
+        elif request.form.get("s1"):
+            print("SELLING")
+            symb = request.form["stockid"]
+            print("DELETING SYMBOL:", symb)
+            stock.sell("stock", symb, path)
+            return render_template('trade.html')
 
     return render_template('trade.html')
 
-print(stock.query("ronaldo72emiway@gmail.com", "app.db"))
+# date = d.datetime.now()
+# date = date.strftime("%m/%d/%Y, %H:%M:%S")
+# print(date)
+#print(stock.query("ronaldo72emiway@gmail.com", "app.db"))
 
 @app.route('/about')
 def about():
@@ -104,7 +132,7 @@ def contact():
             print("Incorrect Email")
             return render_template('contact.html', error="Incorrect Email!")
         print("Correct Email")
-        contactus.insert(email, msg)
+        contactus.insert(email, msg, path)
         return render_template('contact.html', error="Thank you, We will get back to you shortly")
 
     return render_template('contact.html')
