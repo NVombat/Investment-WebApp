@@ -82,6 +82,12 @@ def index():
 def inv():
     return render_template('inv.html')
 
+def transact(data : tuple):
+    transactions = []
+    for d in data:
+        transactions.append(d)
+
+
 
 @app.route('/trade', methods=["GET", "POST"])
 def trade():
@@ -101,7 +107,13 @@ def trade():
             user_email = user_email[0]
             print("USER EMAIL:", user_email)
             stock.buy("stock", (date, symb, price, quant, user_email), path)
-            return render_template('trade.html', error="Bought Successfully!")
+
+            #For the table
+            transactions = []
+            data = (date, symb, price, quant, user_email,)
+            for ele in data:
+                transactions.append(ele)
+            return render_template('trade.html', transactions=transactions, error="Bought Successfully!")
         
         elif request.form.get("s1"):
             print("SELLING")
