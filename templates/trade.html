@@ -50,7 +50,7 @@
 
     <section id="flip-box">
         <div class="wrapper">
-            <h1>Your Investments</h1>
+            <h1>Investment History</h1>
 
             <table class="stock-table">
                 <tr class="heading">
@@ -61,14 +61,14 @@
                 </tr>
 
                 <!-- Iterate over one of these <tr> </tr> below and remove the other!!! -->
-                
+            {% for transaction in transactions %}
                 <tr class="data">
-                    <td>10/12/1999</td>
-                    <td>GOOGLE</td>
-                    <td>10000</td>
-                    <td>87.99</td>
+                    <td>{{ transaction[0] }}</td>
+                    <td>{{ transaction[1] }}</td>
+                    <td>{{ transaction[2] }}</td>
+                    <td>{{ transaction[3] }}</td>
                 </tr>
-
+            {% endfor %}
             </table>
         </div>
             
