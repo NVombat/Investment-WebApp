@@ -9,7 +9,7 @@ from flask import (
 
 import datetime as d
 from models import users, contactus, stock
-
+from api import getdata
 import os
 
 #Path used for all tables
@@ -92,25 +92,30 @@ def transact(data : tuple):
 @app.route('/trade', methods=["GET", "POST"])
 def trade():
     if request.method == "POST":
+
         if request.form.get("b1"):
             print("BUYING")
             date = d.datetime.now()
             date = date.strftime("%m/%d/%Y, %H:%M:%S")
-            print(date)
+
             symb = request.form["stockid"]
-            print("SYMBOL", symb)
-            price = 0
+
             quant = request.form["amount"]
+
             quant = int(quant)
             print("AMOUNT", quant)
+            total = getdata(close='close', symbol=symb)[0]
+
+            total = quant * total
+
             user_email = users.getemail().pop()
             user_email = user_email[0]
             print("USER EMAIL:", user_email)
-            stock.buy("stock", (date, symb, price, quant, user_email), path)
+            stock.buy("stock", (date, symb, total, quant, user_email), path)
 
             #For the table
             transactions = []
-            data = (date, symb, price, quant, user_email,)
+            data = (date, symb, total, quant, user_email,)
             for ele in data:
                 transactions.append(ele)
             return render_template('trade.html', transactions=transactions, error="Bought Successfully!")
@@ -124,6 +129,8 @@ def trade():
             print("AMOUNT", quant)
             stock.sell("stock", symb, quant, path)
             return render_template('trade.html', error="Sold Successfully!")
+
+
 
     return render_template('trade.html')
 
