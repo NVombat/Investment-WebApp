@@ -95,43 +95,53 @@ def trade():
 
         if request.form.get("b1"):
             print("BUYING")
+
             date = d.datetime.now()
             date = date.strftime("%m/%d/%Y, %H:%M:%S")
 
             symb = request.form["stockid"]
 
             quant = request.form["amount"]
-
             quant = int(quant)
             print("AMOUNT", quant)
-            total = getdata(close='close', symbol=symb)[0]
+            stock_price = getdata(close='close', symbol=symb)[0]
+            print("STOCK PRICE", stock_price)
 
-            total = quant * total
+            total = quant * stock_price
+
+            print("You have spent $", total)
 
             user_email = users.getemail().pop()
             user_email = user_email[0]
             print("USER EMAIL:", user_email)
-            stock.buy("stock", (date, symb, total, quant, user_email), path)
+            stock.buy("stock", (date, symb, stock_price, quant, user_email), path)
 
             #For the table
             transactions = []
-            data = (date, symb, total, quant, user_email,)
+            data = (date, symb, stock_price, quant, user_email,)
             for ele in data:
                 transactions.append(ele)
             print("TRANSACTIONS: ", transactions)
+
             return render_template('trade.html', transactions=transactions, error="Bought Successfully!")
         
         elif request.form.get("s1"):
             print("SELLING")
+
             symb = request.form["stockid"]
             print("DELETING SYMBOL:", symb)
+
             quant = request.form["amount"]
             quant = int(quant)
             print("AMOUNT", quant)
+            stock_price = getdata(close='close', symbol=symb)[0]
+            print("STOCK PRICE", stock_price)
+
+            total = quant * stock_price
+            print("You have received $", total)
+
             stock.sell("stock", symb, quant, path)
             return render_template('trade.html', error="Sold Successfully!")
-
-
 
     return render_template('trade.html')
 
