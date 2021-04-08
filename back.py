@@ -118,6 +118,7 @@ def trade():
             data = (date, symb, total, quant, user_email,)
             for ele in data:
                 transactions.append(ele)
+            print("TRANSACTIONS: ", transactions)
             return render_template('trade.html', transactions=transactions, error="Bought Successfully!")
         
         elif request.form.get("s1"):
