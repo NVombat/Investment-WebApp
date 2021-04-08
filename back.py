@@ -82,11 +82,10 @@ def index():
 def inv():
     return render_template('inv.html')
 
-def transact(data : tuple):
-    transactions = []
-    for d in data:
-        transactions.append(d)
 
+@app.route('/about')
+def about():
+    return render_template('about.html')
 
 
 @app.route('/trade', methods=["GET", "POST"])
