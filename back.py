@@ -31,7 +31,7 @@ def security():
     for i in session:
         print(session[i])
     if 'user_email' in session:
-        emails = getemail()
+        emails = users.getemail()
         try:
             useremail = [email for email in emails if email[0] == session['user_email']][0]
             g.user = useremail
@@ -54,6 +54,7 @@ def home():
             if len(repeat_password) == 0:
                 print("Login")
                 if users.checkpwd(password, email):
+                    session['user_email'] = email
                     return render_template('index.html')
                 else:
                     flag=False
@@ -62,7 +63,7 @@ def home():
             print("Sign In")
             if password == repeat_password:
                 users.insert('user', (email, name, password))
-                #session['user_email'] = email
+                session['user_email'] = email
                 return render_template('login.html')
             else:
                 return render_template('login.html', error="Password & Retyped Password Not Same")
@@ -90,59 +91,62 @@ def about():
 
 @app.route('/trade', methods=["GET", "POST"])
 def trade():
-    if request.method == "POST":
 
-        if request.form.get("b1"):
-            print("BUYING")
+    if g.user:
+        user_email = g.user
+        transactions = stock.query(user_email[0], path='app.db')
 
-            date = d.datetime.now()
-            date = date.strftime("%m/%d/%Y, %H:%M:%S")
 
-            symb = request.form["stockid"]
+        if request.method == "POST":
 
-            quant = request.form["amount"]
-            quant = int(quant)
-            print("AMOUNT", quant)
-            stock_price = getdata(close='close', symbol=symb)[0]
-            print("STOCK PRICE", stock_price)
+            if request.form.get("b1"):
+                print("BUYING")
 
-            total = quant * stock_price
+                date = d.datetime.now()
+                date = date.strftime("%m/%d/%Y, %H:%M:%S")
 
-            print("You have spent $", total)
+                symb = request.form["stockid"]
 
-            user_email = users.getemail().pop()
-            user_email = user_email[0]
-            print("USER EMAIL:", user_email)
-            stock.buy("stock", (date, symb, stock_price, quant, user_email), path)
+                quant = request.form["amount"]
+                quant = int(quant)
+                print("AMOUNT", quant)
+                stock_price = getdata(close='close', symbol=symb)[0]
+                print("STOCK PRICE", stock_price)
 
-            #For the table
-            transactions = []
-            data = (date, symb, stock_price, quant, user_email,)
-            for ele in data:
-                transactions.append(ele)
-            print("TRANSACTIONS: ", transactions)
+                total = quant * stock_price
 
-            return render_template('trade.html', transactions=transactions, error="Bought Successfully!")
-        
-        elif request.form.get("s1"):
-            print("SELLING")
+                print("You have spent $", total)
 
-            symb = request.form["stockid"]
-            print("DELETING SYMBOL:", symb)
+                print("USER EMAIL:", user_email)
+                stock.buy("stock", (date, symb, stock_price, quant, user_email[0]), path)
 
-            quant = request.form["amount"]
-            quant = int(quant)
-            print("AMOUNT", quant)
-            stock_price = getdata(close='close', symbol=symb)[0]
-            print("STOCK PRICE", stock_price)
+                #For the table
 
-            total = quant * stock_price
-            print("You have received $", total)
 
-            stock.sell("stock", symb, quant, path)
-            return render_template('trade.html', error="Sold Successfully!")
+                print("TRANSACTIONS: ", transactions)
 
-    return render_template('trade.html')
+                return render_template('trade.html', transactions=transactions, error="Bought Successfully!")
+
+            elif request.form.get("s1"):
+                print("SELLING")
+
+                symb = request.form["stockid"]
+                print("DELETING SYMBOL:", symb)
+
+                quant = request.form["amount"]
+                quant = int(quant)
+                print("AMOUNT", quant)
+                stock_price = getdata(close='close', symbol=symb)[0]
+                print("STOCK PRICE", stock_price)
+
+                total = quant * stock_price
+                print("You have received $", total)
+
+                stock.sell("stock", symb, quant, path)
+                return render_template('trade.html', error="Sold Successfully!")
+
+        return render_template('trade.html')
+    return render_template('login.html')
 
 #print(stock.query("ronaldo72emiway@gmail.com", "app.db"))
 
