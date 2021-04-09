@@ -1,6 +1,5 @@
 import sqlite3 as s
 
-
 def make_tbl(path: str):
     conn = s.connect(path)
     cur = conn.cursor()
@@ -8,7 +7,6 @@ def make_tbl(path: str):
     tbl = "CREATE TABLE IF NOT EXISTS stock(Date Date, Stock_Symbol Text, Price real, Quantity int, Email Text)"
     cur.execute(tbl)
     conn.commit()
-
 
 def buy(tablename: str, data: tuple, path: str):
     # print(tablename, data, path)

@@ -28,8 +28,8 @@ stock.make_tbl("app.db")
 @app.before_request
 def security():
     g.user = None
-    for i in session:
-        print(session[i])
+    # for i in session:
+    #     print(session[i])
     if 'user_email' in session:
         emails = users.getemail()
         try:
@@ -67,12 +67,20 @@ def home():
                 return render_template('login.html')
             else:
                 return render_template('login.html', error="Password & Retyped Password Not Same")
-        if not name:
-            print("Reset Password")
+        if not name and not password:
+            print("Reset Password:")
+            reset(email)
     if flag:
         return render_template('login.html')
     else:
         return render_template('login.html', error="Incorrect Password")
+
+
+def reset(email : str):
+    print(email)
+    #send_mail(email)
+    return render_template('login.html', error="We have sent you a link to reset your password. Check your mailbox")
+
     
 @app.route('/index')
 def index():
@@ -94,8 +102,7 @@ def trade():
 
     if g.user:
         user_email = g.user
-        transactions = stock.query(user_email[0], path='app.db')
-
+        transactions = stock.query(user_email[0], path)
 
         if request.method == "POST":
 
@@ -120,9 +127,6 @@ def trade():
                 print("USER EMAIL:", user_email)
                 stock.buy("stock", (date, symb, stock_price, quant, user_email[0]), path)
 
-                #For the table
-
-
                 print("TRANSACTIONS: ", transactions)
 
                 return render_template('trade.html', transactions=transactions, error="Bought Successfully!")
@@ -143,9 +147,10 @@ def trade():
                 print("You have received $", total)
 
                 stock.sell("stock", symb, quant, path)
-                return render_template('trade.html', error="Sold Successfully!")
+                return render_template('trade.html', transactions=transactions, error="Sold Successfully!")
 
         return render_template('trade.html')
+
     return render_template('login.html')
 
 #print(stock.query("ronaldo72emiway@gmail.com", "app.db"))
