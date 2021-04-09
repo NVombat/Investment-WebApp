@@ -14,14 +14,16 @@
         <nav id="navbar">
             <div class="container">
                 <h1 class="logo"><a href="index">CVS</a></h1>
+
                 <ul>
                     <li><a href="index">Home</a></li>
                     <li><a href="inv">Investments</a></li>
                     <li><a class="current" href="trade">Trade</a></li>
                     <li><a href="about">About</a></li>
                     <li><a href="contact">Contact</a></li>
-                    <li><button type="submit" id="sign-out">Sign Out</button></li>
+                    <li><button type="submit" id="sign-out" >Sign Out</button></li>
                 </ul>
+
             </div>
         </nav>
     </header>
@@ -29,7 +31,7 @@
     <section class="contact-form1" id="contact-form">
         <div class="contain">
             <h1>Trade Stocks</h1>
-            <form action="">
+            <form action="" method="post">
                 <div class="form-group">
                     <label for="stockid">Stock ID:</label>
                     <input type="text" name="stockid" id="stockid">
@@ -39,8 +41,8 @@
                     <input type="number" name="amount" id="amount">
                 </div>
                 <div class="d-button">
-                    <button type="submit" class="btn">Buy !</button>
-                    <button type="submit" class="btn">Sell !</button>
+                    <button type="submit" class="btn" name="b1" value="b1">Buy !</button>
+                    <button type="submit" class="btn" name="s1" value="s1">Sell !</button>
                 </div>
             </form>
         </div>
@@ -50,7 +52,7 @@
 
     <section id="flip-box">
         <div class="wrapper">
-            <h1>Your Investments</h1>
+            <h1 class="py-4">Investment History</h1>
 
             <table class="stock-table">
                 <tr class="heading">
@@ -61,15 +63,14 @@
                 </tr>
 
                 <!-- Iterate over one of these <tr> </tr> below and remove the other!!! -->
-                <!-- {%for attr in attrs%} -->
-
+            {% for transaction in transactions %}
                 <tr class="data">
-                    <td>10/12/1999</td>
-                    <td>GOOGLE</td>
-                    <td>10000</td>
-                    <td>87.99</td>
+                    <td>{{ transaction[0] }}</td>
+                    <td>{{ transaction[1] }}</td>
+                    <td>{{ transaction[2] }}</td>
+                    <td>{{ transaction[3] }}</td>
                 </tr>
-
+            {% endfor %}
             </table>
         </div>
             

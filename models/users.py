@@ -31,6 +31,14 @@ def checkpwd(pwd: str, email: str):
     return False
 
 
+def reset_pwd(tablename : str, pwd : str):
+    conn = s.connect("app.db")
+    cur = conn.cursor()
+
+    reset = f"UPDATE {tablename} SET Password='{pwd}'" # WHERE Email='{email}'"
+    cur.execute(reset)
+    conn.commit()
+
 def getname(email: tuple):
     email = email[0];
     conn = s.connect("app.db")

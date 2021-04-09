@@ -1,7 +1,7 @@
 import configparser
 import json
 import requests
-
+import datetime as d
 
 def apicall(key: int, symbol: str, date_from: str, date_to: str, limit: int = 1) -> dict:
     """
@@ -31,8 +31,14 @@ def apicall(key: int, symbol: str, date_from: str, date_to: str, limit: int = 1)
     return data
 
 
-def getdata(symbol: str, date_from: str = "2020-08-21",
-            date_to: str = "2020-08-22", **kwargs) -> list:
+#UPDATE DATES TO GET NEW VALUES
+#CURRENT DATE - 
+# date = d.datetime.now()
+# date = date.strftime("%Y-%m-%d")
+# print(date)
+
+def getdata(symbol: str, date_from: str = "2021-04-05",
+            date_to: str = "2021-04-06", **kwargs) -> list:
     """
 
     :rtype: list
@@ -63,6 +69,6 @@ def getdata(symbol: str, date_from: str = "2020-08-21",
 
 
 if __name__ == '__main__':
-    symbol = "NVDA"
-    print(getdata(low='low', high='high', symbol=symbol,
-                  date_from="2021-03-01", date_to="2021-03-02", close="close"))
+    symbol = "GOOGL"
+    print(getdata(close='close', symbol=symbol,
+                  date_from="2021-03-01", date_to="2021-03-02"))
