@@ -184,9 +184,9 @@ img{
 
 /* Showcase */
 #showcase{
-    background: url(../img/stock3.jpg) no-repeat center/cover;
+    background: url(../img/stock4.webp) no-repeat center/cover;
     height: 600px;
-    filter: contrast(80%);
+    /* filter: brightness(80%); */
     /* background-size: contain; */
 }
 #showcase .showcase-content{
