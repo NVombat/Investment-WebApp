@@ -69,17 +69,36 @@ def home():
                 return render_template('login.html', error="Password & Retyped Password Not Same")
         if not name and not password:
             print("Reset Password:")
-            reset(email)
+            reset_password(email)
+            return render_template('login.html', error="We have sent you a link to reset your password. Check your mailbox")
+
     if flag:
         return render_template('login.html')
     else:
         return render_template('login.html', error="Incorrect Password")
 
 
-def reset(email : str):
+def reset_password(email : str):
     print(email)
     #send_mail(email)
-    return render_template('login.html', error="We have sent you a link to reset your password. Check your mailbox")
+    return
+    
+
+@app.route('/reset', methods=["GET", "POST"])
+def reset():
+    if request.method == "POST":
+        pwd = request.form['npassword']
+        repeat_pwd = request.form['rnpassword']
+
+        if pwd and repeat_pwd:
+            print("CHECKING")
+            if pwd == repeat_pwd:
+                users.reset_pwd('user', pwd)
+                print("Resetting password & Updating DB")
+                return render_template('login.html', error="Password Reset Successfully")
+            else:
+                return render_template('reset.html', error="Password & Retyped Password Not Same")
+    return render_template('reset.html')
 
     
 @app.route('/index')
