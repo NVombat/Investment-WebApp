@@ -395,8 +395,9 @@ tr:nth-child(even){
 /* Error / Notif */
 
 #error-msg{
-    color: rgba(255, 0, 0, 0.589);
+    color: rgba(221, 236, 2, 0.842);
     font-size: 20px;
+    font-weight: 900;
 }
 
 /* Footer */

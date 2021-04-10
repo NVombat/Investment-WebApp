@@ -5,7 +5,7 @@ def create_user():
     conn = s.connect("app.db")
     cur = conn.cursor()
 
-    tbl = 'CREATE TABLE IF NOT EXISTS user(Email TEXT, Name TEXT, Password TEXT)'
+    tbl = 'CREATE TABLE IF NOT EXISTS user(Email TEXT, Name TEXT, Password TEXT, Code INT DEFAULT 0)'
     cur.execute(tbl)
     conn.commit()
 
@@ -31,12 +31,32 @@ def checkpwd(pwd: str, email: str):
     return False
 
 
-def reset_pwd(tablename : str, pwd : str):
+def reset_pwd(tablename : str, pwd : str, code : int):
     conn = s.connect("app.db")
     cur = conn.cursor()
 
-    reset = f"UPDATE {tablename} SET Password='{pwd}'" # WHERE Email='{email}'"
+    reset = f"UPDATE {tablename} SET Password='{pwd} WHERE Code='{code}'"
     cur.execute(reset)
+    conn.commit()
+
+def check_code(code : int):
+    conn = s.connect("app.db")
+    cur = conn.cursor()
+
+    chk = f"SELECT * FROM user WHERE Code='{code}'"
+    cur.execute(chk)
+    res = cur.fetchall()
+    if len(res)==0:
+        return False
+    else:
+        return True
+
+def add_code(key : int, email : str):
+    conn = s.connect("app.db")
+    cur = conn.cursor()
+
+    cmnd = f"UPDATE user SET Code='{key}' WHERE Email='{email}'"
+    cur.execute(cmnd)
     conn.commit()
 
 def getname(email: tuple):

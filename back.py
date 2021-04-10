@@ -11,6 +11,7 @@ import datetime as d
 from models import users, contactus, stock
 from api import getdata
 import os
+from sendmail import send_mail
 
 #Path used for all tables
 path = "app.db"
@@ -62,7 +63,7 @@ def home():
         if password and repeat_password:
             print("Sign In")
             if password == repeat_password:
-                users.insert('user', (email, name, password))
+                users.insert('user', (email, name, password, 0))
                 session['user_email'] = email
                 return render_template('login.html')
             else:
@@ -80,22 +81,27 @@ def home():
 
 def reset_password(email : str):
     print(email)
-    #send_mail(email)
+    code = send_mail(email)
     return
     
-
 @app.route('/reset', methods=["GET", "POST"])
 def reset():
     if request.method == "POST":
         pwd = request.form['npassword']
         repeat_pwd = request.form['rnpassword']
+        ver_code = request.form['vcode']
+        ver_code = int(ver_code)
 
-        if pwd and repeat_pwd:
+        if pwd and repeat_pwd and ver_code:
             print("CHECKING")
             if pwd == repeat_pwd:
-                users.reset_pwd('user', pwd)
-                print("Resetting password & Updating DB")
-                return render_template('login.html', error="Password Reset Successfully")
+                if users.check_code(ver_code):
+                    users.reset_pwd('user', pwd)
+                    print("Resetting password & Updating DB")
+                    return render_template('login.html', error="Password Reset Successfully")
+                else:
+                    print("Verification Code Doesnt Match")
+                    return render_template('login.html', error="Try resetting again")
             else:
                 return render_template('reset.html', error="Password & Retyped Password Not Same")
     return render_template('reset.html')
