@@ -63,7 +63,7 @@ def home():
             if password == repeat_password:
                 users.insert('user', (email, name, password, 0))
                 session['user_email'] = email
-                return render_template('login.html')
+                return render_template('login.html', error="Sign Up Complete - Login")
             else:
                 return render_template('login.html', error="Password & Retyped Password Not Same")
 
@@ -72,6 +72,8 @@ def home():
                 print("Reset Password:")
                 #session['user_email'] = email
                 reset_password(email)
+                #SET EMAIL BACK TO EMPTY
+                # request.args.get('email')
                 return render_template('login.html', error="We have sent you a link to reset your password. Check your mailbox")
             else:
                 print("User Doesnt Exist")
@@ -179,26 +181,28 @@ def trade():
 
         return render_template('trade.html')
 
-    return render_template('login.html')
+    return redirect('/')
 
 
 @app.route('/contact', methods=["GET", "POST"])
 def contact():
-    if request.method == "POST":
-        print("Contact Us")
-        email = request.form["email"]
-        print(email)
-        msg = request.form["message"]
-        user_email = users.getemail().pop()
-        print(user_email[0])
-        if email != user_email[0]:
-            print("Incorrect Email")
-            return render_template('contact.html', error="Incorrect Email!")
-        print("Correct Email")
-        contactus.insert(email, msg, path)
-        return render_template('contact.html', error="Thank you, We will get back to you shortly")
+    if g.user:
+        if request.method == "POST":
+            print("Contact Us")
+            email = request.form["email"]
+            print(email)
+            msg = request.form["message"]
+            user_email = users.getemail().pop()
+            print(user_email[0])
+            if email != user_email[0]:
+                print("Incorrect Email")
+                return render_template('contact.html', error="Incorrect Email!")
+            print("Correct Email")
+            contactus.insert(email, msg, path)
+            return render_template('contact.html', error="Thank you, We will get back to you shortly")
 
-    return render_template('contact.html')
+        return render_template('contact.html')
+    return redirect('/')
 
 @app.route('/logout', methods=["GET", "POST"])
 def logout():
