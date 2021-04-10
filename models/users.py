@@ -44,11 +44,11 @@ def check_reset(email : str):
         return True
 
 
-def reset_pwd(tablename : str, pwd : str, code : int):
+def reset_pwd(pwd : str, code : int):
     conn = s.connect("app.db")
     cur = conn.cursor()
 
-    reset = f"UPDATE {tablename} SET Password='{pwd} WHERE Code='{code}'"
+    reset = f"UPDATE user SET Password='{pwd}' WHERE Code='{code}'"
     cur.execute(reset)
     conn.commit()
 
