@@ -11,7 +11,7 @@ import datetime as d
 from models import users, contactus, stock
 from api import getdata
 import os
-from sendmail import send_link
+from sendmail import send_mail
 
 #Path used for all tables
 path = "app.db"
@@ -87,7 +87,7 @@ def home():
 
 def reset_password(email : str):
     print(email)
-    send_link(email)
+    send_mail(email)
     
 @app.route('/reset', methods=["GET", "POST"])
 def reset():
