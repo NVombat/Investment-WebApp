@@ -55,7 +55,7 @@ def send_link(email : str):
     print("EMAIL:", email)
 
     # Create the plain-text and HTML version of your message
-    text = f"""\
+    text = """\
     Dear User,
     Please follow this link to reset your "Code"Vid19 Password for the {email} account:
     This is your 4 Digit Verification Code: {key}
@@ -68,10 +68,11 @@ def send_link(email : str):
     html = """\
     <html>
     <body>
-        <p>Dear User,<br>
-        Please follow this link to reset your "Code"Vid19 Password for the {email} account:<br><br>
+        <p>
+        Dear User,<br>
+        Please follow this link to reset your "Code"Vid19 Password for the {{ email }} account: <br><br>
         <a href="http://localhost:8000/reset">Reset Password</a> <br><br>
-        This is your 4 Digit Verification Code: {key}<br><br>
+        This is your 4 Digit Verification Code: {{ key }}<br><br>
         If you didnt ask to reset your password please IGNORE this email!<br><br>
         Thank You <br>
         Warm Regards <br>

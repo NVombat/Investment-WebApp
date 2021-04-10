@@ -87,10 +87,10 @@ def home():
 
 def reset_password(email : str):
     print(email)
-    code = send_link(email)
+    send_link(email)
     
-@app.route('/reset_pass', methods=["GET", "POST"])
-def reset_pass():
+@app.route('/reset', methods=["GET", "POST"])
+def reset():
     if request.method == "POST":
         pwd = request.form['npassword']
         repeat_pwd = request.form['rnpassword']
@@ -102,13 +102,15 @@ def reset_pass():
             print("CHECKING")
             if pwd == repeat_pwd:
                 if users.check_code(ver_code):
-                    users.reset_pwd('user', pwd, ver_code)
+                    users.reset_pwd(pwd, ver_code)
                     print("Resetting password & Updating DB")
                     users.reset_code(ver_code)
-                    return render_template('login.html', error="Password Reset Successfully")
+                    return redirect("/")
+                    #return render_template('login.html', error="Password Reset Successfully")
                 else:
                     print("Verification Code Doesnt Match")
-                    return render_template('login.html', error="Try resetting again")
+                    return redirect("/")
+                    #return render_template('login.html', error="Try resetting again")
             else:
                 return render_template('reset.html', error="Password & Retyped Password Not Same")
     return render_template('reset.html')
