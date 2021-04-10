@@ -1,0 +1,33 @@
+*{
+    margin: 0;
+    padding: 0;
+    font-family: 'Monteserat';
+    scroll-behavior: smooth;
+}
+
+.h-head{
+    text-align: center;
+    margin: 60px auto 20px;
+}
+
+.content{
+    margin: 40px 15% 20px;
+    text-align: justify;
+}
+
+.doc-content{
+    width: 500px;
+    justify-content: center;
+    margin: 40px auto;
+    text-align: center;
+    border: solid 5px #444;
+    border-radius: 5%;
+}
+
+.vid-content{
+    margin: 0 20%;
+    border: solid 2px #444;
+    border-radius: 8%;
+}
+
+
