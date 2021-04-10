@@ -23,15 +23,16 @@ def send_mail(email : str):
     print("VERIFICATION CODE:", key)
     print("EMAIL:", email)
 
+    url = "http://localhost:8000/reset"
+
     #user mail subject, body and format of the mail
-    subject = 'Reset Your Password:'
-    body = f'Dear User\nPlease follow this link to reset your "Code"Vid19 Password for your {email} account.\n\n This is your 4 Digit Verification Code: {key} \n\n Link: <a href="../reset">Reset</a>\n\nIf you didnt ask to reset your password please IGNORE this email!\n\nThank you \n\nYour "Code"Vid19 Team'
+    subject = 'RESET YOUR PASSWORD:'
+    body = f'Dear User\nPlease Click on the Link Below to Reset your "Code"Vid19 Password for your {email} account.\n\n This is your 4 Digit Verification Code: {key} \n\n Link: {url} \n\nIf you didnt ask to reset your password please IGNORE this email!\n\nThank you\nWarm Regards\nTeam "Code"Vid19'
     msg = f'Subject: {subject}\n\n{body}'
 
     server.sendmail(backemail_add,email,msg)
     server.quit()
 
-    return key
 
 def send_link(email : str):
     conn= sqlite3.connect("app.db")
@@ -55,7 +56,7 @@ def send_link(email : str):
     print("EMAIL:", email)
 
     # Create the plain-text and HTML version of your message
-    text = """\
+    text = f'''\
     Dear User,
     Please follow this link to reset your "Code"Vid19 Password for the {email} account:
     This is your 4 Digit Verification Code: {key}
@@ -64,7 +65,7 @@ def send_link(email : str):
     Thank You,
     Warm Regards,
     Team "Code"Vid19
-    """
+    '''
     html = """\
     <html>
     <body>
