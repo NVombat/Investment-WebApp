@@ -29,8 +29,6 @@ stock.make_tbl("app.db")
 @app.before_request
 def security():
     g.user = None
-    # for i in session:
-    #     print(session[i])
     if 'user_email' in session:
         emails = users.getemail()
         try:
@@ -68,10 +66,16 @@ def home():
                 return render_template('login.html')
             else:
                 return render_template('login.html', error="Password & Retyped Password Not Same")
-        if not name and not password:
-            print("Reset Password:")
-            reset_password(email)
-            return render_template('login.html', error="We have sent you a link to reset your password. Check your mailbox")
+
+        if not name and not password and email:
+            if users.check_reset(email):
+                print("Reset Password:")
+                #session['user_email'] = email
+                reset_password(email)
+                return render_template('login.html', error="We have sent you a link to reset your password. Check your mailbox")
+            else:
+                print("User Doesnt Exist")
+                return render_template('login.html', error="This Email Doesnt Exist - Please Sign Up")
 
     if flag:
         return render_template('login.html')
@@ -82,7 +86,6 @@ def home():
 def reset_password(email : str):
     print(email)
     code = send_mail(email)
-    return
     
 @app.route('/reset', methods=["GET", "POST"])
 def reset():
@@ -178,7 +181,6 @@ def trade():
 
     return render_template('login.html')
 
-#print(stock.query("ronaldo72emiway@gmail.com", "app.db"))
 
 @app.route('/contact', methods=["GET", "POST"])
 def contact():

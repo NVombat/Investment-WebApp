@@ -24,8 +24,7 @@ def send_mail(email : str):
 
     #user mail subject, body and format of the mail
     subject = 'Reset Your Password:'
-    body = f'Dear User\nPlease follow this link to reset your "Code"Vid19 Password for your {email} account.\n\n This is your 4 Digit Verification Code: {key} \n\n Link: \n\nIf you didnt ask to reset your password please IGNORE this email!\n\nThank you \n\nYour "Code"Vid19 Team'
-
+    body = f'Dear User\nPlease follow this link to reset your "Code"Vid19 Password for your {email} account.\n\n This is your 4 Digit Verification Code: {key} \n\n Link: <a href="reset">Reset Password</a>\n\nIf you didnt ask to reset your password please IGNORE this email!\n\nThank you \n\nYour "Code"Vid19 Team'
     msg = f'Subject: {subject}\n\n{body}'
 
     server.sendmail(backemail_add,email,msg)
