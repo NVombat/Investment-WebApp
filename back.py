@@ -11,7 +11,7 @@ import datetime as d
 from models import users, contactus, stock
 from api import getdata
 import os
-from sendmail import send_mail
+from sendmail import send_link
 
 #Path used for all tables
 path = "app.db"
@@ -87,22 +87,24 @@ def home():
 
 def reset_password(email : str):
     print(email)
-    code = send_mail(email)
+    code = send_link(email)
     
-@app.route('/reset', methods=["GET", "POST"])
-def reset():
+@app.route('/reset_pass', methods=["GET", "POST"])
+def reset_pass():
     if request.method == "POST":
         pwd = request.form['npassword']
         repeat_pwd = request.form['rnpassword']
         ver_code = request.form['vcode']
         ver_code = int(ver_code)
+        print(ver_code)
 
         if pwd and repeat_pwd and ver_code:
             print("CHECKING")
             if pwd == repeat_pwd:
                 if users.check_code(ver_code):
-                    users.reset_pwd('user', pwd)
+                    users.reset_pwd('user', pwd, ver_code)
                     print("Resetting password & Updating DB")
+                    users.reset_code(ver_code)
                     return render_template('login.html', error="Password Reset Successfully")
                 else:
                     print("Verification Code Doesnt Match")
