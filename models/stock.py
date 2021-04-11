@@ -15,8 +15,8 @@ def buy(tablename: str, data: tuple, path: str):
 
     # print("SYMBOL FROM TUPLE: ", data[1])
     # print("QUANTITY FROM TUPLE: ", data[3])
-
-    cmnd = f"SELECT * FROM {tablename} WHERE Stock_Symbol='{data[1]}'"
+    # print("EMAIL: ", data[4])
+    cmnd = f"SELECT * FROM {tablename} WHERE Stock_Symbol='{data[1]}' AND Email='{data[4]}'"
     cur.execute(cmnd)
     res = cur.fetchall()
     if len(res) == 0:
@@ -25,17 +25,17 @@ def buy(tablename: str, data: tuple, path: str):
         conn.commit()
         print("INSERTED NEW INTO TABLE - NO PREVIOUS VALUES")
     else:
-        b2 = f"UPDATE {tablename} SET Quantity=Quantity+'{data[3]}' WHERE Stock_Symbol = '{data[1]}'"
+        b2 = f"UPDATE {tablename} SET Quantity=Quantity+'{data[3]}' WHERE Stock_Symbol = '{data[1]}' AND Email = '{data[4]}'"
         cur.execute(b2)
         conn.commit()
         print("UPDATED VALUE IN TABLE - ALREADY EXISTED")
 
 
-def sell(tablename: str, sym: str, quant: int, path: str):
+def sell(tablename: str, data : tuple, path: str):
     conn = s.connect(path)
     cur = conn.cursor()
 
-    rem = f"SELECT * FROM {tablename} WHERE Stock_Symbol='{sym}'"
+    rem = f"SELECT * FROM {tablename} WHERE Stock_Symbol='{data[0]}' AND Email = '{data[2]}'"
     cur.execute(rem)
     res = cur.fetchall()
     print("SELLING RES: ", res)
@@ -45,15 +45,15 @@ def sell(tablename: str, sym: str, quant: int, path: str):
     else:
         curr_quant = int(res[0][3])
         print(curr_quant)
-        if quant > curr_quant:
+        if data[1] > curr_quant:
             print("YOU ARE TRYING TO SELL MORE THAN YOU OWN")
-        elif quant - curr_quant == 0:
-            s1 = f"DELETE FROM {tablename} WHERE Stock_Symbol='{sym}'"
+        elif data[1] - curr_quant == 0:
+            s1 = f"DELETE FROM {tablename} WHERE Stock_Symbol='{data[0]}' AND Email = '{data[2]}'"
             cur.execute(s1)
             conn.commit()
             print("STOCK GONE - ALL SOLD")
         else:
-            s2 = f"UPDATE {tablename} SET Quantity=Quantity-'{quant}' WHERE Stock_Symbol='{sym}'"
+            s2 = f"UPDATE {tablename} SET Quantity=Quantity-'{data[1]}' WHERE Stock_Symbol='{data[0]}' AND Email = '{data[2]}'"
             cur.execute(s2)
             conn.commit()
             print("SOLD - QUANTITY UPDATED")

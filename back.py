@@ -180,7 +180,8 @@ def trade():
                 total = quant * stock_price
                 print("You have received $", total)
 
-                stock.sell("stock", symb, quant, path)
+                data = (symb, quant, user_email[0])
+                stock.sell("stock", data, path)
                 return render_template('trade.html', transactions=transactions, error="Sold Successfully!")
 
         return render_template('trade.html')
@@ -207,13 +208,6 @@ def contact():
 
         return render_template('contact.html')
     return redirect('/')
-
-@app.route('/logout', methods=["GET", "POST"])
-def logout():
-    if request.method()=="POST":
-        session.pop()
-        g.user = None
-        return redirect("/")
 
 if __name__ == '__main__':
     app.run(debug=True, port=8000)
