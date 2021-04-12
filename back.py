@@ -7,19 +7,23 @@ from flask import (
     redirect
 )
 
+
 import datetime as d
 from models import users, contactus, stock
 from api import getdata
 import os
 from sendmail import send_mail
 
+
 #Path used for all tables
 path = "app.db"
+
 
 templates_path = os.path.abspath('./templates')
 app = Flask(__name__, template_folder=templates_path)
 app.secret_key = 'somekey'
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
+
 
 users.create_user()
 contactus.create_tbl("app.db")
@@ -72,8 +76,6 @@ def home():
                 print("Reset Password:")
                 #session['user_email'] = email
                 reset_password(email)
-                #SET EMAIL BACK TO EMPTY
-                # request.args.get('email')
                 return render_template('login.html', error="We have sent you a link to reset your password. Check your mailbox")
             else:
                 print("User Doesnt Exist")
@@ -84,16 +86,19 @@ def home():
     else:
         return render_template('login.html', error="Incorrect Password")
 
+
 @app.route('/index')
 def index():
     if g.user:
         return render_template('index.html')
     return redirect('/')
 
+
 def reset_password(email : str):
     print(email)
     send_mail(email)
-    
+
+
 @app.route('/reset', methods=["GET", "POST"])
 def reset():
     if request.method == "POST":
@@ -121,18 +126,19 @@ def reset():
     return render_template('reset.html')
 
 
-
 @app.route('/inv')
 def inv():
     if g.user:
         return render_template('inv.html')
     return redirect('/')
 
+
 @app.route('/about')
 def about():
     if g.user:
         return render_template('about.html')
     return redirect('/')
+
 
 @app.route('/trade', methods=["GET", "POST"])
 def trade():
@@ -164,6 +170,7 @@ def trade():
                 print("USER EMAIL:", user_email)
                 stock.buy("stock", (date, symb, stock_price, quant, user_email[0]), path)
 
+                
                 print("TRANSACTIONS: ", transactions)
 
                 return render_template('trade.html', transactions=transactions, error="Bought Successfully!")
@@ -211,6 +218,7 @@ def contact():
 
         return render_template('contact.html')
     return redirect('/')
+
 
 if __name__ == '__main__':
     app.run(debug=True, port=8000)
