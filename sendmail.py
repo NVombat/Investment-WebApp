@@ -1,28 +1,34 @@
 import smtplib,ssl
-from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-import os
+from email.mime.text import MIMEText
 import sqlite3
-from models.users import add_code
 import random
+import os
+from models.users import add_code
 
-#backend_mail and backend_pwd are environt variables
-#by importing os, backmail_add and backmail_pwd are accessing the environment variable values
+
+#Sends mail for resetting password to the user
 def send_mail(email : str):
     conn= sqlite3.connect("app.db")
     cur = conn.cursor()
 
+    #by importing os, backmail_add and backmail_pwd are accessing the environment variable values
+    #backend_mail and backend_pwd are environment variables
     backemail_add = os.environ.get('backend_mail')
     backemail_pwd = os.environ.get('backend_pwd')
     
+    #Starts a server on port 465 and logs into senders email id so it can send the mail
     server = smtplib.SMTP_SSL("smtp.gmail.com",465)
     server.login(backemail_add,backemail_pwd)
 
+    #Generates a 4 digit random verification code to verify the user while resetting the password
     key = random.randint(1000,9999)
+    #Inserts code into user table
     add_code(key, email)
     print("VERIFICATION CODE:", key)
     print("EMAIL:", email)
 
+    #RESET URL
     url = "http://localhost:8000/reset"
 
     #user mail subject, body and format of the mail
@@ -30,27 +36,35 @@ def send_mail(email : str):
     body = f'Dear User\nPlease Click on the Link Below to Reset your "Code"Vid19 Password for your {email} account.\n\n This is your 4 Digit Verification Code: {key} \n\n Link: {url} \n\nIf you didnt ask to reset your password please IGNORE this email!\n\nThank you\nWarm Regards\nTeam "Code"Vid19'
     msg = f'Subject: {subject}\n\n{body}'
 
+    #Sends the mail with the data and quits the server
     server.sendmail(backemail_add,email,msg)
     server.quit()
 
 
+#Sends the user an email with a reset link using html for the url
 def send_link(email : str):
     conn= sqlite3.connect("app.db")
     cur = conn.cursor()
 
+    #by importing os, backmail_add and backmail_pwd are accessing the environment variable values
+    #backend_mail and backend_pwd are environment variables
     backemail_add = os.environ.get('backend_mail')
     backemail_pwd = os.environ.get('backend_pwd')
-
+    
+    #Details to log into the server and the email id of the recepient
     sender_email = backemail_add
     receiver_email = email
     password = backemail_pwd
 
+    #Uses a function to first generate the parts of the mail and then later combines them to form the mail
     message = MIMEMultipart("alternative")
     message["Subject"] = "RESET YOUR PASSWORD"
     message["From"] = sender_email
     message["To"] = receiver_email
 
+    #Generates a 4 digit random verification code to verify the user while resetting the password
     key = random.randint(1000,9999)
+    #Inserts code into user table
     add_code(key, email)
     print("VERIFICATION CODE:", key)
     print("EMAIL:", email)
@@ -97,6 +111,7 @@ def send_link(email : str):
         server.login(sender_email, password)
         server.sendmail(sender_email, receiver_email, message.as_string())
         server.quit()
+
 
 if __name__ == "__main__":
     # backemail_add = os.environ.get('backend_mail')
