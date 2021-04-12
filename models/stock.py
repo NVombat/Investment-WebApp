@@ -1,13 +1,19 @@
 import sqlite3 as s
 
+
+#Creates the stock table in database
 def make_tbl(path: str):
     conn = s.connect(path)
     cur = conn.cursor()
 
+    #Command to create table if it doesnt exist
+    #Has 5 fields - DATE, STOCK SYMBOL, PRICE, QUANTITY & EMAIL ID
     tbl = "CREATE TABLE IF NOT EXISTS stock(Date Date, Stock_Symbol Text, Price real, Quantity int, Email Text)"
     cur.execute(tbl)
     conn.commit()
 
+
+#Buy Function INSERTS into table when user buys stocks
 def buy(tablename: str, data: tuple, path: str):
     # print(tablename, data, path)
     conn = s.connect(path)
@@ -16,14 +22,20 @@ def buy(tablename: str, data: tuple, path: str):
     # print("SYMBOL FROM TUPLE: ", data[1])
     # print("QUANTITY FROM TUPLE: ", data[3])
     # print("EMAIL: ", data[4])
+
+    #Checks table to see if the user(email) already exists for the stock symbol that has been requested
     cmnd = f"SELECT * FROM {tablename} WHERE Stock_Symbol='{data[1]}' AND Email='{data[4]}'"
     cur.execute(cmnd)
+    #Fetches results in res
     res = cur.fetchall()
+    #If res is an empty array - User has not bought that particular stock thus insert into table as a new entry
     if len(res) == 0:
         b1 = f"INSERT INTO {tablename} VALUES {data}"
         cur.execute(b1)
         conn.commit()
         print("INSERTED NEW INTO TABLE - NO PREVIOUS VALUES")
+    #If res is not empty - User has already bought stocks with that symbol
+    #Update the quantity of that particular stock for that particular user
     else:
         b2 = f"UPDATE {tablename} SET Quantity=Quantity+'{data[3]}' WHERE Stock_Symbol = '{data[1]}' AND Email = '{data[4]}'"
         cur.execute(b2)
@@ -31,27 +43,36 @@ def buy(tablename: str, data: tuple, path: str):
         print("UPDATED VALUE IN TABLE - ALREADY EXISTED")
 
 
+#Sell function DELETES from table when user sells stocks
 def sell(tablename: str, data : tuple, path: str):
     conn = s.connect(path)
     cur = conn.cursor()
 
+    #Checks table to see if the user(email) has stocks of that particular symbol
     rem = f"SELECT * FROM {tablename} WHERE Stock_Symbol='{data[0]}' AND Email = '{data[2]}'"
     cur.execute(rem)
+    #Query result stored in res array
     res = cur.fetchall()
     print("SELLING RES: ", res)
 
+    #If res array is empty - The user doesnt own that stock thus cant sell it
     if len(res) == 0:
         print("YOU DO NOT OWN THIS STOCK")
     else:
+        #Curr_Quant stores quantity of that particular stock the user owns currently
         curr_quant = int(res[0][3])
         print(curr_quant)
+        #Rejects request if user wants to sell more than the amount he owns
         if data[1] > curr_quant:
             print("YOU ARE TRYING TO SELL MORE THAN YOU OWN")
+        #If user owns the same amount as the amount he wants to sell
         elif data[1] - curr_quant == 0:
+            #Deletes the particular stock column from the table for that particular user
             s1 = f"DELETE FROM {tablename} WHERE Stock_Symbol='{data[0]}' AND Email = '{data[2]}'"
             cur.execute(s1)
             conn.commit()
             print("STOCK GONE - ALL SOLD")
+        #Deducts the amount the user wants to sell from the amount the user owns by updating table for that particular user
         else:
             s2 = f"UPDATE {tablename} SET Quantity=Quantity-'{data[1]}' WHERE Stock_Symbol='{data[0]}' AND Email = '{data[2]}'"
             cur.execute(s2)
@@ -59,6 +80,7 @@ def sell(tablename: str, data : tuple, path: str):
             print("SOLD - QUANTITY UPDATED")
 
 
+#Queries stock table to fetch all stocks purchased by a particular user
 def query(email: str, path: str):
     conn = s.connect(path)
     cur = conn.cursor()

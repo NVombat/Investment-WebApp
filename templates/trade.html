@@ -21,7 +21,6 @@
                     <li><a class="current" href="trade">Trade</a></li>
                     <li><a href="about">About</a></li>
                     <li><a href="contact">Contact</a></li>
-                    <!-- <li><button type="submit" id="sign-out" >Sign Out</button></li> -->
                     <li><a href="http://localhost:8000/" class="f90-logout-button">Sign Out</a></li>
                 </ul>
 
@@ -44,11 +43,12 @@
                 <div class="d-button">
                     <button type="submit" class="btn" name="b1" value="b1">Buy !</button>
                     <button type="submit" class="btn" name="s1" value="s1">Sell !</button>
+                    <!-- <form><script src="https://checkout.razorpay.com/v1/payment-button.js" data-payment_button_id="pl_Gy4wOqeIlTOxf8" async> </script> </form> -->
                 </div>
             </form>
         </div>
     </section>
-    
+
     <hr>
 
     <section id="flip-box">
@@ -63,7 +63,6 @@
                     <th>Quantity</th>
                 </tr>
 
-                <!-- Iterate over one of these <tr> </tr> below and remove the other!!! -->
             {% for transaction in transactions %}
                 <tr class="data">
                     <td>{{ transaction[0] }}</td>
