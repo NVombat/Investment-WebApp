@@ -40,9 +40,9 @@ def security():
 
 @app.route('/', methods=["GET", "POST"])
 def home():
+    session.pop("user_email", None)
     flag = True
     if request.method == "POST":
-
         name = request.form['name']
         email = request.form['email']
         password = request.form['password']
@@ -54,7 +54,7 @@ def home():
                 print("Login")
                 if users.checkpwd(password, email):
                     session['user_email'] = email
-                    return render_template('index.html')
+                    return redirect('/index')
                 else:
                     flag=False
 
@@ -84,6 +84,11 @@ def home():
     else:
         return render_template('login.html', error="Incorrect Password")
 
+@app.route('/index')
+def index():
+    if g.user:
+        return render_template('index.html')
+    return redirect('/')
 
 def reset_password(email : str):
     print(email)
@@ -115,25 +120,23 @@ def reset():
                 return render_template('reset.html', error="Password & Retyped Password Not Same")
     return render_template('reset.html')
 
-    
-@app.route('/index')
-def index():
-    return render_template('index.html')
 
 
 @app.route('/inv')
 def inv():
-    return render_template('inv.html')
-
+    if g.user:
+        return render_template('inv.html')
+    return redirect('/')
 
 @app.route('/about')
 def about():
-    return render_template('about.html')
-
+    if g.user:
+        return render_template('about.html')
+    return redirect('/')
 
 @app.route('/trade', methods=["GET", "POST"])
 def trade():
-
+    print(g.user)
     if g.user:
         user_email = g.user
         transactions = stock.query(user_email[0], path)
