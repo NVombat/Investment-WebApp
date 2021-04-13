@@ -33,12 +33,22 @@ def apicall(key: int, symbol: str, date_from: str, date_to: str, limit: int = 1)
 
 #UPDATE DATES TO GET NEW VALUES
 #CURRENT DATE - 
-# date = d.datetime.now()
-# date = date.strftime("%Y-%m-%d")
-# print(date)
+date = d.datetime.now()
+date = date.strftime("%Y-%m-%d")
+#print("Today the date is:", date)
 
-def getdata(symbol: str, date_from: str = "2021-04-05",
-            date_to: str = "2021-04-06", **kwargs) -> list:
+today = d.date.today()
+close_date = today - d.timedelta(days=1)
+close_date = close_date.strftime("%Y-%m-%d")
+#print("Yesterday the date was:", close_date)
+
+open_date = today - d.timedelta(days=2)
+open_date = open_date.strftime("%Y-%m-%d")
+#print("Two days ago the date was:", open_date)
+
+
+def getdata(symbol: str, date_from: str = open_date,
+            date_to: str = close_date, **kwargs) -> list:
     """
 
     :rtype: list
@@ -71,4 +81,4 @@ def getdata(symbol: str, date_from: str = "2021-04-05",
 if __name__ == '__main__':
     symbol = "GOOGL"
     print(getdata(close='close', symbol=symbol,
-                  date_from="2021-03-01", date_to="2021-03-02"))
+                  date_from=open_date, date_to=close_date))
