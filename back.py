@@ -46,18 +46,21 @@ def security():
             print("Failed")
 
 
-#Decorator for LOGIN page
+#LOGIN page
 @app.route('/', methods=["GET", "POST"])
 def home():
     session.pop("user_email", None)
     flag = True
+    """
+    If a post request is made on the login page
+    Take input from the fields - Name, Email, Password, Confirm Password
+    """
     if request.method == "POST":
         name = request.form['name']
         email = request.form['email']
         password = request.form['password']
-
         repeat_password = request.form['rpassword']
-
+        
         if password:
             if len(repeat_password) == 0:
                 print("Login")
@@ -92,23 +95,36 @@ def home():
         return render_template('login.html', error="Incorrect Password")
 
 
-#Decorator for HOME page
+#HOME page
 @app.route('/index')
 def index():
+    #Enters the page only if a user is signed in - g.user represents the current user
     if g.user:
         return render_template('index.html')
     return redirect('/')
 
 
-
+"""
+Function to reset password
+Sends the mail for resetting password to user
+"""
 def reset_password(email : str):
     print(email)
     send_mail(email)
 
 
-#Decorator for RESET PASSWORD page
+#RESET PASSWORD page
 @app.route('/reset', methods=["GET", "POST"])
 def reset():
+    """
+    Once the user clicks on the reset password link sent to his mail he is taken to the reset password page
+    If a post request is generated (when user clicks submit) - all the input fields are fetched (pwd, rpwd, code)
+    If all three fields are filled it checks if the password and repeat password match
+    If the two passwords match the verification code is checked in the database to verify user
+    If code matches the user then the password is updated for the user in the database 
+    The code is set back to 0 for that user (to avoid repetition of codes)
+    Otherwise an error is generated
+    """
     if request.method == "POST":
         pwd = request.form['npassword']
         repeat_pwd = request.form['rnpassword']
@@ -134,25 +150,30 @@ def reset():
     return render_template('reset.html')
 
 
-#Decorator for ANALYSIS page
+#ANALYSIS page
 @app.route('/inv')
 def inv():
+    #Enters the page only if a user is signed in - g.user represents the current user
     if g.user:
         return render_template('inv.html')
+    #Redirects to login page if g.user is empty -> No user signed in 
     return redirect('/')
 
 
-#Decorator for ABOUT US page
+#ABOUT US page
 @app.route('/about')
 def about():
+    #Enters the page only if a user is signed in - g.user represents the current user
     if g.user:
         return render_template('about.html')
+    #Redirects to login page if g.user is empty -> No user signed in 
     return redirect('/')
 
 
-#Decorator for TRADE page
+#TRADE page
 @app.route('/trade', methods=["GET", "POST"])
 def trade():
+    #Enters the page only if a user is signed in - g.user represents the current user
     print(g.user)
     if g.user:
         user_email = g.user
@@ -206,14 +227,22 @@ def trade():
                 return render_template('trade.html', transactions=transactions, error="Sold Successfully!")
 
         return render_template('trade.html')
-
+    #Redirects to login page if g.user is empty -> No user signed in 
     return redirect('/')
 
 
-#Decorator for CONTACT US page
+
+#CONTACT US page
 @app.route('/contact', methods=["GET", "POST"])
 def contact():
+    #Enters the page only if a user is signed in - g.user represents the current user
     if g.user:
+        """
+        If a post request is generated (when user clicks submit)
+        The email and message are fetched from the input fields
+        The entered email is then compared with g.user to make sure it matches the user
+        If the emails dont match it generates an error and if it does match then we insert data into contact table
+        """
         if request.method == "POST":
             print("Contact Us")
             email = request.form["email"]
@@ -229,6 +258,7 @@ def contact():
             return render_template('contact.html', error="Thank you, We will get back to you shortly")
 
         return render_template('contact.html')
+    #Redirects to login page if g.user is empty -> No user signed in 
     return redirect('/')
 
 
