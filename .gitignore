@@ -110,7 +110,12 @@ venv/
 ENV/
 env.bak/
 venv.bak/
-
+analysis/AAPL.csv
+analysis/google.csv
+analysis/google.h5
+analysis/AAPL.h5
+analysis/TSLA.csv
+analysis/TSLA.h5
 # Spyder project settings
 .spyderproject
 .spyproject
