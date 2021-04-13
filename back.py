@@ -9,10 +9,13 @@ from flask import (
 
 
 import datetime as d
-from models import users, contactus, stock
-from api import getdata
 import os
+
+
+#Imports functions from other folders
+from models import users, contactus, stock
 from sendmail import send_mail
+from api import getdata
 
 
 #Path used for all tables
@@ -25,6 +28,7 @@ app.secret_key = 'somekey'
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
 
+#Creates all the tables when the website is run
 users.create_user()
 contactus.create_tbl("app.db")
 stock.make_tbl("app.db")
@@ -42,6 +46,7 @@ def security():
             print("Failed")
 
 
+#Decorator for LOGIN page
 @app.route('/', methods=["GET", "POST"])
 def home():
     session.pop("user_email", None)
@@ -87,6 +92,7 @@ def home():
         return render_template('login.html', error="Incorrect Password")
 
 
+#Decorator for HOME page
 @app.route('/index')
 def index():
     if g.user:
@@ -94,11 +100,13 @@ def index():
     return redirect('/')
 
 
+
 def reset_password(email : str):
     print(email)
     send_mail(email)
 
 
+#Decorator for RESET PASSWORD page
 @app.route('/reset', methods=["GET", "POST"])
 def reset():
     if request.method == "POST":
@@ -126,6 +134,7 @@ def reset():
     return render_template('reset.html')
 
 
+#Decorator for ANALYSIS page
 @app.route('/inv')
 def inv():
     if g.user:
@@ -133,6 +142,7 @@ def inv():
     return redirect('/')
 
 
+#Decorator for ABOUT US page
 @app.route('/about')
 def about():
     if g.user:
@@ -140,6 +150,7 @@ def about():
     return redirect('/')
 
 
+#Decorator for TRADE page
 @app.route('/trade', methods=["GET", "POST"])
 def trade():
     print(g.user)
@@ -199,6 +210,7 @@ def trade():
     return redirect('/')
 
 
+#Decorator for CONTACT US page
 @app.route('/contact', methods=["GET", "POST"])
 def contact():
     if g.user:
