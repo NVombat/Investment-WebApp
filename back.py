@@ -4,7 +4,8 @@ from flask import (
     g,
     render_template,
     request,
-    redirect
+    redirect,
+    url_for
 )
 
 
@@ -14,7 +15,7 @@ import os
 
 #Imports functions from other folders
 from models import users, contactus, stock
-from sendmail import send_mail
+from sendmail import send_mail, send_buy, send_sell
 from api import getdata
 
 
@@ -33,7 +34,10 @@ users.create_user()
 contactus.create_tbl("app.db")
 stock.make_tbl("app.db")
 
-
+'''
+Sets the current user - g.user to none and then checks if the user is in session
+If the user is in session then their email is fetched and g.user is updated to that email
+'''
 @app.before_request
 def security():
     g.user = None
@@ -49,7 +53,9 @@ def security():
 #LOGIN page
 @app.route('/', methods=["GET", "POST"])
 def home():
+    #The particular user is removed from session
     session.pop("user_email", None)
+    #Flag checks if the password entered by the user is correct or not
     flag = True
     """
     If a post request is made on the login page
@@ -61,6 +67,11 @@ def home():
         password = request.form['password']
         repeat_password = request.form['rpassword']
         
+        '''
+        If the password field has a password, and the repeat password is empty the user is trying to login
+        The Password is verified by checking the database for that user
+        If the password matches the user is added to the session otherwise the flag variable is set to false
+        '''
         if password:
             if len(repeat_password) == 0:
                 print("Login")
@@ -70,8 +81,14 @@ def home():
                 else:
                     flag=False
 
+        '''
+        If the password and repeat password fields are filled - SIGN UP
+        If they both are the same then a new user is added to the USER TABLE in the database with all the data
+        The user is then added to the session and the user is redirected to the login page
+        If the fields dont match the user is alerted and redirected back to the login page to try again
+        '''
         if password and repeat_password:
-            print("Sign In")
+            print("Sign Up")
             if password == repeat_password:
                 users.insert('user', (email, name, password, 0))
                 session['user_email'] = email
@@ -79,6 +96,12 @@ def home():
             else:
                 return render_template('login.html', error="Password & Retyped Password Not Same")
 
+        '''
+        If only the email field is filled it means the user has requested to reset their password
+        First the User table is looked up to see if the user exists (if the password can be reset)
+        The password is reset if the user exists through the reset process (mail, verification code ...)
+        If the user doesnt exist an error message is generated and the user is redirected back to the login page
+        '''
         if not name and not password and email:
             if users.check_reset(email):
                 print("Reset Password:")
@@ -88,7 +111,11 @@ def home():
             else:
                 print("User Doesnt Exist")
                 return render_template('login.html', error="This Email Doesnt Exist - Please Sign Up")
-
+    
+    '''
+    If the flag variable is true then the user has entered the correct password and is redirected to the login page - FLAG VALUE IS TRUE INITIALLY
+    If the flag variable is false then the user has entered the wrong password and is redirected to the login page
+    '''
     if flag:
         return render_template('login.html')
     else:
@@ -186,57 +213,104 @@ def trade():
     #Enters the page only if a user is signed in - g.user represents the current user
     print(g.user)
     if g.user:
+        '''
+        uses the user email id to query the users transactions
+        this transactions array is then received by the table on the html page
+        '''
         user_email = g.user
         transactions = stock.query(user_email[0], path)
 
         if request.method == "POST":
-
+            '''
+            If a post request is generated (button clicked) the user wants to buy or sell stocks
+            It is then checked whether the user wants to buy or sell (based on the button pressed)
+            '''
+            #BUYING
             if request.form.get("b1"):
-                print("BUYING")
-
-                date = d.datetime.now()
-                date = date.strftime("%m/%d/%Y, %H:%M:%S")
-
+                #The data from the fields on the page are fetched
                 symb = request.form["stockid"]
-
                 quant = request.form["amount"]
-                quant = int(quant)
-                print("AMOUNT", quant)
-                stock_price = getdata(close='close', symbol=symb)[0]
-                print("STOCK PRICE", stock_price)
-
-                total = quant * stock_price
-
-                print("You have spent $", total)
-
-                print("USER EMAIL:", user_email)
-                stock.buy("stock", (date, symb, stock_price, quant, user_email[0]), path)
-
                 
-                print("TRANSACTIONS: ", transactions)
+                '''
+                If both the fields had data then the current date and time is first calculated
+                Then the quantity is stored as an integer
+                The stock price api is called to calculate the price of that particular stock
+                The total amount of money spent is then calculated using price and quantity
+                The STOCK TABLE is then updated with this data using the buy function
+                A mail is sent to the user alerting them of the transaction made
+                The user is now redirected back to the trade page - we use redirect to make sure a get request is generated
+                '''
+                if symb and quant:
+                    print("BUYING")
 
-                return render_template('trade.html', transactions=transactions, error="Bought Successfully!")
+                    date = d.datetime.now()
+                    date = date.strftime("%m/%d/%Y, %H:%M:%S")
 
+                    quant = int(quant)
+                    print("AMOUNT", quant)
+                    stock_price = getdata(close='close', symbol=symb)[0]
+                    print("STOCK PRICE", stock_price)
+
+                    total = quant * stock_price
+
+                    print("You have spent $", total)
+
+                    print("USER EMAIL:", user_email)
+                    stock.buy("stock", (date, symb, stock_price, quant, user_email[0]), path)
+
+                    data = (symb, stock_price, quant, total, user_email[0], date)
+                    send_buy(data)
+
+                    print("TRANSACTIONS: ", transactions)
+                    #Redirect submits a get request (200) thus cancelling the usual post request generated by the browser when a page is refreshed
+                    return redirect(url_for("trade"))
+                
+                #If the user hasnt filled in both the fields then he is redirected back to that page instead of the program throwing an error
+                else:
+                    return redirect(url_for("trade"))
+                    print("Field Empty")
+
+            #SELLING
             elif request.form.get("s1"):
-                print("SELLING")
-
+                #The data from the fields on the page are fetched
                 symb = request.form["stockid"]
-                print("DELETING SYMBOL:", symb)
-
                 quant = request.form["amount"]
-                quant = int(quant)
-                print("AMOUNT", quant)
-                stock_price = getdata(close='close', symbol=symb)[0]
-                print("STOCK PRICE", stock_price)
+                
+                '''
+                If both the fields had data then the quantity is stored as an integer
+                The stock price api is called to calculate the price of that particular stock
+                The total amount of money received is then calculated using price and quantity
+                The STOCK TABLE is then updated with this data using the sell function
+                A mail is sent to the user alerting them of the transaction made
+                The user is now redirected back to the trade page - we use redirect to make sure a get request is generated
+                '''
+                if symb and quant:
+                    print("SELLING")
+                    print("DELETING SYMBOL:", symb)
 
-                total = quant * stock_price
-                print("You have received $", total)
+                    quant = int(quant)
+                    print("AMOUNT", quant)
+                    stock_price = getdata(close='close', symbol=symb)[0]
+                    print("STOCK PRICE", stock_price)
 
-                data = (symb, quant, user_email[0])
-                stock.sell("stock", data, path)
-                return render_template('trade.html', transactions=transactions, error="Sold Successfully!")
+                    total = quant * stock_price
+                    print("You have received $", total)
 
-        return render_template('trade.html')
+                    date = d.datetime.now()
+                    date = date.strftime("%m/%d/%Y, %H:%M:%S")
+
+                    data = (symb, quant, user_email[0])
+                    stock.sell("stock", data, path)
+
+                    mail_data = (symb, stock_price, quant, total, user_email[0], date)
+                    send_sell(mail_data)
+                    return redirect(url_for("trade"))
+
+                #If the user hasnt filled in both the fields then he is redirected back to that page instead of the program throwing an error
+                else:
+                    return redirect(url_for("trade"))
+                    print("Field Empty")
+        return render_template('trade.html', transactions=transactions, error="Transactions Successful!")
     #Redirects to login page if g.user is empty -> No user signed in 
     return redirect('/')
 

@@ -33,7 +33,7 @@ def send_mail(email : str):
 
     #user mail subject, body and format of the mail
     subject = 'RESET YOUR PASSWORD:'
-    body = f'Dear User\nPlease Click on the Link Below to Reset your "Code"Vid19 Password for your {email} account.\n\n This is your 4 Digit Verification Code: {key} \n\n Link: {url} \n\nIf you didnt ask to reset your password please IGNORE this email!\n\nThank you\nWarm Regards\nTeam "Code"Vid19'
+    body = f'Dear User\nPlease Click on the Link Below to Reset your "Code"Vid19 Password for your {email} account.\n\nThis is your 4 Digit Verification Code: {key} \n\nLink: {url} \n\nIf you didnt ask to reset your password please IGNORE this email!\n\nThank you\nWarm Regards\nTeam "Code"Vid19'
     msg = f'Subject: {subject}\n\n{body}'
 
     #Sends the mail with the data and quits the server
@@ -111,6 +111,76 @@ def send_link(email : str):
         server.login(sender_email, password)
         server.sendmail(sender_email, receiver_email, message.as_string())
         server.quit()
+
+
+'''
+Sends a mail to the user when the user buys a stock
+Alerts the user with all the transaction details
+'''
+def send_buy(data : tuple):
+    '''
+    symbol = data[0]
+    price = data[1]
+    quant = data[2]
+    total = data[3]
+    email = data[4]
+    date = data[5]
+    '''
+    conn= sqlite3.connect("app.db")
+    cur = conn.cursor()
+
+    #by importing os, backmail_add and backmail_pwd are accessing the environment variable values
+    #backend_mail and backend_pwd are environment variables
+    backemail_add = os.environ.get('backend_mail')
+    backemail_pwd = os.environ.get('backend_pwd')
+    
+    #Starts a server on port 465 and logs into senders email id so it can send the mail
+    server = smtplib.SMTP_SSL("smtp.gmail.com",465)
+    server.login(backemail_add,backemail_pwd)
+
+    #user mail subject, body and format of the mail
+    subject = 'Stock Transaction Receipt: IMP!'
+    body = f'Dear User\nHere is your transaction receipt for your {data[4]} account.\n\nYou purchased {data[2]} units of the {data[0]} stock on {data[5]} at a rate of {data[1]} $ per stock unit.\n\nYour total expenditure was {data[3]} $. Thank you for using "Code"vid19 Solutions.\n\nIf you did not make or authorize this transaction PLEASE CONTACT US IMMEDIATELY!\n\nThank you\nWarm Regards\nTeam "Code"Vid19'
+    msg = f'Subject: {subject}\n\n{body}'
+
+    #Sends the mail with the data and quits the server
+    server.sendmail(backemail_add,data[4],msg)
+    server.quit()
+
+
+'''
+Sends a mail to the user when the user sells a stock
+Alerts the user with all the transaction details
+'''
+def send_sell(data : tuple):
+    '''
+    symbol = data[0]
+    price = data[1]
+    quant = data[2]
+    total = data[3]
+    email = data[4]
+    date = data[5]
+    '''
+    conn= sqlite3.connect("app.db")
+    cur = conn.cursor()
+
+    #by importing os, backmail_add and backmail_pwd are accessing the environment variable values
+    #backend_mail and backend_pwd are environment variables
+    backemail_add = os.environ.get('backend_mail')
+    backemail_pwd = os.environ.get('backend_pwd')
+    
+    #Starts a server on port 465 and logs into senders email id so it can send the mail
+    server = smtplib.SMTP_SSL("smtp.gmail.com",465)
+    server.login(backemail_add,backemail_pwd)
+
+    #user mail subject, body and format of the mail
+    subject = 'Stock Transaction Receipt: IMP!'
+    body = f'Dear User\nHere is your transaction receipt for your {data[4]} account.\n\nYou sold {data[2]} units of the {data[0]} stock on {data[5]} at a rate of {data[1]} $ per stock unit.\n\nYour total earning was {data[3]} $. Thank you for using "Code"vid19 Solutions.\n\nIf you did not make or authorize this transaction PLEASE CONTACT US IMMEDIATELY!\n\nThank you\nWarm Regards\nTeam "Code"Vid19'
+    msg = f'Subject: {subject}\n\n{body}'
+
+    #Sends the mail with the data and quits the server
+    server.sendmail(backemail_add,data[4],msg)
+    server.quit()
 
 
 if __name__ == "__main__":
