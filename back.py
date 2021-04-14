@@ -170,6 +170,16 @@ def about():
     return redirect('/')
 
 
+#TRADING GUIDE page
+@app.route('/doc')
+def doc():
+    #Enters the page only if a user is signed in - g.user represents the current user
+    if g.user:
+        return render_template('doc.html')
+    #Redirects to login page if g.user is empty -> No user signed in 
+    return redirect('/')
+
+
 #TRADE page
 @app.route('/trade', methods=["GET", "POST"])
 def trade():
