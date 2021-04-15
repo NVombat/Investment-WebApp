@@ -10,6 +10,8 @@ from flask import (
 
 
 import datetime as d
+import requests
+import json
 import os
 
 
@@ -345,6 +347,17 @@ def contact():
     #Redirects to login page if g.user is empty -> No user signed in 
     return redirect('/')
 
+
+#For analysis - AAPL Chart
+#HELP - https://github.com/soumilshah1995/Stockchart-highchart-flask-
+@app.route('/pipe', methods=["GET", "POST"])
+def pipe():
+    payload = {}
+    headers = {}
+    url = "https://demo-live-data.highcharts.com/aapl-ohlcv.json"
+    r = requests.get(url, headers=headers, data ={})
+    r = r.json()
+    return {"res":r}
 
 if __name__ == '__main__':
     app.run(debug=True, port=8000)
