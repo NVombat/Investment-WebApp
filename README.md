@@ -1,14 +1,11 @@
 # CodeVid19
 
-
-![FrontEnd1](https://user-images.githubusercontent.com/63743496/113564327-d320d500-9626-11eb-8c8d-01ab34f99ba7.jpeg)
-- [Stock Project](#code)
-> This is a project made as a Submission for our SEPM Course
+> Investment
 
 ---
 
 ### Table of Contents
-Click below to check out our project details.
+Click below to check out the project details.
 
 - [Description](#description)
 - [System Diagram](#system-diagram)
@@ -29,7 +26,7 @@ Insert Description
 ## System Diagram
 
 
-![system-design]INSERTSYSDIAGRAMLINK
+![System Diagram](https://user-images.githubusercontent.com/63743496/114854321-52ba5b00-9e02-11eb-9991-91dd7f87f884.jpeg)
 
 [Back To The Top](#codevid19)
 
@@ -70,6 +67,8 @@ Insert Description
 ![4]
 
 ![5]
+
+
 [Back To The Top](#codevid19)
 
 ---
@@ -99,6 +98,22 @@ Nikhill Vombatkere
 
 <td>
 
+Aradhya Tripathi
+
+<p align="center">
+<img src = "https://avatars.githubusercontent.com/Aradhya-Tripathi"  height="120" alt="Rusali Saha">
+</p>
+<p align="center">
+<a href = "https://github.com/Aradhya-Tripathi"><img src = "http://www.iconninja.com/files/241/825/211/round-collaboration-social-github-code-circle-network-icon.svg" width="36" height = "36"/></a>
+<a href = "https://www.linkedin.com/in/aradhya-tripathi51/">
+<img src = "http://www.iconninja.com/files/863/607/751/network-linkedin-social-connection-circular-circle-media-icon.svg" width="36" height="36"/>
+</a>
+</p>
+</td>
+
+
+<td>
+
 Pragya Bharti
 <p align="center">
 
@@ -114,14 +129,7 @@ Pratik Chandrasekhar Pattanaik
 </p>
 </td>
 
-<td>
 
-Aradhya Tripathi 
-
-<p align="center">
-
-</p>
-</td>
 
 
 
