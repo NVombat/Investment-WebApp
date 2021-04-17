@@ -17,7 +17,23 @@ Click below to check out the project details.
 
 ## Description
 
-Insert Description
+The web application simplifies investing and keeping track of the users investments. In addition, it provides an analysis on certain companies and how their stocks will do in the future.
+
+USAGE:
+1. The application requires an individual to Sign Up first and then log in with their credentials
+2. If a user fails to log in under certain circumstances, a reset password facility is provided. The user receives a mail on their registered Email ID with a unique verification code and a reset passwork link. They can reset their password by using that particular code on the reset page
+3. After logging in, the user has the option to go through the sites pages
+
+SERVICES:
+1. The registered user can enter stock symbols and view their current prices, which are fetched with the help of an API
+2. The user can read up about us on the "About Us" Page which also provides the option to view a trading guide
+3. Under the "Trade" option, the user can either buy or sell their desired quantities of stocks by entering the respective stock symbols and the amount
+4. Each user has a unique dashboard maintained which enlists the current holdings of various stocks that they own
+5. With each transaction, a confirmation mail is sent to notify the user
+6. Under the "Analysis" section, we provide a graphical analysis of a few major companies and their stocks, which will help the user get an idea as to how successful companies are performing
+7. The application also lays out an educational page for people who are new to investing and want to know how to invest effectively. We have gathered  information ranging from videos and courses to articles to guide our users at every step
+8. We are open to queries and feedback. In order to do so, we enable our users to reach out to us by writing in the "Contact Us" section
+9. The user can log out securely by clicking on the "Sign Out" button
 
 [Back To The Top](#codevid19)
 
@@ -36,7 +52,7 @@ Insert Description
 
 ##### ML :
 
-  1.  
+1.  
   
   
 ##### Frontend Tech Stack :
@@ -111,7 +127,7 @@ Aradhya Tripathi
 
 <td>
 
-Pratik Chandrasekhar Pattanaik
+Pratik C Pattanaik
 
 <p align="center">
 <img src = "https://avatars.githubusercontent.com/u/54735734?v=4"  height="120" alt="Rusali Saha">
