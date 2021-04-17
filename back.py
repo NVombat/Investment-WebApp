@@ -1,3 +1,4 @@
+#Imports all the flask libraries
 from flask import (
     Flask,
     session,
@@ -9,6 +10,7 @@ from flask import (
 )
 
 
+#Other libraries needed 
 import datetime as d
 import requests
 import json
@@ -33,8 +35,8 @@ app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
 #Creates all the tables when the website is run
 users.create_user()
-contactus.create_tbl("app.db")
-stock.make_tbl("app.db")
+contactus.create_tbl(path)
+stock.make_tbl(path)
 
 '''
 Sets the current user - g.user to none and then checks if the user is in session
@@ -125,11 +127,24 @@ def home():
 
 
 #HOME page
-@app.route('/index')
+@app.route('/index', methods=["GET", "POST"])
 def index():
     #Enters the page only if a user is signed in - g.user represents the current user
     if g.user:
-        return render_template('index.html')
+        '''
+        If the user wants to find the price of a stock they can enter the symbol they want to find the price for
+        The API fetches the price and then returns the value
+        The user is then given the price of that stock
+        '''
+        if request.method == "POST":
+            sym = request.form["symb"]
+            price = getdata(close='close', symbol=sym)[0]
+            price = str(price)
+            err_str = "The price for 1 unit of "+sym+" Stock is "+price+" $"
+            return render_template('index.html', error=err_str)
+
+        return render_template("index.html")
+
     return redirect('/')
 
 
@@ -347,6 +362,7 @@ def contact():
     #Redirects to login page if g.user is empty -> No user signed in 
     return redirect('/')
 
+#################################################################################################################
 
 #For analysis - AAPL Chart
 #HELP - https://github.com/soumilshah1995/Stockchart-highchart-flask-
@@ -359,5 +375,6 @@ def pipe():
     r = r.json()
     return {"res":r}
 
+##################################################################################################################
 if __name__ == '__main__':
     app.run(debug=True, port=8000)
