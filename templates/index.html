@@ -33,6 +33,17 @@
                 </div>
             </div>
         </div>
+
+        <form action="" method="post">
+            <div class="form-group">
+                <label for="symb">Stock Symbol</label>
+                <input type="text" name="symb" id="symb">
+            </div>
+            <div class="d-button">
+                <button type="submit" class="btn" name="btn" value="btn">Find Price!</button>
+            </div>
+            <p id="error-msg"> {{error}} </p>
+        </form>
     </header>
 
     <section id="home-info" class="bg-dark">
