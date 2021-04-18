@@ -35,15 +35,17 @@
             <form action="" method="post">
                 <div class="form-group">
                     <label for="stockid">Stock ID:</label>
-                    <input type="text" name="stockid" id="stockid">
+                    <input type="text" name="stockid" id="stockid" required>
                 </div>
                 <div class="form-group">
                     <label for="amount">Amount:</label>
-                    <input type="number" name="amount" id="amount">
+                    <input type="number" name="amount" id="amount" required>
                 </div>
+                <p id="error-msg"> {{error}} </p>
                 <div class="d-button">
                     <button type="submit" class="btn" name="b1" value="b1">Buy !</button>
                     <button type="submit" class="btn" name="s1" value="s1">Sell !</button>
+                    <button type="submit" class="btn" name="p1" value="p1">Find Price!</button>
                 </div>
             </form>
         </div>
