@@ -17,17 +17,18 @@
 }
 
 .doc-content{
-    width: 500px;
+    width: 600px;
     justify-content: center;
     margin: 40px auto;
-    text-align: center;
-    border: solid 5px #444;
+    text-align: left;
+    padding-left: 15px;
+    border: solid 3px #444;
     border-radius: 5%;
 }
 
 .vid-content{
     margin: 0 20%;
-    border: solid 2px #444;
+    border: solid 1px #444;
     border-radius: 8%;
 }
 
