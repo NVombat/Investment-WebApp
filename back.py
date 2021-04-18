@@ -328,24 +328,33 @@ def trade():
                 The user is then given the price of that stock for the amount they entered
                 '''
                 if sym and quant:
+                    print("PRICE")
                     quant = int(quant)
                     print("AMOUNT", quant)
 
                     price = getdata(close='close', symbol=sym)[0]
-                    price = str(price)
+                    price = int(price)
 
                     total = quant * price
-                    print("You have received $", total)
+                    print("Total cost is $", total)
 
-                    err_str = "The price for "+quant+ " unit(s) of "+sym+" Stock is "+total+" $"
-                    return render_template('trade.html', error=err_str)
+                    quant = str(quant)
+                    price = str(price)
+                    total = str(total)
+
+                    #Message with price for amount entered and per unit as well
+                    err_str = "The price for "+quant+ " unit(s) of "+sym+" Stock is $ "+total+" at $ "+price+" per unit"
+
+                    print(transactions)
+                    #render template because we want the table to show and the message
+                    return render_template('trade.html', transactions=transactions, error=err_str)
                 
                 #If the user hasnt filled in both the fields then he is redirected back to that page instead of the program throwing an error
                 else:
                     return redirect(url_for("trade"))
                     print("Field Empty")
 
-        return render_template('trade.html', transactions=transactions, error="Transactions Successful!")
+        return render_template('trade.html', transactions=transactions)
     #Redirects to login page if g.user is empty -> No user signed in 
     return redirect('/')
 
