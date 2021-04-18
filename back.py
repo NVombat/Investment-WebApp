@@ -333,7 +333,7 @@ def trade():
                     print("AMOUNT", quant)
 
                     price = getdata(close='close', symbol=sym)[0]
-                    price = int(price)
+                    price = float(price)
 
                     total = quant * price
                     print("Total cost is $", total)
@@ -367,7 +367,7 @@ def contact():
         """
         If a post request is generated (when user clicks submit)
         The email and message are fetched from the input fields
-        The entered email is then compared with g.user to make sure it matches the user
+        The entered email is then checked with the database to make sure it matches the user and the user exists
         If the emails dont match it generates an error and if it does match then we insert data into contact table
         """
         if request.method == "POST":
@@ -375,16 +375,21 @@ def contact():
             email = request.form["email"]
             print(email)
             msg = request.form["message"]
-            user_email = users.getemail().pop()
-            print(user_email[0])
-            if email != user_email[0]:
+
+            user_email = g.user
+            curr_user = user_email[0]
+            print(curr_user)
+
+            if users.check_contact_us(email, curr_user):                
+                print("Correct Email")
+                contactus.insert(email, msg, path)
+                return render_template('contact.html', error="Thank you, We will get back to you shortly")
+            else:
                 print("Incorrect Email")
                 return render_template('contact.html', error="Incorrect Email!")
-            print("Correct Email")
-            contactus.insert(email, msg, path)
-            return render_template('contact.html', error="Thank you, We will get back to you shortly")
 
-        return render_template('contact.html')
+        return render_template("contact.html")
+        
     #Redirects to login page if g.user is empty -> No user signed in 
     return redirect('/')
 

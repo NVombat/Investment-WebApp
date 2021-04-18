@@ -132,3 +132,28 @@ def getemail():
     cur.execute(gml)
     emails = cur.fetchall()
     return emails
+
+
+'''
+For the contact us function:
+If the user types a message and an email ID - 
+It checks if the email ID is in our database (the user exists)
+It also checks if the email ID mentioned is the same one as the current user
+If both these conditions are true the user is able to send a message otherwise an error message is displayed
+'''
+def check_contact_us(email : str, curr_user : str):
+    conn = s.connect("app.db")
+    cur = conn.cursor()
+
+    #Command to fetch from the table any data with that particular email
+    chk = f"SELECT * FROM user WHERE Email='{email}'"
+    cur.execute(chk)
+    #Stores the fetched data in the table
+    res = cur.fetchall()
+    print("RES", res)
+
+    #Checks the above mentioned conditions
+    if len(res)>0 and res[0][0]==curr_user:
+        return True
+    else:
+        return False
