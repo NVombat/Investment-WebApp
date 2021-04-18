@@ -131,20 +131,8 @@ def home():
 def index():
     #Enters the page only if a user is signed in - g.user represents the current user
     if g.user:
-        '''
-        If the user wants to find the price of a stock they can enter the symbol they want to find the price for
-        The API fetches the price and then returns the value
-        The user is then given the price of that stock
-        '''
-        if request.method == "POST":
-            sym = request.form["symb"]
-            price = getdata(close='close', symbol=sym)[0]
-            price = str(price)
-            err_str = "The price for 1 unit of "+sym+" Stock is "+price+" $"
-            return render_template('index.html', error=err_str)
-
         return render_template("index.html")
-
+    #Redirects to login page if g.user is empty -> No user signed in 
     return redirect('/')
 
 
@@ -327,10 +315,39 @@ def trade():
                 else:
                     return redirect(url_for("trade"))
                     print("Field Empty")
+
+            #FIND PRICE
+            elif request.form.get("p1"):
+                #The data from the fields on the page are fetched
+                sym = request.form["stockid"]
+                quant = request.form["amount"]
+                '''
+                If the user wants to find the price of a stock they can enter the symbol they want to find the price for
+                and the amount
+                The API fetches the price and then returns the value
+                The user is then given the price of that stock for the amount they entered
+                '''
+                if sym and quant:
+                    quant = int(quant)
+                    print("AMOUNT", quant)
+
+                    price = getdata(close='close', symbol=sym)[0]
+                    price = str(price)
+
+                    total = quant * price
+                    print("You have received $", total)
+
+                    err_str = "The price for "+quant+ " unit(s) of "+sym+" Stock is "+total+" $"
+                    return render_template('trade.html', error=err_str)
+                
+                #If the user hasnt filled in both the fields then he is redirected back to that page instead of the program throwing an error
+                else:
+                    return redirect(url_for("trade"))
+                    print("Field Empty")
+
         return render_template('trade.html', transactions=transactions, error="Transactions Successful!")
     #Redirects to login page if g.user is empty -> No user signed in 
     return redirect('/')
-
 
 
 #CONTACT US page
