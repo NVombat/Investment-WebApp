@@ -408,9 +408,17 @@ tr:nth-child(even){
     font-weight: 900;
 }
 
+#the-msg{
+    text-align: center;
+    color: #222;
+    font-size: 18px;
+    font-weight: 700;
+    margin: auto;
+}
+
 /* */
 
-.jumbotron{
+.cntain{
     display: inline-flex;
     transform: translateX(33%); 
 }
