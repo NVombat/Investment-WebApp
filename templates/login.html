@@ -22,7 +22,7 @@
 
     <section class="flex-wrap">
         <div >
-            <form action novalidate method="post">
+            <form method="post">
                 <input type="radio" name="rg" id="sign-in" checked/>
                 <input type="radio" name="rg" id="sign-up" />
                 <input type="radio" name="rg" id="reset" />        
@@ -31,10 +31,10 @@
                 <label for="sign-up">Sign Up</label>
                 <label for="reset">Reset</label>  
         
-                <input class="sign-up sign-in" type="text" placeholder="Name" name="name" />
-                <input class="sign-up sign-in reset" type="email" placeholder="Email" name="email" />
-                <input class="sign-up sign-in" type="password" placeholder ="Password" name="password" />
-                <input class="sign-up" type="password" placeholder ="Repeat Password" name="rpassword"/>
+                <input class="sign-up sign-in" type="text" placeholder="Name" name="name" required>
+                <input class="sign-up sign-in reset" type="email" placeholder="Email" name="email" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" title="enter a valid email" required>
+                <input class="sign-up sign-in" type="password" placeholder ="Password" name="password"  pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" title="must contain at least one  number and one uppercase and lowercase letter, and at least 8 or more characters" required >
+                <input class="sign-up" type="password" placeholder ="Repeat Password" name="rpassword" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" title="must contain at least one  number and one uppercase and lowercase letter, and at least 8 or more characters" required >
                 
                 <p id="error-msg"> {{error}} </p>
 
