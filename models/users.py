@@ -40,8 +40,8 @@ def checkpwd(pwd: str, email: str):
     return False
 
 
-#Checks if the reset is possible by seeing if the user exists
-def check_reset(email : str):
+#Checks if the RESET PASSWORD option and SIGN UP is possible by seeing if the user exists
+def check_user_exist(email : str):
     conn = s.connect("app.db")
     cur = conn.cursor()
 
@@ -50,10 +50,10 @@ def check_reset(email : str):
     cur.execute(chk)
     #Fetches results in array
     res = cur.fetchall()
-    #If the array is empty then user doesnt exist and thus cant reset password
+    #If the array is empty then user doesnt exist and thus cant reset password but can sign up
     if len(res)==0:
         return False
-    #If array is not empty - reset possible
+    #If array is not empty - reset possible but signup not possible
     else:
         return True
 
