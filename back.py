@@ -1,4 +1,4 @@
-#Imports all the flask libraries
+# Imports all the flask libraries
 from flask import (
     Flask,
     session,
@@ -9,31 +9,26 @@ from flask import (
     url_for
 )
 
-
-#Other libraries needed 
+# Other libraries needed
 import datetime as d
 import requests
 import json
 import os
 
-
-#Imports functions from other folders
+# Imports functions from other folders
 from models import users, contactus, stock
 from sendmail import send_mail, send_buy, send_sell
 from api import getdata
 
-
-#Path used for all tables
+# Path used for all tables
 path = "app.db"
-
 
 templates_path = os.path.abspath('./templates')
 app = Flask(__name__, template_folder=templates_path)
 app.secret_key = 'somekey'
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
-
-#Creates all the tables when the website is run
+# Creates all the tables when the website is run
 users.create_user()
 contactus.create_tbl(path)
 stock.make_tbl(path)
@@ -42,6 +37,8 @@ stock.make_tbl(path)
 Sets the current user - g.user to none and then checks if the user is in session
 If the user is in session then their email is fetched and g.user is updated to that email
 '''
+
+
 @app.before_request
 def security():
     g.user = None
@@ -54,12 +51,12 @@ def security():
             print("Failed")
 
 
-#LOGIN page
+# LOGIN page
 @app.route('/', methods=["GET", "POST"])
 def home():
-    #The particular user is removed from session
+    # The particular user is removed from session
     session.pop("user_email", None)
-    #Flag checks if the password entered by the user is correct or not
+    # Flag checks if the password entered by the user is correct or not
     flag = True
     """
     If a post request is made on the login page
@@ -70,7 +67,7 @@ def home():
         email = request.form['email']
         password = request.form['password']
         repeat_password = request.form['rpassword']
-        
+
         '''
         If the password field has a password, and the repeat password is empty the user is trying to login
         The Password is verified by checking the database for that user
@@ -83,7 +80,7 @@ def home():
                     session['user_email'] = email
                     return redirect('/index')
                 else:
-                    flag=False
+                    flag = False
 
         '''
         If the password and repeat password fields are filled - SIGN UP
@@ -109,13 +106,14 @@ def home():
         if not name and not password and email:
             if users.check_reset(email):
                 print("Reset Password:")
-                #session['user_email'] = email
+                # session['user_email'] = email
                 reset_password(email)
-                return render_template('login.html', error="We have sent you a link to reset your password. Check your mailbox")
+                return render_template('login.html',
+                                       error="We have sent you a link to reset your password. Check your mailbox")
             else:
                 print("User Doesnt Exist")
                 return render_template('login.html', error="This Email Doesnt Exist - Please Sign Up")
-    
+
     '''
     If the flag variable is true then the user has entered the correct password and is redirected to the login page - FLAG VALUE IS TRUE INITIALLY
     If the flag variable is false then the user has entered the wrong password and is redirected to the login page
@@ -126,13 +124,13 @@ def home():
         return render_template('login.html', error="Incorrect Password")
 
 
-#HOME page
+# HOME page
 @app.route('/index', methods=["GET", "POST"])
 def index():
-    #Enters the page only if a user is signed in - g.user represents the current user
+    # Enters the page only if a user is signed in - g.user represents the current user
     if g.user:
         return render_template("index.html")
-    #Redirects to login page if g.user is empty -> No user signed in 
+    # Redirects to login page if g.user is empty -> No user signed in
     return redirect('/')
 
 
@@ -140,12 +138,14 @@ def index():
 Function to reset password
 Sends the mail for resetting password to user
 """
-def reset_password(email : str):
+
+
+def reset_password(email: str):
     print(email)
     send_mail(email)
 
 
-#RESET PASSWORD page
+# RESET PASSWORD page
 @app.route('/reset', methods=["GET", "POST"])
 def reset():
     """
@@ -172,50 +172,50 @@ def reset():
                     print("Resetting password & Updating DB")
                     users.reset_code(ver_code)
                     return redirect("/")
-                    #return render_template('login.html', error="Password Reset Successfully")
+                    # return render_template('login.html', error="Password Reset Successfully")
                 else:
                     print("Verification Code Doesnt Match")
                     return redirect("/")
-                    #return render_template('login.html', error="Try resetting again")
+                    # return render_template('login.html', error="Try resetting again")
             else:
                 return render_template('reset.html', error="Password & Retyped Password Not Same")
     return render_template('reset.html')
 
 
-#ANALYSIS page
+# ANALYSIS page
 @app.route('/inv')
 def inv():
-    #Enters the page only if a user is signed in - g.user represents the current user
+    # Enters the page only if a user is signed in - g.user represents the current user
     if g.user:
         return render_template('inv.html')
-    #Redirects to login page if g.user is empty -> No user signed in 
+    # Redirects to login page if g.user is empty -> No user signed in
     return redirect('/')
 
 
-#ABOUT US page
+# ABOUT US page
 @app.route('/about')
 def about():
-    #Enters the page only if a user is signed in - g.user represents the current user
+    # Enters the page only if a user is signed in - g.user represents the current user
     if g.user:
         return render_template('about.html')
-    #Redirects to login page if g.user is empty -> No user signed in 
+    # Redirects to login page if g.user is empty -> No user signed in
     return redirect('/')
 
 
-#TRADING GUIDE page
+# TRADING GUIDE page
 @app.route('/doc')
 def doc():
-    #Enters the page only if a user is signed in - g.user represents the current user
+    # Enters the page only if a user is signed in - g.user represents the current user
     if g.user:
         return render_template('doc.html')
-    #Redirects to login page if g.user is empty -> No user signed in 
+    # Redirects to login page if g.user is empty -> No user signed in
     return redirect('/')
 
 
-#TRADE page
+# TRADE page
 @app.route('/trade', methods=["GET", "POST"])
 def trade():
-    #Enters the page only if a user is signed in - g.user represents the current user
+    # Enters the page only if a user is signed in - g.user represents the current user
     print(g.user)
     if g.user:
         '''
@@ -230,12 +230,12 @@ def trade():
             If a post request is generated (button clicked) the user wants to buy or sell stocks
             It is then checked whether the user wants to buy or sell (based on the button pressed)
             '''
-            #BUYING
+            # BUYING
             if request.form.get("b1"):
-                #The data from the fields on the page are fetched
+                # The data from the fields on the page are fetched
                 symb = request.form["stockid"]
                 quant = request.form["amount"]
-                
+
                 '''
                 If both the fields had data then the current date and time is first calculated
                 Then the quantity is stored as an integer
@@ -267,20 +267,20 @@ def trade():
                     send_buy(data)
 
                     print("TRANSACTIONS: ", transactions)
-                    #Redirect submits a get request (200) thus cancelling the usual post request generated by the browser when a page is refreshed
+                    # Redirect submits a get request (200) thus cancelling the usual post request generated by the browser when a page is refreshed
                     return redirect(url_for("trade"))
-                
-                #If the user hasnt filled in both the fields then he is redirected back to that page instead of the program throwing an error
+
+                # If the user hasnt filled in both the fields then he is redirected back to that page instead of the program throwing an error
                 else:
                     return redirect(url_for("trade"))
                     print("Field Empty")
 
-            #SELLING
+            # SELLING
             elif request.form.get("s1"):
-                #The data from the fields on the page are fetched
+                # The data from the fields on the page are fetched
                 symb = request.form["stockid"]
                 quant = request.form["amount"]
-                
+
                 '''
                 If both the fields had data then the quantity is stored as an integer
                 The stock price api is called to calculate the price of that particular stock
@@ -311,14 +311,14 @@ def trade():
                     send_sell(mail_data)
                     return redirect(url_for("trade"))
 
-                #If the user hasnt filled in both the fields then he is redirected back to that page instead of the program throwing an error
+                # If the user hasnt filled in both the fields then he is redirected back to that page instead of the program throwing an error
                 else:
                     return redirect(url_for("trade"))
-                    print("Field Empty")
 
-            #FIND PRICE
+
+            # FIND PRICE
             elif request.form.get("p1"):
-                #The data from the fields on the page are fetched
+                # The data from the fields on the page are fetched
                 sym = request.form["stockid"]
                 quant = request.form["amount"]
                 '''
@@ -342,27 +342,27 @@ def trade():
                     price = str(price)
                     total = str(total)
 
-                    #Message with price for amount entered and per unit as well
-                    err_str = "The price for "+quant+ " unit(s) of "+sym+" Stock is $ "+total+" at $ "+price+" per unit"
+                    # Message with price for amount entered and per unit as well
+                    err_str = "The price for " + quant + " unit(s) of " + sym + " Stock is $ " + total + " at $ " + price + " per unit"
 
                     print(transactions)
-                    #render template because we want the table to show and the message
+                    # render template because we want the table to show and the message
                     return render_template('trade.html', transactions=transactions, error=err_str)
-                
-                #If the user hasnt filled in both the fields then he is redirected back to that page instead of the program throwing an error
+
+                # If the user hasnt filled in both the fields then he is redirected back to that page instead of the program throwing an error
                 else:
                     return redirect(url_for("trade"))
                     print("Field Empty")
 
         return render_template('trade.html', transactions=transactions)
-    #Redirects to login page if g.user is empty -> No user signed in 
+    # Redirects to login page if g.user is empty -> No user signed in
     return redirect('/')
 
 
-#CONTACT US page
+# CONTACT US page
 @app.route('/contact', methods=["GET", "POST"])
 def contact():
-    #Enters the page only if a user is signed in - g.user represents the current user
+    # Enters the page only if a user is signed in - g.user represents the current user
     if g.user:
         """
         If a post request is generated (when user clicks submit)
@@ -380,7 +380,7 @@ def contact():
             curr_user = user_email[0]
             print(curr_user)
 
-            if users.check_contact_us(email, curr_user):                
+            if users.check_contact_us(email, curr_user):
                 print("Correct Email")
                 contactus.insert(email, msg, path)
                 return render_template('contact.html', error="Thank you, We will get back to you shortly")
@@ -389,22 +389,24 @@ def contact():
                 return render_template('contact.html', error="Incorrect Email!")
 
         return render_template("contact.html")
-        
-    #Redirects to login page if g.user is empty -> No user signed in 
+
+    # Redirects to login page if g.user is empty -> No user signed in
     return redirect('/')
+
 
 #################################################################################################################
 
-#For analysis - AAPL Chart
-#HELP - https://github.com/soumilshah1995/Stockchart-highchart-flask-
+# For analysis - AAPL Chart
+# HELP - https://github.com/soumilshah1995/Stockchart-highchart-flask-
 @app.route('/pipe', methods=["GET", "POST"])
 def pipe():
     payload = {}
     headers = {}
     url = "https://demo-live-data.highcharts.com/aapl-ohlcv.json"
-    r = requests.get(url, headers=headers, data ={})
+    r = requests.get(url, headers=headers, data={})
     r = r.json()
-    return {"res":r}
+    return {"res": r}
+
 
 ##################################################################################################################
 if __name__ == '__main__':
