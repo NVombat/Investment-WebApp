@@ -25,14 +25,32 @@ def load_t(sym: str):
 
 
 class Data:
-    def __init__(self, path: str):
-        self.df = pd.read_csv(path)
-        data = self.df.reset_index()['close']
-        data = np.array(data)
+    def __init__(self, path_aap: str, path_goog: str,
+                 path_tsla: str):
+        self.df_google = pd.read_csv(path_goog)
+        self.df_tsla = pd.read_csv(path_tsla)
+        self.df_aap = pd.read_csv(path_aap)
 
-        self.scaler = MinMaxScaler(feature_range=(0, 1))
-        self.scaler.fit(np.array(data).reshape(-1, 1))
-        self.data = self.scaler.transform(data.reshape(-1, 1))
+        data_aap = self.df_aap.reset_index()['close']
+        data_aap = np.array(data_aap)
+
+        data_tsla = self.df_tsla.reset_index()['close']
+        data_tsla = np.array(data_tsla)
+
+        data_goog = self.df_google.reset_index()['close']
+        data_goog = np.array(data_goog)
+
+        self.scaler_aap = MinMaxScaler(feature_range=(0, 1))
+        self.scaler_aap.fit(np.array(data_aap).reshape(-1, 1))
+        self.data_aap = self.scaler_aap.transform(data_aap.reshape(-1, 1))
+
+        self.scaler_goog = MinMaxScaler(feature_range=(0, 1))
+        self.scaler_goog.fit(np.array(data_goog).reshape(-1, 1))
+        self.data_goog = self.scaler_aap.transform(data_goog.reshape(-1, 1))
+
+        self.scaler_tsla = MinMaxScaler(feature_range=(0, 1))
+        self.scaler_tsla.fit(np.array(data_tsla).reshape(-1, 1))
+        self.data_tsla = self.scaler_aap.transform(data_tsla.reshape(-1, 1))
 
     @staticmethod
     def _make_dataset(dataset, time_step):
@@ -43,9 +61,18 @@ class Data:
             dataY.append(dataset[i + time_step, 0])
         return np.array(dataX), np.array(dataY)
 
-    def get_data(self):
-        x_train, y_train = self._make_dataset(self.data, 100)
-        return x_train, y_train
+    def get_data(self, train_on: str):
+        if train_on == 'GOOGL':
+            x_train, y_train = self._make_dataset(self.data_goog, 100)
+            return x_train, y_train
+
+        elif train_on == 'TSLA':
+            x_train, y_train = self._make_dataset(self.data_tsla, 100)
+            return x_train, y_train
+
+        else:
+            x_train, y_train = self._make_dataset(self.data_aap, 100)
+            return x_train, y_train
 
 
 def Model():
@@ -63,7 +90,7 @@ def Model():
 
 
 if __name__ == '__main__':
-    data = Data('AAPL.csv')
+    data = Data('AAPL.csv', 'google.csv', 'TSLA.csv')
     x_train, y_train = data.get_data()
     x_train = x_train.reshape(1156, 100, 1)
     model = Model()
