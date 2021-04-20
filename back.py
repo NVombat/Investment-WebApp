@@ -74,6 +74,7 @@ def home():
         password = request.form['password']
         repeat_password = request.form['rpassword']
 
+
         '''
         If the password field has a password, and the repeat password is empty the user is trying to login
         The Password is verified by checking the database for that user
@@ -88,20 +89,28 @@ def home():
                 else:
                     flag = False
 
+
         '''
         If the password and repeat password fields are filled - SIGN UP
-        If they both are the same then a new user is added to the USER TABLE in the database with all the data
+        If the user already exists then print an error message and redirect to login page
+        If the user doesnt exist then allow the signup to take place
+        If they both are the same (password and repeat password)
+        Then a new user is added to the USER TABLE in the database with all the data
         The user is then added to the session and the user is redirected to the login page
         If the fields dont match the user is alerted and redirected back to the login page to try again
         '''
         if password and repeat_password:
             print("Sign Up")
-            if password == repeat_password:
-                users.insert('user', (email, name, password, 0))
-                session['user_email'] = email
-                return render_template('login.html', error="Sign Up Complete - Login")
+            if not users.check_user_exist(email):
+                if password == repeat_password:
+                    users.insert('user', (email, name, password, 0))
+                    session['user_email'] = email
+                    return render_template('login.html', error="Sign Up Complete - Login")
+                else:
+                    return render_template('login.html', error="Password & Retyped Password Not Same")
             else:
-                return render_template('login.html', error="Password & Retyped Password Not Same")
+                return render_template('login.html', error="This User Already Exists! Try Again")
+
 
         '''
         If only the email field is filled it means the user has requested to reset their password
@@ -110,7 +119,7 @@ def home():
         If the user doesnt exist an error message is generated and the user is redirected back to the login page
         '''
         if not name and not password and email:
-            if users.check_reset(email):
+            if users.check_user_exist(email):
                 print("Reset Password:")
                 # session['user_email'] = email
                 reset_password(email)
@@ -119,6 +128,7 @@ def home():
             else:
                 print("User Doesnt Exist")
                 return render_template('login.html', error="This Email Doesnt Exist - Please Sign Up")
+
 
     '''
     If the flag variable is true then the user has entered the correct password and is redirected to the login page - FLAG VALUE IS TRUE INITIALLY
@@ -403,7 +413,6 @@ def contact():
 
 
 #################################################################################################################
-
 # For analysis - AAPL Chart
 # HELP - https://github.com/soumilshah1995/Stockchart-highchart-flask-
 @app.route('/pipe', methods=["GET", "POST"])
