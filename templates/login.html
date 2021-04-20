@@ -22,7 +22,7 @@
 
     <section class="flex-wrap">
         <div >
-            <form method="post">
+            <form method="post" id="formy">
                 <input type="radio" name="rg" id="sign-in" checked/>
                 <input type="radio" name="rg" id="sign-up" />
                 <input type="radio" name="rg" id="reset" />        
@@ -38,10 +38,19 @@
                 
                 <p id="error-msg"> {{error}} </p>
 
-                <button>Submit</button>         
+                <button onclick="signinForm()">Submit</button>         
             </form>
         </div>
     </section>
+
+    <script>
+        function signinForm(event){
+            var checky = document.getElementById("sign-in");
+            if(checky.checked == true){
+                document.getElementById("formy").noValidate = true;
+            }
+        }
+    </script>
 
 
     <div class="clr"></div>
