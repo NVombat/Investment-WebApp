@@ -57,11 +57,12 @@ class Predict(Data):
 
 
 if __name__ == '__main__':
-    predict_tsla = Predict(symbol='GOOGL', path_aap='AAPL.csv',
+    predict_goog = Predict(symbol='GOOGL', path_aap='AAPL.csv',
                       path_goog='google.csv', path_tsla='TSLA.csv')
 
     random = np.random.randint(low=1000, high=2000, size=100)
-    print(predict_tsla.result(random))
+    print(predict_goog.result(random))
 
     random = np.random.randint(low=1000, high=2000, size=100)
-    print(predict_tsla.result(random))
+    print(predict_goog.result(random))
+
