@@ -46,7 +46,12 @@
     <script>
         function signinForm(event){
             var checky = document.getElementById("sign-in");
+            var checky2 = document.getElementById("reset");
+
             if(checky.checked == true){
+                document.getElementById("formy").noValidate = true;
+            }
+            if(checky2.checked == true){
                 document.getElementById("formy").noValidate = true;
             }
         }
