@@ -9,36 +9,41 @@ from flask import (
     url_for
 )
 
+
 # Other libraries needed
 import datetime as d
 import requests
 import json
 import os
 
+
 # Imports functions from other folders
 from models import users, contactus, stock
 from sendmail import send_mail, send_buy, send_sell
 from api import getdata
 
+
 # Path used for all tables
 path = "app.db"
+
 
 templates_path = os.path.abspath('./templates')
 app = Flask(__name__, template_folder=templates_path)
 app.secret_key = 'somekey'
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
+
 # Creates all the tables when the website is run
 users.create_user()
 contactus.create_tbl(path)
 stock.make_tbl(path)
 
+
 '''
 Sets the current user - g.user to none and then checks if the user is in session
 If the user is in session then their email is fetched and g.user is updated to that email
+Otherwise Exception is thrown
 '''
-
-
 @app.before_request
 def security():
     g.user = None
@@ -58,6 +63,7 @@ def home():
     session.pop("user_email", None)
     # Flag checks if the password entered by the user is correct or not
     flag = True
+
     """
     If a post request is made on the login page
     Take input from the fields - Name, Email, Password, Confirm Password
@@ -138,8 +144,6 @@ def index():
 Function to reset password
 Sends the mail for resetting password to user
 """
-
-
 def reset_password(email: str):
     print(email)
     send_mail(email)
@@ -218,6 +222,7 @@ def trade():
     # Enters the page only if a user is signed in - g.user represents the current user
     print(g.user)
     if g.user:
+
         '''
         uses the user email id to query the users transactions
         this transactions array is then received by the table on the html page
@@ -226,6 +231,7 @@ def trade():
         transactions = stock.query(user_email[0], path)
 
         if request.method == "POST":
+
             '''
             If a post request is generated (button clicked) the user wants to buy or sell stocks
             It is then checked whether the user wants to buy or sell (based on the button pressed)
@@ -272,8 +278,9 @@ def trade():
 
                 # If the user hasnt filled in both the fields then he is redirected back to that page instead of the program throwing an error
                 else:
-                    return redirect(url_for("trade"))
                     print("Field Empty")
+                    return redirect(url_for("trade"))
+                    
 
             # SELLING
             elif request.form.get("s1"):
@@ -313,6 +320,7 @@ def trade():
 
                 # If the user hasnt filled in both the fields then he is redirected back to that page instead of the program throwing an error
                 else:
+                    print("Field Empty")
                     return redirect(url_for("trade"))
 
 
@@ -351,8 +359,8 @@ def trade():
 
                 # If the user hasnt filled in both the fields then he is redirected back to that page instead of the program throwing an error
                 else:
-                    return redirect(url_for("trade"))
                     print("Field Empty")
+                    return redirect(url_for("trade"))
 
         return render_template('trade.html', transactions=transactions)
     # Redirects to login page if g.user is empty -> No user signed in
@@ -406,8 +414,7 @@ def pipe():
     r = requests.get(url, headers=headers, data={})
     r = r.json()
     return {"res": r}
-
-
 ##################################################################################################################
+
 if __name__ == '__main__':
     app.run(debug=True, port=8000)

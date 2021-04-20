@@ -41,13 +41,11 @@ date = date.strftime("%Y-%m-%d")
 today = d.date.today()
 close_date = today - d.timedelta(days=3)
 close_date = close_date.strftime("%Y-%m-%d")
-# print("Two days ago the date was CLOSE DATE:", close_date)
+#print("Two days ago the date was CLOSE DATE:", close_date)
 
 open_date = today - d.timedelta(days=4)
 open_date = open_date.strftime("%Y-%m-%d")
-
-
-# print("Three days ago the date was OPEN DATE:", open_date)
+#print("Three days ago the date was OPEN DATE:", open_date)
 
 # format - yyyy-mm-dd --- eg -> 2021-04-17
 
