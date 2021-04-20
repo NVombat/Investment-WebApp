@@ -307,7 +307,7 @@ img{
 
 /* Contact Form */
 .contact-form1{
-    height: 500px;
+    height: 550px;
 }
 
 #contact-form .form-group{
@@ -343,6 +343,7 @@ img{
     display: block;
     overflow: auto;
     padding: 60px 30%;
+    min-height: 420px;
 }
 
 #trade-form .form-group{
