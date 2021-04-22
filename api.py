@@ -38,15 +38,20 @@ date = d.datetime.now()
 date = date.strftime("%Y-%m-%d")
 # print("Today the date is:", date)
 
-today = d.date.today()
-close_date = today - d.timedelta(days=3)
-close_date = close_date.strftime("%Y-%m-%d")
-#print("Two days ago the date was CLOSE DATE:", close_date)
+#Closing Date
+# today = d.date.today()
+# close_date = today - d.timedelta(days=1)
+# close_date = close_date.strftime("%Y-%m-%d")
+# print("One day ago the date was CLOSE DATE:", close_date)
 
-open_date = today - d.timedelta(days=4)
-open_date = open_date.strftime("%Y-%m-%d")
-#print("Three days ago the date was OPEN DATE:", open_date)
+#Opening Date
+# open_date = today - d.timedelta(days=2)
+# open_date = open_date.strftime("%Y-%m-%d")
+# print("Two days ago the date was OPEN DATE:", open_date)
 
+#Safe Values
+open_date = "2021-04-01"
+close_date = "2021-04-02"
 # format - yyyy-mm-dd --- eg -> 2021-04-17
 
 def getdata(symbol: str, date_from: str = open_date,
