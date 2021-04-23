@@ -1,6 +1,6 @@
 from tensorflow.keras.models import load_model
 import numpy as np
-from train import Data
+from .train import Data
 
 
 class Predict(Data):
@@ -22,15 +22,15 @@ class Predict(Data):
         """
         if self.symbol == 'GOOGL' and not self.model_goog:
             print("LOADING GOOGLE MODEL")
-            self.model_goog = load_model('google.h5')
+            self.model_goog = load_model('analysis/google.h5')
 
         elif self.symbol == 'TSLA' and not self.model_tsla:
             print("LOADING TESLA MODEL")
-            self.model_tsla = load_model('TSLA.h5')
+            self.model_tsla = load_model('analysis/TSLA.h5')
 
         elif self.symbol == 'AAPL' and not self.model_aap:
             print("LOADING AAPLE MODEL")
-            self.model_aap = load_model('AAPL.h5')
+            self.model_aap = load_model('analysis/AAPL.h5')
 
     def result(self, inputs: list):
         """
