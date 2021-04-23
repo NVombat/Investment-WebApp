@@ -8,25 +8,28 @@ from flask import (
     redirect,
     url_for
 )
-import numpy as np
+
 
 # Other libraries needed
 import datetime as d
+import numpy as np
 import requests
 import json
 import os
 
+
 # Imports functions from other folders
-from models import users, contactus, stock
 from sendmail import send_mail, send_buy, send_sell
-from api import getdata
+from models import users, contactus, stock
 from analysis.predict import  Predict
+from api import getdata
+
 
 # Path used for all tables
 path = "app.db"
 
-# Ml models
 
+# Ml models
 predict_aap = Predict('AAPL', 'analysis/AAPL.csv', 'analysis/google.csv', 'analysis/TSLA.csv')
 predict_goog = Predict('GOOGL', 'analysis/AAPL.csv', 'analysis/google.csv', 'analysis/TSLA.csv')
 predict_tsla = Predict('TSLA', 'analysis/AAPL.csv', 'analysis/google.csv', 'analysis/TSLA.csv')
@@ -37,18 +40,18 @@ app = Flask(__name__, template_folder=templates_path)
 app.secret_key = 'somekey'
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
+
 # Creates all the tables when the website is run
 users.create_user()
 contactus.create_tbl(path)
 stock.make_tbl(path)
+
 
 '''
 Sets the current user - g.user to none and then checks if the user is in session
 If the user is in session then their email is fetched and g.user is updated to that email
 Otherwise Exception is thrown
 '''
-
-
 @app.before_request
 def security():
     g.user = None
@@ -66,6 +69,7 @@ def security():
 def home():
     # The particular user is removed from session
     session.pop("user_email", None)
+
     # Flag checks if the password entered by the user is correct or not
     flag = True
 
@@ -155,8 +159,6 @@ def index():
 Function to reset password
 Sends the mail for resetting password to user
 """
-
-
 def reset_password(email: str):
     print(email)
     send_mail(email)
@@ -202,9 +204,22 @@ def reset():
 # ANALYSIS page
 @app.route('/inv')
 def inv():
-    # google_value = np.random.randint(high=2500, low=1700, size=100)
-    # tsla_value = np.random.randint(high=2500, low=1700, size=100)
-    # aap_value = np.random.randint(high=2500, low=1700, size=100)
+    google_value = np.random.randint(high=2590, low=2095, size=100) # $ 2,299 APR24
+    tsla_value = np.random.randint(high=930, low=530, size=100) # $ 722 APR24
+    aap_value = np.random.randint(high=245, low=80, size=100) # $ 135 APR24
+
+    google_list = google_value.tolist()
+    google_json_str = json.dumps(google_list)
+
+    tsla_list = tsla_value.tolist()
+    tsla_json_str = json.dumps(tsla_list)
+
+    aap_list = aap_value.tolist()
+    aap_json_str = json.dumps(aap_list)
+
+    print("Google : ", google_json_str)
+    print("Tesla : ", tsla_json_str)
+    print("Apple : ", aap_json_str)
 
     # Enters the page only if a user is signed in - g.user represents the current user
     if g.user:
@@ -350,6 +365,7 @@ def trade():
                 # The data from the fields on the page are fetched
                 sym = request.form["stockid"]
                 quant = request.form["amount"]
+
                 '''
                 If the user wants to find the price of a stock they can enter the symbol they want to find the price for
                 and the amount
@@ -394,6 +410,7 @@ def trade():
 def contact():
     # Enters the page only if a user is signed in - g.user represents the current user
     if g.user:
+        
         """
         If a post request is generated (when user clicks submit)
         The email and message are fetched from the input fields
@@ -425,7 +442,7 @@ def contact():
 
 
 #################################################################################################################
-# For analysis - AAPL Chart
+# For analysis - AAPL Chart - IT GIVES JAN 2021 - to current date
 # HELP - https://github.com/soumilshah1995/Stockchart-highchart-flask-
 @app.route('/pipe', methods=["GET", "POST"])
 def pipe():
@@ -435,8 +452,6 @@ def pipe():
     r = requests.get(url, headers=headers, data={})
     r = r.json()
     return {"res": r}
-
-
 ##################################################################################################################
 
 if __name__ == '__main__':
