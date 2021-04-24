@@ -417,13 +417,22 @@ tr:nth-child(even){
     margin: auto;
 }
 
-/* */
+/* Misc */
 
 .cntain{
     display: inline-flex;
     transform: translateX(33%); 
 }
 
+.c-logo{
+    float: left;
+    width: 80px;
+    height: 40px;
+    border-radius: 50%;
+    margin-top: 15px;
+    margin-left: 40px;
+    margin-right: 20px;
+}
 
 /* Footer */
 
