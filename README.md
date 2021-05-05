@@ -49,18 +49,26 @@ SERVICES:
 ---
 
 ## Tech Stack
+To run : Clone Repository & Run -> pip install -r requirements.txt
 
 ##### ML :
 
-1.  
+
+1. Tensorflow
+2. Numpy
+3. Pandas
+4. Scikit Learn
+5. PyTorch
   
   
 ##### Frontend Tech Stack :
+
 
 1. HTML/CSS
 
 
 ##### Backend Tech Stack :
+
 
 1. Python
 2. Flask
@@ -74,15 +82,24 @@ SERVICES:
 ## Preview
 
 
-![1]
+![WhatsApp Image 2021-05-05 at 14 56 46](https://user-images.githubusercontent.com/63743496/117121422-32067500-adb2-11eb-817c-da51b691dafd.jpeg)
 
-![2]
+![WhatsApp Image 2021-05-05 at 14 43 50](https://user-images.githubusercontent.com/63743496/117121502-4ba7bc80-adb2-11eb-8a52-37e567361034.jpeg)
 
-![3]
+![WhatsApp Image 2021-05-05 at 14 43 40](https://user-images.githubusercontent.com/63743496/117121547-5c583280-adb2-11eb-8df0-246031ffb36f.jpeg)
 
-![4]
+![WhatsApp Image 2021-05-05 at 14 37 52](https://user-images.githubusercontent.com/63743496/117121576-67ab5e00-adb2-11eb-9089-015ab0a9b80a.jpeg)
 
-![5]
+![WhatsApp Image 2021-05-05 at 14 44 48](https://user-images.githubusercontent.com/63743496/117121616-75f97a00-adb2-11eb-9857-d116ef6ee978.jpeg)
+
+![WhatsApp Image 2021-05-05 at 14 44 33](https://user-images.githubusercontent.com/63743496/117121643-801b7880-adb2-11eb-97fc-59bd59667a08.jpeg)
+
+![WhatsApp Image 2021-05-05 at 14 39 09](https://user-images.githubusercontent.com/63743496/117121669-89a4e080-adb2-11eb-9a07-0151866e609e.jpeg)
+
+![WhatsApp Image 2021-05-05 at 14 48 37](https://user-images.githubusercontent.com/63743496/117121690-91fd1b80-adb2-11eb-86a9-271edc2824ea.jpeg)
+
+![WhatsApp Image 2021-05-05 at 14 39 42](https://user-images.githubusercontent.com/63743496/117121715-9e817400-adb2-11eb-9de8-8bacea0f4665.jpeg)
+
 
 
 [Back To The Top](#codevid19)
