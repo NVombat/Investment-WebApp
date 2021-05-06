@@ -91,7 +91,15 @@ def home():
         if password:
             if len(repeat_password) == 0:
                 print("Login")
-                if users.checkpwd(password, email):
+                # if users.checkpwd(password, email):
+                #     session['user_email'] = email
+                #     return redirect('/index')
+                '''
+                If the password field is entered check the password againts the hashed password in the db
+                If it matches then user is in session and is redirected to the homepage
+                Else a flag is set and the user is shown an error message
+                '''
+                if users.check_hash(password, email):
                     session['user_email'] = email
                     return redirect('/index')
                 else:
@@ -110,7 +118,11 @@ def home():
             print("Sign Up")
             if not users.check_user_exist(email):
                 if password == repeat_password:
+                    #Hash the users password and store the hashed password for security
+                    password = users.hash_pwd(password)
+                    print("Hashed PWD: ", password)
                     users.insert('user', (email, name, password, 0))
+                    print("Inserted Hashed Password")
                     session['user_email'] = email
                     return render_template('login.html', error="Sign Up Complete - Login")
                 else:
@@ -187,6 +199,8 @@ def reset():
             print("CHECKING")
             if pwd == repeat_pwd:
                 if users.check_code(ver_code):
+                    #Hash the new password and update db with hashed password
+                    pwd = users.hash_pwd(pwd)
                     users.reset_pwd(pwd, ver_code)
                     print("Resetting password & Updating DB")
                     users.reset_code(ver_code)
