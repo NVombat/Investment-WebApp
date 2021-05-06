@@ -18,6 +18,7 @@ Click below to check out the project details.
 ## Description
 
 The web application simplifies investing and keeping track of the users investments. In addition, it provides an analysis on certain companies and how their stocks will do in the future.
+NOTE: FOR USER INFORMATION SECURITY WE USE SALTED PASSWORD HASHING
 
 USAGE:
 1. The application requires an individual to Sign Up first and then log in with their credentials
