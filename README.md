@@ -43,7 +43,8 @@ SERVICES:
 ## System Diagram
 
 
-![System Diagram](https://user-images.githubusercontent.com/63743496/114854321-52ba5b00-9e02-11eb-9991-91dd7f87f884.jpeg)
+![System Diagram](https://user-images.githubusercontent.com/63743496/117470928-f23bbb00-af74-11eb-87ae-dad0f30a9d3e.jpeg)
+
 
 [Back To The Top](#codevid19)
 
