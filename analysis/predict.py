@@ -4,6 +4,9 @@ from .train import Data
 
 
 class Predict(Data):
+    """
+    Model caching
+    """
     def __init__(self, symbol: str, path_aap: str,
                  path_goog: str, path_tsla: str):
         super(Predict, self).__init__(path_aap, path_goog, path_tsla)
@@ -16,9 +19,9 @@ class Predict(Data):
 
     def load(self) -> object:
         """
+        loading in trained models.
+        and initializing them to the class instance,
 
-        :param symbol:
-        :return:
         """
         if self.symbol == 'GOOGL' and not self.model_goog:
             print("LOADING GOOGLE MODEL")
@@ -34,7 +37,11 @@ class Predict(Data):
 
     def result(self, inputs: list):
         """
-
+        getting the final model output,
+        standardizing the user input for the respective model,
+        running the features through the model.
+        and then converting the data back to original value,
+        to display it to the user.
         :param inputs:
         :return:
         """
