@@ -53,10 +53,10 @@ def check_user_exist(email : str):
     cur.execute(chk)
     #Fetches results in array
     res = cur.fetchall()
-    #If the array is empty then user doesnt exist and thus cant reset password but can sign up
+    #If the array is empty then user doesnt exist and thus cant reset password but can sign up USER DOESNT EXIST
     if len(res)==0:
         return False
-    #If array is not empty - reset possible but signup not possible
+    #If array is not empty - reset possible but signup not possible USER EXISTS
     else:
         return True
 
@@ -200,18 +200,20 @@ def check_hash(pwd : str, email : str):
     print("RES : ", res)
     #The list stores a tuple and password is the third element in the tuple
     dbpwd = res[0][2]
+    #DATABASE STORED PASSWORD
     print("DBPWD: ", dbpwd)
 
-
+    #PASSWORD HASH AND SALT STORED IN DATABASE
     salt = dbpwd[:64]
     print("SALT2: ", salt)
     dbpwd = dbpwd[64:]
-    print("stored password hash: ", dbpwd)
-
+    print("Stored password hash: ", dbpwd)
+    
+    #PASSWORD HASH FOR PASSWORD THAT USER HAS CURRENTLY ENTERED
     pwd_hash = hashlib.pbkdf2_hmac('sha512', pwd.encode('utf-8'), salt.encode('ascii'), 100000)
     pwd_hash = binascii.hexlify(pwd_hash).decode('ascii')
     print("pwd_hash: ", pwd_hash)
-
+    
     if pwd_hash==dbpwd:
         return True
     else:

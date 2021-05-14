@@ -85,11 +85,13 @@ def home():
 
         '''
         If the password field has a password, and the repeat password is empty the user is trying to login
-        The Password is verified by checking the database for that user
+        First the user is verified -> Check if user exists
+        Then the password is verified by checking the database for that user
         If the password matches the user is added to the session otherwise the flag variable is set to false
+        If the user doesnt exist then render back to login and give error message
         '''
-        if password:
-            if len(repeat_password) == 0:
+        if password and not repeat_password:
+            if users.check_user_exist(email):
                 print("Login")
                 # if users.checkpwd(password, email):
                 #     session['user_email'] = email
@@ -103,7 +105,14 @@ def home():
                     session['user_email'] = email
                     return redirect('/index')
                 else:
+                    #If the flag variable is false -> user has entered the wrong password
                     flag = False
+                    print("WRONG PWD")
+                    #And is redirected to the login page
+                    return render_template('login.html', error="Incorrect Password")
+            else:
+                #If the user doesnt exist
+                return render_template('login.html', error="User Doesnt Exist")
 
         '''
         If the password and repeat password fields are filled - SIGN UP
@@ -147,14 +156,10 @@ def home():
                 print("User Doesnt Exist")
                 return render_template('login.html', error="This Email Doesnt Exist - Please Sign Up")
 
-    '''
-    If the flag variable is true then the user has entered the correct password and is redirected to the login page - FLAG VALUE IS TRUE INITIALLY
-    If the flag variable is false then the user has entered the wrong password and is redirected to the login page
-    '''
+    #If the flag variable is true then the user has entered the correct password and is redirected to the login page
+    #FLAG VALUE IS TRUE INITIALLY
     if flag:
-        return render_template('login.html')
-    else:
-        return render_template('login.html', error="Incorrect Password")
+        return render_template('login.html')    
 
 
 # HOME page
