@@ -14,11 +14,12 @@
     <header>
         <nav id="navbar">
             <div class="container">
+                <img src="../static/img/web_logo.png" alt="logo" class="c-logo">
                 <h1 class="logo"><a href="index">CVS</a></h1>
 
                 <ul>
                     <li><a href="index">Home</a></li>
-                    <li><a href="inv">Investments</a></li>
+                    <li><a href="inv">Analysis</a></li>
                     <li><a class="current" href="trade">Trade</a></li>
                     <li><a href="about">About</a></li>
                     <li><a href="contact">Contact</a></li>
@@ -35,19 +36,27 @@
             <form action="" method="post">
                 <div class="form-group">
                     <label for="stockid">Stock ID:</label>
-                    <input type="text" name="stockid" id="stockid">
+                    <input type="text" name="stockid" id="stockid" pattern="[A-Z]*" title="Enter a Valid Stock Symbol" required>
                 </div>
                 <div class="form-group">
                     <label for="amount">Amount:</label>
-                    <input type="number" name="amount" id="amount">
+                    <input type="number" name="amount" id="amount" required>
                 </div>
+                <p id="the-msg"> {{error}} </p>
                 <div class="d-button">
                     <button type="submit" class="btn" name="b1" value="b1">Buy !</button>
+                    <button type="submit" class="btn" name="p1" value="p1">Find Price!</button>
                     <button type="submit" class="btn" name="s1" value="s1">Sell !</button>
                 </div>
+
             </form>
         </div>
+        <div class="d-button">
+            <a href="https://stockanalysis.com/stocks/" target="_blank" class="btn" style="padding-left: 70px; padding-right: 70px;">View Stock Symbols</a>
+        </div> 
     </section>
+
+
 
     <hr>
 
@@ -67,7 +76,7 @@
                 <tr class="data">
                     <td>{{ transaction[0] }}</td>
                     <td>{{ transaction[1] }}</td>
-                    <td>{{ transaction[2] }} $</td>
+                    <td>$ {{ transaction[2] }}</td>
                     <td>{{ transaction[3] }}</td>
                 </tr>
             {% endfor %}

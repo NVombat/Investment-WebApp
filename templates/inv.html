@@ -1,3 +1,5 @@
+<!-- For analysis - AAPL Chart
+HELP - https://github.com/soumilshah1995/Stockchart-highchart-flask- -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,18 +7,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Welcome to the most extraordinary finance web application!">
     <meta name="keywords" content="CVS investment web application">
-    <link rel="stylesheet" href="../static/css/style.css">
     <link rel="stylesheet" href="../static/css/style_buy.css">
-    <title>Investments</title>
+    <link rel="stylesheet" href="../static/css/style.css">
+    <title>Analysis</title>
+    
+    <!-- JQuery links  -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+    <!--Added -->
+    <link rel="stylesheet" type="text/css" href="https://code.highcharts.com/css/stocktools/gui.css">
+    <link rel="stylesheet" type="text/css" href="https://code.highcharts.com/css/annotations/popup.css">
+
+    <script src="https://code.highcharts.com/stock/highstock.js"></script>
+    <script src="https://code.highcharts.com/stock/modules/data.js"></script>
+
+    <script src="https://code.highcharts.com/stock/indicators/indicators-all.js"></script>
+
+    <script src="https://code.highcharts.com/stock/modules/drag-panes.js"></script>
+    <script src="https://code.highcharts.com/stock/modules/annotations-advanced.js"></script>
+    <script src="https://code.highcharts.com/stock/modules/price-indicator.js"></script>
+    <script src="https://code.highcharts.com/stock/modules/full-screen.js"></script>
+
+    <script src="https://code.highcharts.com/stock/modules/stock-tools.js"></script>
 </head>
 <body>
     <header>
         <nav id="navbar">
-            <div class="container">
+            <div class="container0">
+                <img src="../static/img/web_logo.png" alt="logo" class="c-logo">
                 <h1 class="logo"><a href="index">CVS</a></h1>
                 <ul>
                     <li><a href="index">Home</a></li>
-                    <li><a class="current" href="inv">Investments</a></li>
+                    <li><a class="current" href="inv">Analysis</a></li>
                     <li><a href="trade">Trade</a></li>
                     <li><a href="about">About</a></li>
                     <li><a href="contact">Contact</a></li>
@@ -27,148 +49,159 @@
     </header>
 
     <section id="flip-box">
-        <div class="wrapper">
-            <h1 class="py-4">My Investments</h1>
-            <div class="cols">
 
+        <div class="wrapper" style="padding-bottom: 150px;">
+            <h1 class="py-4">Stock Analysis</h1>
 
-                <!-- The code commented below is the sample code for each Card! Make your iterations here!.... delete remaining cards! -->
+            <div class="cntain">
+                <div id="container2" class="chart"></div>
+            </div>
+        </div>
 
-
-
-                      <!-- <div class="col" ontouchstart="this.classList.toggle('hover');">
-                          <div class="container1">
-                              <div class="front" style="background-image: url(https://unsplash.it/500/500/)">
-                                  <div class="inner">
-                                      <p>Axis</p>
-                        <span>Long Term Equity Direct - Growth</span>
-                                  </div>
-                              </div>
-                              <div class="back">
-                                  <div class="inner">
-                                    <p>Sold on 05/03/2021</p>
-                                  </div>
-                              </div>
-                          </div>
-                        </div> -->
-
-                      <div class="col" ontouchstart="this.classList.toggle('hover');">
-                          <div class="container1">
-                              <div class="front" style="background-image: url(https://unsplash.it/500/500/)">
-                                  <div class="inner">
-                                      <p>Axis</p>
-                        <span>Long Term Equity Direct - Growth</span>
-                                  </div>
-                              </div>
-                              <div class="back">
-                                  <div class="inner">
-                                    <p>Sold on 05/03/2021</p>
-                                  </div>
-                              </div>
-                          </div>
-                        </div>
-
-                      <div class="col" ontouchstart="this.classList.toggle('hover');">
-                          <div class="container1">
-                              <div class="front" style="background-image: url(https://unsplash.it/502/502/)">
-                                  <div class="inner">
-                                      <p>Invesco</p>
-                        <span>Tax Plan Direct - Growth</span>
-                                  </div>
-                              </div>
-                              <div class="back">
-                                  <div class="inner">
-                                      <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Alias cum repellat velit quae suscipit c.</p>
-                                  </div>
-                              </div>
-                          </div>
-                      </div>
-
-                      <div class="col" ontouchstart="this.classList.toggle('hover');">
-                          <div class="container1">
-                              <div class="front" style="background-image: url(https://unsplash.it/503/503/)">
-                                  <div class="inner">
-                                      <p>PGIM</p>
-                        <span>Midcap Direct - Growth</span>
-                                  </div>
-                              </div>
-                              <div class="back">
-                                  <div class="inner">
-                                      <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Alias cum repellat velit quae suscipit c.</p>
-                                  </div>
-                              </div>
-                          </div>
-                      </div>
-
-                      <div class="col" ontouchstart="this.classList.toggle('hover');">
-                          <div class="container1">
-                              <div class="front" style="background-image: url(https://unsplash.it/504/504/)">
-                                  <div class="inner">
-                                      <p>ICICI Prudential</p>
-                        <span>Long Term Equity Direct - Growth</span>
-                                  </div>
-                              </div>
-                              <div class="back">
-                                  <div class="inner">
-                                      <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Alias cum repellat velit quae suscipit c.</p>
-                                  </div>
-                              </div>
-                          </div>
-                      </div>
-
-                      <div class="col" ontouchstart="this.classList.toggle('hover');">
-                          <div class="container1">
-                              <div class="front" style = "background-image: url(https://unsplash.it/505/505/)">
-                                  <div class="inner">
-                                      <p>Quant</p>
-                        <span>Bluechip Direct - Growth</span>
-                                  </div>
-                              </div>
-                              <div class="back">
-                                  <div class="inner">
-                                      <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Alias cum repellat velit quae suscipit c.</p>
-                                  </div>
-                              </div>
-                          </div>
-                      </div>
-
-                      <div class="col" ontouchstart="this.classList.toggle('hover');">
-                          <div class="container1">
-                              <div class="front" style="background-image: url(https://unsplash.it/506/506/)">
-                                  <div class="inner">
-                                      <p>Mahindra</p>
-                        <span>Badhat Yojna Direct - Growth</span>
-                                  </div>
-                              </div>
-                              <div class="back">
-                                  <div class="inner">
-                                      <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Alias cum repellat velit quae suscipit c.</p>
-                                  </div>
-                              </div>
-                          </div>
-                      </div>
-                      
-                      <div class="col" ontouchstart="this.classList.toggle('hover');">
-                          <div class="container1">
-                              <div class="front" style="background-image: url(https://unsplash.it/508/508/)">
-                                  <div class="inner">
-                                      <p>Tata</p>
-                        <span>Index Sensex Direct</span>
-                                  </div>
-                              </div>
-                              <div class="back">
-                                  <div class="inner">
-                                      <p>Bought on 23/12/2020</p>
-                                  </div>
-                              </div>
-                          </div>
-                      </div>
-                  </div>
-           </div>
     </section>
+
+    <script>
+        var chartdata = []
+        var volume = []
+    
+        function processData(data)
+        {
+            var data = data.res;
+            for (var i=0; i < data.length; i++)
+            {
+                chartdata.push([
+                    data[i][0], // the date
+                    data[i][1], // open
+                    data[i][2], // high
+                    data[i][3], // low
+                    data[i][4] // close
+                ]);
+                volume.push([
+                    data[i][0], // the date
+                    data[i][5] // the volume
+                ]);
+            }
+        }
+      
+        function plotCharts(){
+            Highcharts.stockChart('container2', {
+                chart: {
+                    backgroundColor: '#333',
+                    borderRadius: 30,
+                    width: 800,
+                    styleMode: true
+                },
+                rangeSelector:{
+                    selected: 1,
+                    color: '#777'
+                },
+                navigation: {
+                    bindings: {
+                        rect: {
+                            annotationsOptions: {
+                                shapeOptions: {
+                                    fill: 'rgba(0, 255, 255, 0.8)'
+                                }
+                            }
+                        }
+                    },
+                    annotationsOptions: {
+                        typeOptions: {
+                            line: {
+                                stroke: 'rgba(0, 255, 255, 1)',
+                                strokeWidth: 1
+                            }
+                        }
+                    }
+                },
+                yAxis: [{
+                    labels: {
+                        align: 'left'
+                    },
+                    height: '80%'
+                }, {
+                    labels: {
+                        align: 'left'
+                    },
+                    top: '80%',
+                    height: '20%',
+                    offset: 0
+                }],
+                tooltip: {
+                    backgroundColor: {
+                        linearGradient: [0, 0, 0, 70],
+                        stops: [
+                            [0, '#3366AA'],
+                            [1, '#ff3399']
+                        ]
+                    },
+                    color: '#fff',
+                    borderWidth: 1,
+                    borderRadius: 20
+                },
+                series: [{
+                    type: 'areaspline',
+                    id: 'aapl-ohlc',
+                    threshold: null,
+                    fillColor: {
+                        linearGradient: {
+                            x1: 0,
+                            y1: 0,
+                            x2: 0,
+                            y2: 1
+                        },
+                        stops: [
+                            [0, Highcharts.getOptions().colors[0]],
+                            [1, Highcharts.color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
+                        ]
+                    },
+                    name: 'AAPL Stock Price',
+                    data: chartdata
+                }, {
+                    type: 'column',
+                    id: 'aapl-volume',
+                    name: 'AAPL Volume',
+                    data: volume,
+                    yAxis: 1
+                }]
+            });
+    
+    
+        }
+    
+        $( document ).ready(function()
+        {
+            $.getJSON('/pipe', function(data){
+                processData(data);
+                plotCharts();
+            });
+        });
+    
+    </script>        
+    
 
     <!-- <div class="clr"></div> -->
     <footer id="main-footer">
         <p>Code"vid"19 Solutions &copy; 2021, All Rights Reserved</p>
     </footer>
+</body>
 </html>
+
+
+<!-- The code commented below is the sample code for each Card! Make your iterations here!.... delete remaining cards!
+
+    <div class="col" ontouchstart="this.classList.toggle('hover');">
+        <div class="container1">
+            <div class="front" style="background-image: url(https://unsplash.it/500/500/)">
+                <div class="inner">
+                    <p>Axis</p>
+    <span>Long Term Equity Direct - Growth</span>
+                </div>
+            </div>
+            <div class="back">
+                <div class="inner">
+                <p>Sold on 05/03/2021</p>
+                </div>
+            </div>
+        </div>
+    </div> -->

@@ -1,26 +1,39 @@
 # CodeVid19
 
-
-![FrontEnd1](https://user-images.githubusercontent.com/63743496/113564327-d320d500-9626-11eb-8c8d-01ab34f99ba7.jpeg)
-- [Stock Project](#code)
-> This is a project made as a Submission for our SEPM Course
+> Investment Web Application
 
 ---
 
 ### Table of Contents
-Click below to check out our project details.
+Click below to check out the project details.
 
 - [Description](#description)
 - [System Diagram](#system-diagram)
 - [Tech Stack](#tech-stack)
 - [Preview](#preview)
-- [Contributors](#contributors)
 
 ---
 
 ## Description
 
-Insert Description
+The web application simplifies investing and keeping track of the users investments. In addition, it provides an analysis on certain companies and how their stocks will do in the future.
+NOTE: FOR USER INFORMATION SECURITY WE USE SALTED PASSWORD HASHING
+
+USAGE:
+1. The application requires an individual to Sign Up first and then log in with their credentials
+2. If a user fails to log in under certain circumstances, a reset password facility is provided. The user receives a mail on their registered Email ID with a unique verification code and a reset passwork link. They can reset their password by using that particular code on the reset page
+3. After logging in, the user has the option to go through the sites pages
+
+SERVICES:
+1. The registered user can enter stock symbols and view their current prices, which are fetched with the help of an API
+2. The user can read up about us on the "About Us" Page which also provides the option to view a trading guide
+3. Under the "Trade" option, the user can either buy or sell their desired quantities of stocks by entering the respective stock symbols and the amount
+4. Each user has a unique dashboard maintained which enlists the current holdings of various stocks that they own
+5. With each transaction, a confirmation mail is sent to notify the user
+6. Under the "Analysis" section, we provide a graphical analysis of a few major companies and their stocks, which will help the user get an idea as to how successful companies are performing
+7. The application also lays out an educational page for people who are new to investing and want to know how to invest effectively. We have gathered  information ranging from videos and courses to articles to guide our users at every step
+8. We are open to queries and feedback. In order to do so, we enable our users to reach out to us by writing in the "Contact Us" section
+9. The user can log out securely by clicking on the "Sign Out" button
 
 [Back To The Top](#codevid19)
 
@@ -29,25 +42,34 @@ Insert Description
 ## System Diagram
 
 
-![system-design]INSERTSYSDIAGRAMLINK
+![System Diagram](https://user-images.githubusercontent.com/63743496/117470928-f23bbb00-af74-11eb-87ae-dad0f30a9d3e.jpeg)
+
 
 [Back To The Top](#codevid19)
 
 ---
 
 ## Tech Stack
+To run : Clone Repository & Run -> pip install -r requirements.txt
 
 ##### ML :
 
-  1.  
+
+1. Tensorflow
+2. Numpy
+3. Pandas
+4. Scikit Learn
+5. PyTorch
   
   
 ##### Frontend Tech Stack :
+
 
 1. HTML/CSS
 
 
 ##### Backend Tech Stack :
+
 
 1. Python
 2. Flask
@@ -61,75 +83,24 @@ Insert Description
 ## Preview
 
 
-![1]
+![WhatsApp Image 2021-05-05 at 14 56 46](https://user-images.githubusercontent.com/63743496/117121422-32067500-adb2-11eb-817c-da51b691dafd.jpeg)
 
-![2]
+![WhatsApp Image 2021-05-05 at 14 43 50](https://user-images.githubusercontent.com/63743496/117121502-4ba7bc80-adb2-11eb-8a52-37e567361034.jpeg)
 
-![3]
+![WhatsApp Image 2021-05-05 at 14 43 40](https://user-images.githubusercontent.com/63743496/117121547-5c583280-adb2-11eb-8df0-246031ffb36f.jpeg)
 
-![4]
+![WhatsApp Image 2021-05-05 at 14 37 52](https://user-images.githubusercontent.com/63743496/117121576-67ab5e00-adb2-11eb-9089-015ab0a9b80a.jpeg)
 
-![5]
-[Back To The Top](#codevid19)
+![WhatsApp Image 2021-05-05 at 14 44 48](https://user-images.githubusercontent.com/63743496/117121616-75f97a00-adb2-11eb-9857-d116ef6ee978.jpeg)
 
----
+![WhatsApp Image 2021-05-05 at 14 44 33](https://user-images.githubusercontent.com/63743496/117121643-801b7880-adb2-11eb-97fc-59bd59667a08.jpeg)
 
-## Contributors
+![WhatsApp Image 2021-05-05 at 14 39 09](https://user-images.githubusercontent.com/63743496/117121669-89a4e080-adb2-11eb-9a07-0151866e609e.jpeg)
 
-<table>
-<tr align="center">
+![WhatsApp Image 2021-05-05 at 14 48 37](https://user-images.githubusercontent.com/63743496/117121690-91fd1b80-adb2-11eb-86a9-271edc2824ea.jpeg)
 
-
+![WhatsApp Image 2021-05-05 at 14 39 42](https://user-images.githubusercontent.com/63743496/117121715-9e817400-adb2-11eb-9de8-8bacea0f4665.jpeg)
 
 
-<td>
-
-Nikhill Vombatkere
-
-<p align="center">
-<img src = "https://avatars.githubusercontent.com/u/63743496?s=400&u=2d0cfa0977549862b6aacc1c3d7357024a7233d6&v=4"  height="120" alt="Rusali Saha">
-</p>
-<p align="center">
-<a href = "https://github.com/NVombat"><img src = "https://cdns.iconmonstr.com/wp-content/assets/preview/2012/240/iconmonstr-github-1.png" width="36" height = "36"/></a>
-<a href = "https://www.linkedin.com/in/nikhill-vombatkere-1a0b9a192/">
-<img src = "https://cdns.iconmonstr.com/wp-content/assets/preview/2012/240/iconmonstr-linkedin-2.png" width="36" height="36"/>
-</a>
-</p>
-</td>
-
-<td>
-
-Pragya Bharti
-<p align="center">
-
-</p>
-</td>
-
-<td>
-
-Pratik Chandrasekhar Pattanaik
-
-<p align="center">
-
-</p>
-</td>
-
-<td>
-
-Aradhya Tripathi 
-
-<p align="center">
-
-</p>
-</td>
-
-
-
-
-
-
-  </table>
-</tr>
-  </table>
 
 [Back To The Top](#codevid19)

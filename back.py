@@ -1,3 +1,4 @@
+# Imports all the flask libraries
 from flask import (
     Flask,
     session,
@@ -9,18 +10,29 @@ from flask import (
 )
 
 
+# Other libraries needed
 import datetime as d
+import numpy as np
+import requests
+import json
 import os
 
 
-#Imports functions from other folders
-from models import users, contactus, stock
+# Imports functions from other folders
 from sendmail import send_mail, send_buy, send_sell
+from models import users, contactus, stock
+from ML.predict import  Predict
 from api import getdata
 
 
-#Path used for all tables
+# Path used for all tables
 path = "app.db"
+
+
+# Ml models
+# predict_aap = Predict('AAPL', 'analysis/AAPL.csv', 'analysis/google.csv', 'analysis/TSLA.csv')
+# predict_goog = Predict('GOOGL', 'analysis/AAPL.csv', 'analysis/google.csv', 'analysis/TSLA.csv')
+# predict_tsla = Predict('TSLA', 'analysis/AAPL.csv', 'analysis/google.csv', 'analysis/TSLA.csv')
 
 
 templates_path = os.path.abspath('./templates')
@@ -29,14 +41,16 @@ app.secret_key = 'somekey'
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
 
-#Creates all the tables when the website is run
+# Creates all the tables when the website is run
 users.create_user()
-contactus.create_tbl("app.db")
-stock.make_tbl("app.db")
+contactus.create_tbl(path)
+stock.make_tbl(path)
+
 
 '''
 Sets the current user - g.user to none and then checks if the user is in session
 If the user is in session then their email is fetched and g.user is updated to that email
+Otherwise Exception is thrown
 '''
 @app.before_request
 def security():
@@ -50,13 +64,15 @@ def security():
             print("Failed")
 
 
-#LOGIN page
+# LOGIN page
 @app.route('/', methods=["GET", "POST"])
 def home():
-    #The particular user is removed from session
+    # The particular user is removed from session
     session.pop("user_email", None)
-    #Flag checks if the password entered by the user is correct or not
+
+    # Flag checks if the password entered by the user is correct or not
     flag = True
+
     """
     If a post request is made on the login page
     Take input from the fields - Name, Email, Password, Confirm Password
@@ -66,35 +82,62 @@ def home():
         email = request.form['email']
         password = request.form['password']
         repeat_password = request.form['rpassword']
-        
+
         '''
         If the password field has a password, and the repeat password is empty the user is trying to login
-        The Password is verified by checking the database for that user
+        First the user is verified -> Check if user exists
+        Then the password is verified by checking the database for that user
         If the password matches the user is added to the session otherwise the flag variable is set to false
+        If the user doesnt exist then render back to login and give error message
         '''
-        if password:
-            if len(repeat_password) == 0:
+        if password and not repeat_password:
+            if users.check_user_exist(email):
                 print("Login")
-                if users.checkpwd(password, email):
+                # if users.checkpwd(password, email):
+                #     session['user_email'] = email
+                #     return redirect('/index')
+                '''
+                If the password field is entered check the password againts the hashed password in the db
+                If it matches then user is in session and is redirected to the homepage
+                Else a flag is set and the user is shown an error message
+                '''
+                if users.check_hash(password, email):
                     session['user_email'] = email
                     return redirect('/index')
                 else:
-                    flag=False
+                    #If the flag variable is false -> user has entered the wrong password
+                    flag = False
+                    print("WRONG PWD")
+                    #And is redirected to the login page
+                    return render_template('login.html', error="Incorrect Password")
+            else:
+                #If the user doesnt exist
+                return render_template('login.html', error="User Doesnt Exist")
 
         '''
         If the password and repeat password fields are filled - SIGN UP
-        If they both are the same then a new user is added to the USER TABLE in the database with all the data
+        If the user already exists then print an error message and redirect to login page
+        If the user doesnt exist then allow the signup to take place
+        If they both are the same (password and repeat password)
+        Then a new user is added to the USER TABLE in the database with all the data
         The user is then added to the session and the user is redirected to the login page
         If the fields dont match the user is alerted and redirected back to the login page to try again
         '''
         if password and repeat_password:
             print("Sign Up")
-            if password == repeat_password:
-                users.insert('user', (email, name, password, 0))
-                session['user_email'] = email
-                return render_template('login.html', error="Sign Up Complete - Login")
+            if not users.check_user_exist(email):
+                if password == repeat_password:
+                    #Hash the users password and store the hashed password for security
+                    password = users.hash_pwd(password)
+                    print("Hashed PWD: ", password)
+                    users.insert('user', (email, name, password, 0))
+                    print("Inserted Hashed Password")
+                    session['user_email'] = email
+                    return render_template('login.html', error="Sign Up Complete - Login")
+                else:
+                    return render_template('login.html', error="Password & Retyped Password Not Same")
             else:
-                return render_template('login.html', error="Password & Retyped Password Not Same")
+                return render_template('login.html', error="This User Already Exists! Try Again")
 
         '''
         If only the email field is filled it means the user has requested to reset their password
@@ -103,31 +146,29 @@ def home():
         If the user doesnt exist an error message is generated and the user is redirected back to the login page
         '''
         if not name and not password and email:
-            if users.check_reset(email):
+            if users.check_user_exist(email):
                 print("Reset Password:")
-                #session['user_email'] = email
+                # session['user_email'] = email
                 reset_password(email)
-                return render_template('login.html', error="We have sent you a link to reset your password. Check your mailbox")
+                return render_template('login.html',
+                                       error="We have sent you a link to reset your password. Check your mailbox")
             else:
                 print("User Doesnt Exist")
                 return render_template('login.html', error="This Email Doesnt Exist - Please Sign Up")
-    
-    '''
-    If the flag variable is true then the user has entered the correct password and is redirected to the login page - FLAG VALUE IS TRUE INITIALLY
-    If the flag variable is false then the user has entered the wrong password and is redirected to the login page
-    '''
+
+    #If the flag variable is true then the user has entered the correct password and is redirected to the login page
+    #FLAG VALUE IS TRUE INITIALLY
     if flag:
-        return render_template('login.html')
-    else:
-        return render_template('login.html', error="Incorrect Password")
+        return render_template('login.html')    
 
 
-#HOME page
-@app.route('/index')
+# HOME page
+@app.route('/index', methods=["GET", "POST"])
 def index():
-    #Enters the page only if a user is signed in - g.user represents the current user
+    # Enters the page only if a user is signed in - g.user represents the current user
     if g.user:
-        return render_template('index.html')
+        return render_template("index.html")
+    # Redirects to login page if g.user is empty -> No user signed in
     return redirect('/')
 
 
@@ -135,12 +176,12 @@ def index():
 Function to reset password
 Sends the mail for resetting password to user
 """
-def reset_password(email : str):
+def reset_password(email: str):
     print(email)
     send_mail(email)
 
 
-#RESET PASSWORD page
+# RESET PASSWORD page
 @app.route('/reset', methods=["GET", "POST"])
 def reset():
     """
@@ -163,56 +204,77 @@ def reset():
             print("CHECKING")
             if pwd == repeat_pwd:
                 if users.check_code(ver_code):
+                    #Hash the new password and update db with hashed password
+                    pwd = users.hash_pwd(pwd)
                     users.reset_pwd(pwd, ver_code)
                     print("Resetting password & Updating DB")
                     users.reset_code(ver_code)
                     return redirect("/")
-                    #return render_template('login.html', error="Password Reset Successfully")
+                    # return render_template('login.html', error="Password Reset Successfully")
                 else:
                     print("Verification Code Doesnt Match")
                     return redirect("/")
-                    #return render_template('login.html', error="Try resetting again")
+                    # return render_template('login.html', error="Try resetting again")
             else:
                 return render_template('reset.html', error="Password & Retyped Password Not Same")
     return render_template('reset.html')
 
 
-#ANALYSIS page
+# ANALYSIS page
 @app.route('/inv')
 def inv():
-    #Enters the page only if a user is signed in - g.user represents the current user
+    # google_value = np.random.randint(high=2590, low=2095, size=100) # $ 2,299 APR24
+    # tsla_value = np.random.randint(high=930, low=530, size=100) # $ 722 APR24
+    # aap_value = np.random.randint(high=245, low=80, size=100) # $ 135 APR24
+
+    # google_list = google_value.tolist()
+    # google_json_str = json.dumps(google_list)
+
+    # tsla_list = tsla_value.tolist()
+    # tsla_json_str = json.dumps(tsla_list)
+
+    # aap_list = aap_value.tolist()
+    # aap_json_str = json.dumps(aap_list)
+
+    # print("Google : ", google_json_str)
+    # print("Tesla : ", tsla_json_str)
+    # print("Apple : ", aap_json_str)
+
+    # Enters the page only if a user is signed in - g.user represents the current user
     if g.user:
+        # aap_results = predict_aap.result(aap_value)
         return render_template('inv.html')
-    #Redirects to login page if g.user is empty -> No user signed in 
+    # Redirects to login page if g.user is empty -> No user signed in
     return redirect('/')
 
 
-#ABOUT US page
+# ABOUT US page
 @app.route('/about')
 def about():
-    #Enters the page only if a user is signed in - g.user represents the current user
+    # Enters the page only if a user is signed in - g.user represents the current user
     if g.user:
         return render_template('about.html')
-    #Redirects to login page if g.user is empty -> No user signed in 
+    # Redirects to login page if g.user is empty -> No user signed in
     return redirect('/')
 
 
-#TRADING GUIDE page
+# TRADING GUIDE page
 @app.route('/doc')
 def doc():
-    #Enters the page only if a user is signed in - g.user represents the current user
+    # Enters the page only if a user is signed in - g.user represents the current user
     if g.user:
         return render_template('doc.html')
-    #Redirects to login page if g.user is empty -> No user signed in 
+    # Redirects to login page if g.user is empty -> No user signed in
     return redirect('/')
 
 
-#TRADE page
+# TRADE page
 @app.route('/trade', methods=["GET", "POST"])
 def trade():
-    #Enters the page only if a user is signed in - g.user represents the current user
+    # Enters the page only if a user is signed in - g.user represents the current user
     print(g.user)
     if g.user:
+
         '''
         uses the user email id to query the users transactions
         this transactions array is then received by the table on the html page
@@ -221,16 +283,17 @@ def trade():
         transactions = stock.query(user_email[0], path)
 
         if request.method == "POST":
+
             '''
             If a post request is generated (button clicked) the user wants to buy or sell stocks
             It is then checked whether the user wants to buy or sell (based on the button pressed)
             '''
-            #BUYING
+            # BUYING
             if request.form.get("b1"):
-                #The data from the fields on the page are fetched
+                # The data from the fields on the page are fetched
                 symb = request.form["stockid"]
                 quant = request.form["amount"]
-                
+
                 '''
                 If both the fields had data then the current date and time is first calculated
                 Then the quantity is stored as an integer
@@ -262,20 +325,23 @@ def trade():
                     send_buy(data)
 
                     print("TRANSACTIONS: ", transactions)
-                    #Redirect submits a get request (200) thus cancelling the usual post request generated by the browser when a page is refreshed
+                    # Redirect submits a get request (200) thus cancelling the usual post request generated by the
+                    # browser when a page is refreshed
                     return redirect(url_for("trade"))
-                
-                #If the user hasnt filled in both the fields then he is redirected back to that page instead of the program throwing an error
-                else:
-                    return redirect(url_for("trade"))
-                    print("Field Empty")
 
-            #SELLING
+                # If the user hasnt filled in both the fields then he is redirected back to that page instead of the
+                # program throwing an error
+                else:
+                    print("Field Empty")
+                    return redirect(url_for("trade"))
+
+
+            # SELLING
             elif request.form.get("s1"):
-                #The data from the fields on the page are fetched
+                # The data from the fields on the page are fetched
                 symb = request.form["stockid"]
                 quant = request.form["amount"]
-                
+
                 '''
                 If both the fields had data then the quantity is stored as an integer
                 The stock price api is called to calculate the price of that particular stock
@@ -306,25 +372,68 @@ def trade():
                     send_sell(mail_data)
                     return redirect(url_for("trade"))
 
-                #If the user hasnt filled in both the fields then he is redirected back to that page instead of the program throwing an error
+                # If the user hasnt filled in both the fields then he is redirected back to that page instead of the
+                # program throwing an error
                 else:
-                    return redirect(url_for("trade"))
                     print("Field Empty")
-        return render_template('trade.html', transactions=transactions, error="Transactions Successful!")
-    #Redirects to login page if g.user is empty -> No user signed in 
+                    return redirect(url_for("trade"))
+
+
+            # FIND PRICE
+            elif request.form.get("p1"):
+                # The data from the fields on the page are fetched
+                sym = request.form["stockid"]
+                quant = request.form["amount"]
+
+                '''
+                If the user wants to find the price of a stock they can enter the symbol they want to find the price for
+                and the amount
+                The API fetches the price and then returns the value
+                The user is then given the price of that stock for the amount they entered
+                '''
+                if sym and quant:
+                    print("PRICE")
+                    quant = int(quant)
+                    print("AMOUNT", quant)
+
+                    price = getdata(close='close', symbol=sym)[0]
+                    price = float(price)
+
+                    total = quant * price
+                    print("Total cost is $", total)
+
+                    quant = str(quant)
+                    price = str(price)
+                    total = str(total)
+
+                    # Message with price for amount entered and per unit as well
+                    err_str = "The price for " + quant + " unit(s) of " + sym + " Stock is $ " + total + " at $ " + price + " per unit"
+
+                    print(transactions)
+                    # render template because we want the table to show and the message
+                    return render_template('trade.html', transactions=transactions, error=err_str)
+
+                # If the user hasnt filled in both the fields then he is redirected back to that page instead of the
+                # program throwing an error
+                else:
+                    print("Field Empty")
+                    return redirect(url_for("trade"))
+
+        return render_template('trade.html', transactions=transactions)
+    # Redirects to login page if g.user is empty -> No user signed in
     return redirect('/')
 
 
-
-#CONTACT US page
+# CONTACT US page
 @app.route('/contact', methods=["GET", "POST"])
 def contact():
-    #Enters the page only if a user is signed in - g.user represents the current user
+    # Enters the page only if a user is signed in - g.user represents the current user
     if g.user:
+        
         """
         If a post request is generated (when user clicks submit)
         The email and message are fetched from the input fields
-        The entered email is then compared with g.user to make sure it matches the user
+        The entered email is then checked with the database to make sure it matches the user and the user exists
         If the emails dont match it generates an error and if it does match then we insert data into contact table
         """
         if request.method == "POST":
@@ -332,19 +441,37 @@ def contact():
             email = request.form["email"]
             print(email)
             msg = request.form["message"]
-            user_email = users.getemail().pop()
-            print(user_email[0])
-            if email != user_email[0]:
+
+            user_email = g.user
+            curr_user = user_email[0]
+            print(curr_user)
+
+            if users.check_contact_us(email, curr_user):
+                print("Correct Email")
+                contactus.insert(email, msg, path)
+                return render_template('contact.html', error="Thank you, We will get back to you shortly")
+            else:
                 print("Incorrect Email")
                 return render_template('contact.html', error="Incorrect Email!")
-            print("Correct Email")
-            contactus.insert(email, msg, path)
-            return render_template('contact.html', error="Thank you, We will get back to you shortly")
 
-        return render_template('contact.html')
-    #Redirects to login page if g.user is empty -> No user signed in 
+        return render_template("contact.html")
+
+    # Redirects to login page if g.user is empty -> No user signed in
     return redirect('/')
 
+
+#################################################################################################################
+# For analysis - AAPL Chart - IT GIVES JAN 2021 - to current date
+# HELP - https://github.com/soumilshah1995/Stockchart-highchart-flask-
+@app.route('/pipe', methods=["GET", "POST"])
+def pipe():
+    payload = {}
+    headers = {}
+    url = "https://demo-live-data.highcharts.com/aapl-ohlcv.json"
+    r = requests.get(url, headers=headers, data={})
+    r = r.json()
+    return {"res": r}
+##################################################################################################################
 
 if __name__ == '__main__':
     app.run(debug=True, port=8000)

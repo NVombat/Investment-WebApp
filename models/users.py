@@ -1,3 +1,6 @@
+#libraries for salted hashing of password
+import hashlib, binascii, os
+#Sql library
 import sqlite3 as s
 
 
@@ -40,8 +43,8 @@ def checkpwd(pwd: str, email: str):
     return False
 
 
-#Checks if the reset is possible by seeing if the user exists
-def check_reset(email : str):
+#Checks if the RESET PASSWORD option and SIGN UP is possible by seeing if the user exists
+def check_user_exist(email : str):
     conn = s.connect("app.db")
     cur = conn.cursor()
 
@@ -50,10 +53,10 @@ def check_reset(email : str):
     cur.execute(chk)
     #Fetches results in array
     res = cur.fetchall()
-    #If the array is empty then user doesnt exist and thus cant reset password
+    #If the array is empty then user doesnt exist and thus cant reset password but can sign up USER DOESNT EXIST
     if len(res)==0:
         return False
-    #If array is not empty - reset possible
+    #If array is not empty - reset possible but signup not possible USER EXISTS
     else:
         return True
 
@@ -132,3 +135,86 @@ def getemail():
     cur.execute(gml)
     emails = cur.fetchall()
     return emails
+
+
+'''
+For the contact us function:
+If the user types a message and an email ID - 
+It checks if the email ID is in our database (the user exists)
+It also checks if the email ID mentioned is the same one as the current user
+If both these conditions are true the user is able to send a message otherwise an error message is displayed
+'''
+def check_contact_us(email : str, curr_user : str):
+    conn = s.connect("app.db")
+    cur = conn.cursor()
+
+    #Command to fetch from the table any data with that particular email
+    chk = f"SELECT * FROM user WHERE Email='{email}'"
+    cur.execute(chk)
+    #Stores the fetched data in the table
+    res = cur.fetchall()
+    print("RES", res)
+
+    #Checks the above mentioned conditions
+    if len(res)>0 and res[0][0]==curr_user:
+        return True
+    else:
+        return False
+
+
+'''
+Hashes the password entered by the user using the SHA256 HASH FUNCTION
+First It generates salt using the urandom lib for CSPRNG
+Then it converts the salt to hexadecimal and then encodes it in ASCII format
+Then we use the Password based Key definition function which derives the secret key using the password and a HMAC pseudo-random function
+It is also hashed with the salt and put through 100,000 iterations
+binascii can convert between binary and ascii encoded binary representations
+hexlify converts the binary data to hexadecimal
+Final hash is computed with salt and then decoded to ascii and returned
+'''
+def hash_pwd(pwd : str):
+    salt = hashlib.sha256(os.urandom(60)).hexdigest().encode('ascii')
+    print("SALT1: ", salt)
+    pwd_hash = hashlib.pbkdf2_hmac('sha512', pwd.encode('utf-8'), salt, 100000)
+    pwd_hash = binascii.hexlify(pwd_hash)
+    final_hashed_pwd = (salt + pwd_hash).decode('ascii')
+    return final_hashed_pwd
+
+
+'''
+First we extract the stored hashed password from the database
+Then from that we extract the password part and the salt part
+We then hash the current password which the user has entered 
+We then compare the hashed password to the one stored in the db
+if they match we return true else we return false
+'''
+def check_hash(pwd : str, email : str):
+    conn = s.connect("app.db")
+    cur = conn.cursor()
+
+    #Command to fetch all data for user with a particular email id
+    check = f"SELECT * FROM user where Email='{email}'"
+    cur.execute(check)
+    #Once the data is fetched from the db it is stored in a list
+    res = cur.fetchall()
+    print("RES : ", res)
+    #The list stores a tuple and password is the third element in the tuple
+    dbpwd = res[0][2]
+    #DATABASE STORED PASSWORD
+    print("DBPWD: ", dbpwd)
+
+    #PASSWORD HASH AND SALT STORED IN DATABASE
+    salt = dbpwd[:64]
+    print("SALT2: ", salt)
+    dbpwd = dbpwd[64:]
+    print("Stored password hash: ", dbpwd)
+    
+    #PASSWORD HASH FOR PASSWORD THAT USER HAS CURRENTLY ENTERED
+    pwd_hash = hashlib.pbkdf2_hmac('sha512', pwd.encode('utf-8'), salt.encode('ascii'), 100000)
+    pwd_hash = binascii.hexlify(pwd_hash).decode('ascii')
+    print("pwd_hash: ", pwd_hash)
+    
+    if pwd_hash==dbpwd:
+        return True
+    else:
+        return False
