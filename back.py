@@ -21,7 +21,7 @@ import os
 # Imports functions from other folders
 from sendmail import send_mail, send_buy, send_sell
 from models import users, contactus, stock
-from analysis.predict import  Predict
+from ML.predict import  Predict
 from api import getdata
 
 
@@ -30,9 +30,9 @@ path = "app.db"
 
 
 # Ml models
-predict_aap = Predict('AAPL', 'analysis/AAPL.csv', 'analysis/google.csv', 'analysis/TSLA.csv')
-predict_goog = Predict('GOOGL', 'analysis/AAPL.csv', 'analysis/google.csv', 'analysis/TSLA.csv')
-predict_tsla = Predict('TSLA', 'analysis/AAPL.csv', 'analysis/google.csv', 'analysis/TSLA.csv')
+# predict_aap = Predict('AAPL', 'analysis/AAPL.csv', 'analysis/google.csv', 'analysis/TSLA.csv')
+# predict_goog = Predict('GOOGL', 'analysis/AAPL.csv', 'analysis/google.csv', 'analysis/TSLA.csv')
+# predict_tsla = Predict('TSLA', 'analysis/AAPL.csv', 'analysis/google.csv', 'analysis/TSLA.csv')
 
 
 templates_path = os.path.abspath('./templates')
@@ -223,22 +223,22 @@ def reset():
 # ANALYSIS page
 @app.route('/inv')
 def inv():
-    google_value = np.random.randint(high=2590, low=2095, size=100) # $ 2,299 APR24
-    tsla_value = np.random.randint(high=930, low=530, size=100) # $ 722 APR24
-    aap_value = np.random.randint(high=245, low=80, size=100) # $ 135 APR24
+    # google_value = np.random.randint(high=2590, low=2095, size=100) # $ 2,299 APR24
+    # tsla_value = np.random.randint(high=930, low=530, size=100) # $ 722 APR24
+    # aap_value = np.random.randint(high=245, low=80, size=100) # $ 135 APR24
 
-    google_list = google_value.tolist()
-    google_json_str = json.dumps(google_list)
+    # google_list = google_value.tolist()
+    # google_json_str = json.dumps(google_list)
 
-    tsla_list = tsla_value.tolist()
-    tsla_json_str = json.dumps(tsla_list)
+    # tsla_list = tsla_value.tolist()
+    # tsla_json_str = json.dumps(tsla_list)
 
-    aap_list = aap_value.tolist()
-    aap_json_str = json.dumps(aap_list)
+    # aap_list = aap_value.tolist()
+    # aap_json_str = json.dumps(aap_list)
 
-    print("Google : ", google_json_str)
-    print("Tesla : ", tsla_json_str)
-    print("Apple : ", aap_json_str)
+    # print("Google : ", google_json_str)
+    # print("Tesla : ", tsla_json_str)
+    # print("Apple : ", aap_json_str)
 
     # Enters the page only if a user is signed in - g.user represents the current user
     if g.user:
