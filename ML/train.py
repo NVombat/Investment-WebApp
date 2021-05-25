@@ -18,7 +18,7 @@ def getkey(path: str):
 
 
 def load_t(sym: str):
-    import pandas_datareader as pdr
+    from pandas import pandas_datareader as pdr
     key = getkey('../configuration.cfg')
     all_data = pdr.get_data_tiingo(sym, api_key=key)
     all_data.to_csv(f'{sym}.csv')
