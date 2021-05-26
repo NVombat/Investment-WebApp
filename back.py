@@ -463,13 +463,19 @@ def contact():
 #################################################################################################################
 # For analysis - AAPL Chart - IT GIVES JAN 2021 - to current date
 # HELP - https://github.com/soumilshah1995/Stockchart-highchart-flask-
+
+import json
+
 @app.route('/pipe', methods=["GET", "POST"])
 def pipe():
     payload = {}
     headers = {}
-    url = "https://demo-live-data.highcharts.com/aapl-ohlcv.json"
-    r = requests.get(url, headers=headers, data={})
-    r = r.json()
+    # url = "https://demo-live-data.highcharts.com/aapl-ohlcv.json"
+    # r = requests.get(url, headers=headers, data={})
+    # r = r.json()
+    with open('AAPL2.json') as f:
+        r = json.load(f)
+
     return {"res": r}
 ##################################################################################################################
 
