@@ -223,26 +223,8 @@ def reset():
 # ANALYSIS page
 @app.route('/inv')
 def inv():
-    # google_value = np.random.randint(high=2590, low=2095, size=100) # $ 2,299 APR24
-    # tsla_value = np.random.randint(high=930, low=530, size=100) # $ 722 APR24
-    # aap_value = np.random.randint(high=245, low=80, size=100) # $ 135 APR24
-
-    # google_list = google_value.tolist()
-    # google_json_str = json.dumps(google_list)
-
-    # tsla_list = tsla_value.tolist()
-    # tsla_json_str = json.dumps(tsla_list)
-
-    # aap_list = aap_value.tolist()
-    # aap_json_str = json.dumps(aap_list)
-
-    # print("Google : ", google_json_str)
-    # print("Tesla : ", tsla_json_str)
-    # print("Apple : ", aap_json_str)
-
     # Enters the page only if a user is signed in - g.user represents the current user
     if g.user:
-        # aap_results = predict_aap.result(aap_value)
         return render_template('inv.html')
     # Redirects to login page if g.user is empty -> No user signed in
     return redirect('/')
@@ -460,12 +442,6 @@ def contact():
     return redirect('/')
 
 
-#################################################################################################################
-# For analysis - AAPL Chart - IT GIVES JAN 2021 - to current date
-# HELP - https://github.com/soumilshah1995/Stockchart-highchart-flask-
-
-import json
-
 @app.route('/pipe', methods=["GET", "POST"])
 def pipe():
     payload = {}
@@ -473,11 +449,11 @@ def pipe():
     # url = "https://demo-live-data.highcharts.com/aapl-ohlcv.json"
     # r = requests.get(url, headers=headers, data={})
     # r = r.json()
-    with open('AAPL2.json') as f:
+    with open('analysis/data/AAPL.json') as f:
         r = json.load(f)
 
     return {"res": r}
-##################################################################################################################
+
 
 if __name__ == '__main__':
     app.run(debug=True, port=8000)

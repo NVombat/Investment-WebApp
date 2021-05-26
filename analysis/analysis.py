@@ -2,7 +2,7 @@ from pytz import utc
 import justpy as jp
 import pandas as pd
 
-df = pd.read_csv("AAPL.csv", parse_dates=['Date'])
+df = pd.read_csv("data/AAPL.csv", parse_dates=['Date'])
 df['Month'] = df['Date'].dt.strftime("%Y-%m")
 df_mon = df.groupby(['Month']).mean()
 
