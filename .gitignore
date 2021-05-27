@@ -150,13 +150,6 @@ analysis/data/Visa.json
 analysis/data/WMT.csv
 analysis/data/WMT.json
 
-ML/AAPL.csv
-ML/google.csv
-ML/TSLA.csv
-ML/AAPL.h5
-ML/google.h5
-ML/TSLA.h5
-
 # Spyder project settings
 .spyderproject
 .spyproject

@@ -21,18 +21,11 @@ import os
 # Imports functions from other folders
 from sendmail import send_mail, send_buy, send_sell
 from models import users, contactus, stock
-from ML.predict import  Predict
 from api import getdata
 
 
 # Path used for all tables
 path = "app.db"
-
-
-# Ml models
-# predict_aap = Predict('AAPL', 'analysis/AAPL.csv', 'analysis/google.csv', 'analysis/TSLA.csv')
-# predict_goog = Predict('GOOGL', 'analysis/AAPL.csv', 'analysis/google.csv', 'analysis/TSLA.csv')
-# predict_tsla = Predict('TSLA', 'analysis/AAPL.csv', 'analysis/google.csv', 'analysis/TSLA.csv')
 
 
 templates_path = os.path.abspath('./templates')
