@@ -421,7 +421,7 @@ tr:nth-child(even){
 
 .cntain{
     display: inline-flex;
-    transform: translateX(33%); 
+    transform: translateX(8%); 
 }
 
 .c-logo{

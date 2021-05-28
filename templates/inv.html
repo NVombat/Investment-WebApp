@@ -6,6 +6,7 @@
     <meta name="description" content="Welcome to the most extraordinary finance web application!">
     <meta name="keywords" content="CVS investment web application">
     <link rel="stylesheet" href="../static/css/style_buy.css">
+    <link rel="stylesheet" href="../static/css/style_inv.css">
     <link rel="stylesheet" href="../static/css/style.css">
     <title>Analysis</title>
     
@@ -28,6 +29,8 @@
 
     <script src="https://code.highcharts.com/stock/modules/stock-tools.js"></script>
 
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+
 </head>
 <body>
     <header>
@@ -48,13 +51,44 @@
     </header>
 
     <section id="flip-box">
+        <h1 class="py-4">Stock Analysis</h1>
 
-        <div class="wrapper" style="padding-bottom: 150px;">
-            <h1 class="py-4">Stock Analysis</h1>
-
+        <div class="wrapper">
             <div class="cntain">
                 <div id="container2" class="chart"></div>
             </div>
+
+            <form class="form-style">
+            <div class="secondary">
+                <div class="inputGroup">
+                  <input id="radio1" name="radio" value="GOOGL" type="radio" checked/>
+                  <label for="radio1">Google</label>
+                </div>
+                <div class="inputGroup">
+                    <input id="radio2" name="radio" type="radio"/>
+                    <label for="radio2">Apple</label>
+                </div>
+                <div class="inputGroup">
+                    <input id="radio3" name="radio" type="radio"/>
+                    <label for="radio3">Tesla</label>
+                </div>
+                <div class="inputGroup">
+                    <input id="radio4" name="radio" type="radio"/>
+                    <label for="radio4">Nvidia</label>
+                </div>
+                <div class="inputGroup">
+                    <input id="radio5" name="radio" type="radio"/>
+                    <label for="radio5">Microsoft</label>
+                </div>
+                <div class="inputGroup">
+                    <input id="radio6" name="radio" type="radio"/>
+                    <label for="radio6">Amazon</label>
+                </div>
+            </div>
+            <button type="submit" class="btn" onsubmit="redo();">View</button>
+            </form>
+
+            
         </div>
 
     </section>
@@ -62,7 +96,7 @@
     <script>
         var chartdata = []
         var volume = []
-    
+
         function processData(data)
         {
             var data = data.res;
@@ -169,14 +203,16 @@
     
         }
 
-        
-        $( document ).ready(function()
-        {
-            $.getJSON('/pipe', function(data){
-                processData(data);
-                plotCharts();
+        function redo(){
+            $( document ).ready(function()
+            {
+                $.getJSON("/pipe", function(data){
+                    processData(data);
+                    plotCharts();
+                });
             });
-        });
+        }
+        redo();
     
     </script>        
     
@@ -189,20 +225,20 @@
 </html>
 
 
-<!-- The code commented below is the sample code for each Card! Make your iterations here!.... delete remaining cards!
+<!-- The code commented below is the sample code for each Card! Make your iterations here!.... delete remaining cards! -->
 
-    <div class="col" ontouchstart="this.classList.toggle('hover');">
-        <div class="container1">
-            <div class="front" style="background-image: url(https://unsplash.it/500/500/)">
-                <div class="inner">
-                    <p>Axis</p>
-    <span>Long Term Equity Direct - Growth</span>
-                </div>
-            </div>
-            <div class="back">
-                <div class="inner">
-                <p>Sold on 05/03/2021</p>
-                </div>
+<!-- <div class="col" ontouchstart="this.classList.toggle('hover');">
+    <div class="container1">
+        <div class="front" style="background-image: url(https://unsplash.it/500/500/)">
+            <div class="inner">
+                <p>Axis</p>
+                <span>Long Term Equity Direct - Growth</span>
             </div>
         </div>
-    </div> -->
+        <div class="back">
+            <div class="inner">
+            <p>Sold on 05/03/2021</p>
+            </div>
+        </div>
+    </div>
+</div> -->
