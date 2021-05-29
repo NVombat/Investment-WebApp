@@ -12,7 +12,6 @@ from flask import (
 
 # Other libraries needed
 import datetime as d
-import numpy as np
 import requests
 import json
 import os
@@ -214,11 +213,20 @@ def reset():
 
 
 # ANALYSIS page
-@app.route('/inv')
+@app.route('/inv', methods=["GET", "POST"])
 def inv():
     # Enters the page only if a user is signed in - g.user represents the current user
     if g.user:
+        #If the user clicks on the 'VIEW' Button a POST request is generated
+        if request.method == "POST":
+            #Get the variable name for the option the the user has selected and clicked view
+            company = request.form['radio']
+            print("ENTERED POST REQUEST")
+            print(company)
+            return redirect(url_for("inv"))
+        
         return render_template('inv.html')
+
     # Redirects to login page if g.user is empty -> No user signed in
     return redirect('/')
 
@@ -437,7 +445,9 @@ def contact():
 
 @app.route('/pipe', methods=["GET", "POST"])
 def pipe():
-    with open('analysis/data/AAPL.json') as f:
+    #Sends json file containing data to be plotted
+    #filename = 'analysis/data/'+str(company)+'.json'
+    with open("analysis/data/AAPL.json") as f:
         r = json.load(f)
 
     return {"res": r}
