@@ -50,8 +50,8 @@ date = date.strftime("%Y-%m-%d")
 # print("Two days ago the date was OPEN DATE:", open_date)
 
 #Safe Values
-open_date = "2021-04-01"
-close_date = "2021-04-02"
+open_date = "2021-05-01"
+close_date = "2021-05-02"
 # format - yyyy-mm-dd --- eg -> 2021-04-17
 
 def getdata(symbol: str, date_from: str = open_date,

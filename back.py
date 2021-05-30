@@ -8,9 +8,11 @@ from flask import (
     redirect,
     url_for
 )
+from requests.api import get
 
 
 # Other libraries needed
+import yfinance as yf
 import datetime as d
 import requests
 import json
@@ -37,6 +39,17 @@ app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 users.create_user()
 contactus.create_tbl(path)
 stock.make_tbl(path)
+
+
+'''
+Function to get the current price of any stock
+Takes symbol as input and uses Ticker Method to get stock data of the current day
+Extracts the closing price and returns it
+'''
+def get_current_price(symbol):
+    ticker = yf.Ticker(symbol)
+    todays_data = ticker.history(period='1d')
+    return todays_data['Close'][0]
 
 
 '''
@@ -279,8 +292,9 @@ def trade():
 
                 '''
                 If both the fields had data then the current date and time is first calculated
+                The stock symbol entered is capitalised as all symbols are always capitalized
                 Then the quantity is stored as an integer
-                The stock price api is called to calculate the price of that particular stock
+                The stock price api/stock price function is called to calculate the price of that particular stock
                 The total amount of money spent is then calculated using price and quantity
                 The STOCK TABLE is then updated with this data using the buy function
                 A mail is sent to the user alerting them of the transaction made
@@ -289,12 +303,15 @@ def trade():
                 if symb and quant:
                     print("BUYING")
 
+                    symb = symb.upper()
+
                     date = d.datetime.now()
                     date = date.strftime("%m/%d/%Y, %H:%M:%S")
 
                     quant = int(quant)
                     print("AMOUNT", quant)
-                    stock_price = getdata(close='close', symbol=symb)[0]
+                    #stock_price = getdata(close='close', symbol=symb)[0]
+                    stock_price = get_current_price(symb)
                     print("STOCK PRICE", stock_price)
 
                     total = quant * stock_price
@@ -327,7 +344,8 @@ def trade():
 
                 '''
                 If both the fields had data then the quantity is stored as an integer
-                The stock price api is called to calculate the price of that particular stock
+                The stock symbol entered is capitalised as all symbols are always capitalized
+                The stock price api/stock price function is called to calculate the price of that particular stock
                 The total amount of money received is then calculated using price and quantity
                 The STOCK TABLE is then updated with this data using the sell function
                 A mail is sent to the user alerting them of the transaction made
@@ -335,11 +353,14 @@ def trade():
                 '''
                 if symb and quant:
                     print("SELLING")
+
+                    symb = symb.upper()
                     print("DELETING SYMBOL:", symb)
 
                     quant = int(quant)
                     print("AMOUNT", quant)
-                    stock_price = getdata(close='close', symbol=symb)[0]
+                    #stock_price = getdata(close='close', symbol=symb)[0]
+                    stock_price = get_current_price(symb)
                     print("STOCK PRICE", stock_price)
 
                     total = quant * stock_price
@@ -371,15 +392,21 @@ def trade():
                 '''
                 If the user wants to find the price of a stock they can enter the symbol they want to find the price for
                 and the amount
-                The API fetches the price and then returns the value
+                The stock symbol entered is capitalised as all symbols are always capitalized
+                The API/Function fetches the price and then returns the value
                 The user is then given the price of that stock for the amount they entered
                 '''
                 if sym and quant:
                     print("PRICE")
+
+                    sym = sym.upper()
+
                     quant = int(quant)
                     print("AMOUNT", quant)
 
-                    price = getdata(close='close', symbol=sym)[0]
+                    #price = getdata(close='close', symbol=sym)[0]
+                    price = get_current_price(sym)
+                    print("PRICE:", price)
                     price = float(price)
 
                     total = quant * price
