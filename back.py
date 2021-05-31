@@ -12,7 +12,7 @@ from requests.api import get
 
 
 # Other libraries needed
-import yfinance as yf
+# import yfinance as yf
 import datetime as d
 import requests
 import json

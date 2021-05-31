@@ -420,8 +420,7 @@ tr:nth-child(even){
 /* Misc */
 
 .cntain{
-    display: inline-flex;
-    transform: translateX(8%); 
+    margin: 0 auto;
 }
 
 .c-logo{

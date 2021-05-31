@@ -6,7 +6,7 @@
     <meta name="description" content="Welcome to the most extraordinary finance web application!">
     <meta name="keywords" content="CVS investment web application">
     <link rel="stylesheet" href="../static/css/style_buy.css">
-    <link rel="stylesheet" href="../static/css/style_inv.css">
+    <!-- <link rel="stylesheet" href="../static/css/style_inv.css"> -->
     <link rel="stylesheet" href="../static/css/style.css">
     <title>Analysis</title>
     
@@ -58,7 +58,7 @@
                 <div id="container2" class="chart"></div>
             </div>
 
-            <form class="form-style" method="post">
+            <!-- <form class="form-style" method="post">
             <div class="secondary">
                 <div class="inputGroup">
                   <input id="radio1" name="radio" value="AAPL" type="radio" checked/>
@@ -142,9 +142,25 @@
                 </div>
             </div>
             <button type="submit" class="btn" onsubmit="redo();">View</button>
-            </form>
-                 
+            </form> -->
         </div>
+
+        <section class="contact-form1" id="contact-form">
+            <div class="contain">
+                <h1>Title ABCD</h1>
+                <form method="post">
+                    <div class="form-group">
+                        <label for="stocksym">Stock Symbol:</label>
+                        <input type="text" name="stocksym" id="stocksym">
+                    </div>
+                    <p id="the-msg"> {{error}} </p>
+                    <div class="d-button">
+                        <button type="submit" class="btn" style="padding: 12px 40px;">View</button>
+                    </div>
+    
+                </form>
+            </div>
+        </section>
 
     </section>
 
