@@ -16,22 +16,22 @@ Click below to check out the project details.
 
 ## Description
 
-The web application simplifies investing and keeping track of the users investments. In addition, it provides an analysis on certain companies and how their stocks will do in the future.
+The web application simplifies investing and keeps a track of the users' investments. In addition, it gives the user an option to view historical data and graphical analysis on any company using the yFinance Library
 NOTE: FOR USER INFORMATION SECURITY WE USE SALTED PASSWORD HASHING
 
 USAGE:
-1. The application requires an individual to Sign Up first and then log in with their credentials
+1. The application requires an individual to sign up first and then log in with their credentials
 2. If a user fails to log in under certain circumstances, a reset password facility is provided. The user receives a mail on their registered Email ID with a unique verification code and a reset passwork link. They can reset their password by using that particular code on the reset page
-3. After logging in, the user has the option to go through the sites pages
+3. After logging in, the user has the option to go through the sites' pages
 
 SERVICES:
-1. The registered user can enter stock symbols and view their current prices, which are fetched with the help of an API
-2. The user can read up about us on the "About Us" Page which also provides the option to view a trading guide
-3. Under the "Trade" option, the user can either buy or sell their desired quantities of stocks by entering the respective stock symbols and the amount
-4. Each user has a unique dashboard maintained which enlists the current holdings of various stocks that they own
-5. With each transaction, a confirmation mail is sent to notify the user
-6. Under the "Analysis" section, we provide a graphical analysis of a few major companies and their stocks, which will help the user get an idea as to how successful companies are performing
-7. The application also lays out an educational page for people who are new to investing and want to know how to invest effectively. We have gathered  information ranging from videos and courses to articles to guide our users at every step
+1. The registered user can enter any stock symbol and view their current prices, which are fetched with the help of an API/function
+2. Under the "Trade" option, the user can either buy or sell their desired quantities of stocks by entering the respective stock symbols and the amount
+3. Each user has a unique dashboard maintained which enlists the current holdings of various stocks that they own
+4. With each transaction, a confirmation mail is sent to notify the user
+5. Under the "Analysis" section, we provide a graphical analysis of any company and their stocks, which will help the user get an idea as to how successful companies are performing and an insight into the variation of stock prices and volume with respect to time
+6. The user can read up about the company on the "About Us" Page which also provides the option to view a trading guide
+7. The application lays out an educational page for people who are new to investing and want to know how to invest effectively. We have gathered information ranging from videos and courses to articles to guide our users at every step
 8. We are open to queries and feedback. In order to do so, we enable our users to reach out to us by writing in the "Contact Us" section
 9. The user can log out securely by clicking on the "Sign Out" button
 
@@ -42,7 +42,7 @@ SERVICES:
 ## System Diagram
 
 
-![System Diagram](https://user-images.githubusercontent.com/63743496/117470928-f23bbb00-af74-11eb-87ae-dad0f30a9d3e.jpeg)
+![System Diagram](https://user-images.githubusercontent.com/63743496/120221376-ed101a00-c25b-11eb-83cb-841f8fb7f456.jpeg)
 
 
 [Back To The Top](#codevid19)
@@ -52,20 +52,21 @@ SERVICES:
 ## Tech Stack
 To run : Clone Repository & Run -> pip install -r requirements.txt
 
-##### ML :
+##### Analysis :
 
 
-1. Tensorflow
-2. Numpy
-3. Pandas
-4. Scikit Learn
-5. PyTorch
+1. Pandas
+2. yFinance
+3. matplotlib 
   
   
 ##### Frontend Tech Stack :
 
 
 1. HTML/CSS
+2. Javascript
+3. HighChart.js
+4. JustPy
 
 
 ##### Backend Tech Stack :
