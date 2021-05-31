@@ -50,7 +50,7 @@ SERVICES:
 ---
 
 ## Tech Stack
-To run : Clone Repository & Run -> pip install -r requirements.txt
+To run : Clone Repository & Run -> pip install -r requirements.txt -> python3 back.py
 
 ##### Analysis :
 
