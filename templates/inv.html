@@ -147,7 +147,7 @@
 
         <section class="contact-form1" id="contact-form">
             <div class="contain">
-                <h1>Title ABCD</h1>
+                <h1>Search</h1>
                 <form method="post">
                     <div class="form-group">
                         <label for="stocksym">Stock Symbol:</label>
@@ -165,6 +165,7 @@
     </section>
 
     <script>
+        let company = "{{ name }}";
         var chartdata = []
         var volume = []
 
@@ -260,18 +261,17 @@
                             [1, Highcharts.color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
                         ]
                     },
-                    name: 'AAPL Stock Price',
+                    name: company + ' Stock Price',
                     data: chartdata
                 }, {
                     type: 'column',
-                    id: 'aapl-volume',
-                    name: 'AAPL Volume',
+                    id: 'volume',
+                    name: company + ' Volume',
                     data: volume,
                     yAxis: 1
                 }]
             });
-    
-    
+
         }
 
         function redo(){

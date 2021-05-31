@@ -1,4 +1,4 @@
-# Imports all the flask libraries
+# Import the flask library functions
 from flask import (
     Flask,
     session,
@@ -12,14 +12,19 @@ from requests.api import get
 
 
 # Other libraries needed
+from pathlib import Path
 import yfinance as yf
 import datetime as d
+import pandas as pd
 import requests
+import glob
 import json
+import time
 import os
+import io
 
 
-# Imports functions from other folders
+# Import functions from other folders
 from sendmail import send_mail, send_buy, send_sell
 from models import users, contactus, stock
 from api import getdata
@@ -29,13 +34,14 @@ from api import getdata
 path = "app.db"
 
 
+# App configuration
 templates_path = os.path.abspath('./templates')
 app = Flask(__name__, template_folder=templates_path)
 app.secret_key = 'somekey'
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
 
-# Creates all the tables when the website is run
+# Creates all the tables in the database when the application is run
 users.create_user()
 contactus.create_tbl(path)
 stock.make_tbl(path)
@@ -50,6 +56,19 @@ def get_current_price(symbol):
     ticker = yf.Ticker(symbol)
     todays_data = ticker.history(period='1d')
     return todays_data['Close'][0]
+
+
+'''
+For analysis and trading we need a list of stock symbols to see if the user has entered a valid stock symbol
+URL containing NASDAQ listings in csv format
+Get data from url in a variable
+Read data into dataframe
+Finally we store all stock symbols in a list
+'''
+url="https://pkgstore.datahub.io/core/nasdaq-listings/nasdaq-listed_csv/data/7665719fb51081ba0bd834fde71ce822/nasdaq-listed_csv.csv"
+data = requests.get(url).content
+df_data = pd.read_csv(io.StringIO(data.decode('utf-8')))
+symbols = df_data['Symbol'].to_list()
 
 
 '''
@@ -114,7 +133,7 @@ def home():
                     flag = False
                     print("WRONG PWD")
                     #And is redirected to the login page
-                    return render_template('login.html', error="Incorrect Password")
+                    return render_template('login.html', error="Incorrect Email or Password")
             else:
                 #If the user doesnt exist
                 return render_template('login.html', error="User Doesnt Exist")
@@ -225,21 +244,69 @@ def reset():
     return render_template('reset.html')
 
 
-# ANALYSIS page
+# ANALYSIS page -> Allows user to get historical stock data for any company and then view it graphically
 @app.route('/inv', methods=["GET", "POST"])
 def inv():
     # Enters the page only if a user is signed in - g.user represents the current user
     if g.user:
         #If the user clicks on the 'VIEW' Button a POST request is generated
         if request.method == "POST":
-            #Get the variable name for the option the the user has selected and clicked view
-            company = request.form['radio']
             print("ENTERED POST REQUEST")
-            print(company)
-            return redirect(url_for("inv"))
-        
-        return render_template('inv.html')
+            #Get the variable name for the option the the user has entered
+            stock_id = request.form['stocksym']
+            stock_id = stock_id.upper()
+            print(stock_id)
 
+            #If the stock symbol is valid and exists
+            if stock_id in symbols:
+                print(stock_id)
+                #Fetch data into another dataframe
+                df_stock = yf.download(stock_id, start="1950-01-01", period='1d')
+                print(df_stock)
+            #If stock symbol is invalid   
+            else:
+                #Return to page with error
+                return render_template('inv.html', error="Incorrect Stock Symbol. Please Enter Valid Symbol")
+            
+            #Drop the 'Adj Close' column as we dont need it to plot data 
+            df_stock.drop('Adj Close', axis='columns', inplace=True)
+
+            #Reset index makes sure the dataframe has indexing of its own and converts the date index to a column
+            df_stock.reset_index(inplace=True)
+
+            #Convert the date to a datetime object (gets converted to a specialised type of datetime object)
+            df_stock['Date'] = pd.to_datetime(df_stock['Date'])
+
+            #Convert date to epoch datetime format
+            df_stock['Date'] = (df_stock['Date'] - d.datetime(1970,1,1)).dt.total_seconds()
+
+            #Format for plotting requires specific size for date so multiply by 1000
+            df_stock['Date'] = df_stock['Date']*1000
+            print(df_stock.head())
+
+            #Gets a list of all files ending in _mod.json
+            files = glob.glob("/home/nvombat/Desktop/Investment-WebApp/analysis/data/*_mod.json")
+            #If there is such a file (list is not empty)
+            if len(files)!=0:
+                #Extract the file name of that particular file
+                file_rem = Path(files[0]).name
+                print("FILE BEING DELETED IS:", file_rem)
+                #Get the path of that file
+                location = "/home/nvombat/Desktop/Investment-WebApp/analysis/data/"
+                path = os.path.join(location, file_rem)
+                #Delete the file
+                os.remove(path)
+            
+            #We delete the file to make sure that at any given time there is only one file that can be plotted
+            #As the plotting function chooses the first file from the directory (files[0])
+            #Thus if we have more than one file we may not end up plotting the correct data
+
+            #Convert to json format and make sure its converted as json with arrays thus orient = values
+            df_stock.to_json("/home/nvombat/Desktop/Investment-WebApp/analysis/data/"+stock_id+"_mod.json", orient='values')
+            #return redirect(url_for("inv"))
+            return render_template('inv.html', name=stock_id)
+
+        return render_template('inv.html')
     # Redirects to login page if g.user is empty -> No user signed in
     return redirect('/')
 
@@ -291,8 +358,9 @@ def trade():
                 quant = request.form["amount"]
 
                 '''
-                If both the fields had data then the current date and time is first calculated
                 The stock symbol entered is capitalised as all symbols are always capitalized
+                The stock symbol is checked for validity
+                Then the current date and time is calculated
                 Then the quantity is stored as an integer
                 The stock price api/stock price function is called to calculate the price of that particular stock
                 The total amount of money spent is then calculated using price and quantity
@@ -300,11 +368,10 @@ def trade():
                 A mail is sent to the user alerting them of the transaction made
                 The user is now redirected back to the trade page - we use redirect to make sure a get request is generated
                 '''
-                if symb and quant:
-                    print("BUYING")
-
-                    symb = symb.upper()
-
+                print("BUYING")
+                symb = symb.upper()
+                #Check if the stock symbol is valid
+                if symb in symbols:
                     date = d.datetime.now()
                     date = date.strftime("%m/%d/%Y, %H:%M:%S")
 
@@ -328,12 +395,10 @@ def trade():
                     # Redirect submits a get request (200) thus cancelling the usual post request generated by the
                     # browser when a page is refreshed
                     return redirect(url_for("trade"))
-
-                # If the user hasnt filled in both the fields then he is redirected back to that page instead of the
-                # program throwing an error
+                #If stock symbol is invalid
                 else:
-                    print("Field Empty")
-                    return redirect(url_for("trade"))
+                    #Return to page with error
+                    return render_template('trade.html', error="Incorrect Stock Symbol. Please Enter Valid Symbol", transactions=transactions)
 
 
             # SELLING
@@ -343,18 +408,18 @@ def trade():
                 quant = request.form["amount"]
 
                 '''
-                If both the fields had data then the quantity is stored as an integer
                 The stock symbol entered is capitalised as all symbols are always capitalized
+                The stock symbol is checked for validity
+                Then the quantity is stored as an integer
                 The stock price api/stock price function is called to calculate the price of that particular stock
                 The total amount of money received is then calculated using price and quantity
                 The STOCK TABLE is then updated with this data using the sell function
                 A mail is sent to the user alerting them of the transaction made
                 The user is now redirected back to the trade page - we use redirect to make sure a get request is generated
                 '''
-                if symb and quant:
+                symb = symb.upper()
+                if symb in symbols:
                     print("SELLING")
-
-                    symb = symb.upper()
                     print("DELETING SYMBOL:", symb)
 
                     quant = int(quant)
@@ -375,12 +440,10 @@ def trade():
                     mail_data = (symb, stock_price, quant, total, user_email[0], date)
                     send_sell(mail_data)
                     return redirect(url_for("trade"))
-
-                # If the user hasnt filled in both the fields then he is redirected back to that page instead of the
-                # program throwing an error
+                #If stock symbol is invalid
                 else:
-                    print("Field Empty")
-                    return redirect(url_for("trade"))
+                    #Return to page with error
+                    return render_template('trade.html', error="Incorrect Stock Symbol. Please Enter Valid Symbol", transactions=transactions)
 
 
             # FIND PRICE
@@ -396,10 +459,10 @@ def trade():
                 The API/Function fetches the price and then returns the value
                 The user is then given the price of that stock for the amount they entered
                 '''
-                if sym and quant:
+                sym = sym.upper()
+                #First we check if the stock symbol is valid
+                if sym in symbols:
                     print("PRICE")
-
-                    sym = sym.upper()
 
                     quant = int(quant)
                     print("AMOUNT", quant)
@@ -422,13 +485,11 @@ def trade():
                     print(transactions)
                     # render template because we want the table to show and the message
                     return render_template('trade.html', transactions=transactions, error=err_str)
-
-                # If the user hasnt filled in both the fields then he is redirected back to that page instead of the
-                # program throwing an error
+                #If stock symbol is invalid
                 else:
-                    print("Field Empty")
-                    return redirect(url_for("trade"))
-
+                    #Return to page with error
+                    return render_template('trade.html', error="Incorrect Stock Symbol. Please Enter Valid Symbol", transactions=transactions)
+                    
         return render_template('trade.html', transactions=transactions)
     # Redirects to login page if g.user is empty -> No user signed in
     return redirect('/')
@@ -465,19 +526,28 @@ def contact():
                 return render_template('contact.html', error="Incorrect Email!")
 
         return render_template("contact.html")
-
     # Redirects to login page if g.user is empty -> No user signed in
     return redirect('/')
 
 
+#Function sends data (in json format) to the plotting function
 @app.route('/pipe', methods=["GET", "POST"])
 def pipe():
-    #Sends json file containing data to be plotted
-    #filename = 'analysis/data/'+str(company)+'.json'
-    with open("analysis/data/AAPL.json") as f:
-        r = json.load(f)
-
-    return {"res": r}
+    #Get a list of all files in the data folder which have a _mod.json ending
+    files = glob.glob("/home/nvombat/Desktop/Investment-WebApp/analysis/data/*_mod.json")
+    #If there are no such files then plot AAPL as the default graph
+    if len(files) == 0:
+        with open("/home/nvombat/Desktop/Investment-WebApp/analysis/data/AAPL.json") as f:
+            #Sends json file containing data to be plotted
+            r = json.load(f)
+            return {"res": r}
+    #If there is such a file
+    else:
+        #Open that file and plot that data
+        with open(files[0]) as f:
+            #Sends json file containing data to be plotted
+            r = json.load(f)
+            return {"res": r}
 
 
 if __name__ == '__main__':
