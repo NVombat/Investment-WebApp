@@ -33,14 +33,14 @@ def buy(tablename: str, data: tuple, path: str):
         b1 = f"INSERT INTO {tablename} VALUES {data}"
         cur.execute(b1)
         conn.commit()
-        print("INSERTED NEW INTO TABLE - NO PREVIOUS VALUES")
+        #print("INSERTED NEW INTO TABLE - NO PREVIOUS VALUES")
     #If res is not empty - User has already bought stocks with that symbol
     #Update the quantity of that particular stock for that particular user
     else:
         b2 = f"UPDATE {tablename} SET Quantity=Quantity+'{data[3]}' WHERE Stock_Symbol = '{data[1]}' AND Email = '{data[4]}'"
         cur.execute(b2)
         conn.commit()
-        print("UPDATED VALUE IN TABLE - ALREADY EXISTED")
+        #print("UPDATED VALUE IN TABLE - ALREADY EXISTED")
 
 
 #Sell function DELETES from table when user sells stocks
@@ -53,7 +53,7 @@ def sell(tablename: str, data : tuple, path: str):
     cur.execute(rem)
     #Query result stored in res array
     res = cur.fetchall()
-    print("SELLING RES: ", res)
+    #print("SELLING RES: ", res)
 
     #If res array is empty - The user doesnt own that stock thus cant sell it
     if len(res) == 0:
@@ -61,7 +61,7 @@ def sell(tablename: str, data : tuple, path: str):
     else:
         #Curr_Quant stores quantity of that particular stock the user owns currently
         curr_quant = int(res[0][3])
-        print(curr_quant)
+        #print(curr_quant)
         #Rejects request if user wants to sell more than the amount he owns
         if data[1] > curr_quant:
             print("YOU ARE TRYING TO SELL MORE THAN YOU OWN")
@@ -71,13 +71,13 @@ def sell(tablename: str, data : tuple, path: str):
             s1 = f"DELETE FROM {tablename} WHERE Stock_Symbol='{data[0]}' AND Email = '{data[2]}'"
             cur.execute(s1)
             conn.commit()
-            print("STOCK GONE - ALL SOLD")
+            #print("STOCK GONE - ALL SOLD")
         #Deducts the amount the user wants to sell from the amount the user owns by updating table for that particular user
         else:
             s2 = f"UPDATE {tablename} SET Quantity=Quantity-'{data[1]}' WHERE Stock_Symbol='{data[0]}' AND Email = '{data[2]}'"
             cur.execute(s2)
             conn.commit()
-            print("SOLD - QUANTITY UPDATED")
+            #print("SOLD - QUANTITY UPDATED")
 
 
 #Queries stock table to fetch all stocks purchased by a particular user
@@ -94,5 +94,5 @@ def query(email: str, path: str):
 if __name__ == "__main__":
     path = "../app.db"
     make_tbl("../app.db")
-    buy("stock", ("19-9-2000", "NVDI", 354.9, 14, "ronaldo72emiway@gmail.com"), path)
-    # buy("stock", ("23-7-2002", "AAPL", 162.4, 10, "ronaldo72emiway@gmail.com"), path)
+    #buy("stock", ("19-9-2000", "NVDI", 354.9, 14, "ronaldo72emiway@gmail.com"), path)
+    #buy("stock", ("23-7-2002", "AAPL", 162.4, 10, "ronaldo72emiway@gmail.com"), path)

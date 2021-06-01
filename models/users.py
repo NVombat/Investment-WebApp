@@ -93,12 +93,16 @@ def check_code(code : int):
     chk = f"SELECT * FROM user WHERE Code='{code}'"
     cur.execute(chk)
     res = cur.fetchall()
-    print("RES", res)
-    #Res array stores a tuple of the user details - code is the 4th field
-    if res[0][3]==code:
-        return True
-    else:
+    #print("RES", res)
+    #If code doesnt match then res will be empty
+    if len(res)==0:
         return False
+    else:
+        #Res array stores a tuple of the user details - code is the 4th field
+        if res[0][3]==code:
+            return True
+        else:
+            return False
 
 
 #Resets the Verification code to 0 once the user has reset their password
@@ -153,7 +157,7 @@ def check_contact_us(email : str, curr_user : str):
     cur.execute(chk)
     #Stores the fetched data in the table
     res = cur.fetchall()
-    print("RES", res)
+    #print("RES", res)
 
     #Checks the above mentioned conditions
     if len(res)>0 and res[0][0]==curr_user:
@@ -174,7 +178,7 @@ Final hash is computed with salt and then decoded to ascii and returned
 '''
 def hash_pwd(pwd : str):
     salt = hashlib.sha256(os.urandom(60)).hexdigest().encode('ascii')
-    print("SALT1: ", salt)
+    #print("SALT1: ", salt)
     pwd_hash = hashlib.pbkdf2_hmac('sha512', pwd.encode('utf-8'), salt, 100000)
     pwd_hash = binascii.hexlify(pwd_hash)
     final_hashed_pwd = (salt + pwd_hash).decode('ascii')
@@ -197,22 +201,22 @@ def check_hash(pwd : str, email : str):
     cur.execute(check)
     #Once the data is fetched from the db it is stored in a list
     res = cur.fetchall()
-    print("RES : ", res)
+    #print("RES : ", res)
     #The list stores a tuple and password is the third element in the tuple
     dbpwd = res[0][2]
     #DATABASE STORED PASSWORD
-    print("DBPWD: ", dbpwd)
+    #print("DBPWD: ", dbpwd)
 
     #PASSWORD HASH AND SALT STORED IN DATABASE
     salt = dbpwd[:64]
-    print("SALT2: ", salt)
+    #print("SALT2: ", salt)
     dbpwd = dbpwd[64:]
-    print("Stored password hash: ", dbpwd)
+    #print("Stored password hash: ", dbpwd)
     
     #PASSWORD HASH FOR PASSWORD THAT USER HAS CURRENTLY ENTERED
     pwd_hash = hashlib.pbkdf2_hmac('sha512', pwd.encode('utf-8'), salt.encode('ascii'), 100000)
     pwd_hash = binascii.hexlify(pwd_hash).decode('ascii')
-    print("pwd_hash: ", pwd_hash)
+    #print("pwd_hash: ", pwd_hash)
     
     if pwd_hash==dbpwd:
         return True

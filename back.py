@@ -116,7 +116,7 @@ def home():
         '''
         if password and not repeat_password:
             if users.check_user_exist(email):
-                print("Login")
+                print("LOGIN")
                 # if users.checkpwd(password, email):
                 #     session['user_email'] = email
                 #     return redirect('/index')
@@ -131,7 +131,7 @@ def home():
                 else:
                     #If the flag variable is false -> user has entered the wrong password
                     flag = False
-                    print("WRONG PWD")
+                    #print("WRONG PWD")
                     #And is redirected to the login page
                     return render_template('login.html', error="Incorrect Email or Password")
             else:
@@ -148,14 +148,14 @@ def home():
         If the fields dont match the user is alerted and redirected back to the login page to try again
         '''
         if password and repeat_password:
-            print("Sign Up")
+            print("SIGN UP")
             if not users.check_user_exist(email):
                 if password == repeat_password:
                     #Hash the users password and store the hashed password for security
                     password = users.hash_pwd(password)
-                    print("Hashed PWD: ", password)
+                    #print("Hashed PWD: ", password)
                     users.insert('user', (email, name, password, 0))
-                    print("Inserted Hashed Password")
+                    #print("Inserted Hashed Password")
                     session['user_email'] = email
                     return render_template('login.html', error="Sign Up Complete - Login")
                 else:
@@ -171,7 +171,7 @@ def home():
         '''
         if not name and not password and email:
             if users.check_user_exist(email):
-                print("Reset Password:")
+                print("RESET PASSWORD:")
                 # session['user_email'] = email
                 reset_password(email)
                 return render_template('login.html',
@@ -201,7 +201,7 @@ Function to reset password
 Sends the mail for resetting password to user
 """
 def reset_password(email: str):
-    print(email)
+    #print(email)
     send_mail(email)
 
 
@@ -222,7 +222,7 @@ def reset():
         repeat_pwd = request.form['rnpassword']
         ver_code = request.form['vcode']
         ver_code = int(ver_code)
-        print(ver_code)
+        #print(ver_code)
 
         if pwd and repeat_pwd and ver_code:
             print("CHECKING")
@@ -231,14 +231,14 @@ def reset():
                     #Hash the new password and update db with hashed password
                     pwd = users.hash_pwd(pwd)
                     users.reset_pwd(pwd, ver_code)
-                    print("Resetting password & Updating DB")
+                    #print("Resetting password & Updating DB")
                     users.reset_code(ver_code)
                     return redirect("/")
-                    # return render_template('login.html', error="Password Reset Successfully")
+                    #return render_template('login.html', error="Password Reset Successfully")
                 else:
-                    print("Verification Code Doesnt Match")
-                    return redirect("/")
-                    # return render_template('login.html', error="Try resetting again")
+                    #print("Verification Code Doesnt Match")
+                    #return redirect("/")
+                    return render_template('reset.html', error="Incorrect Verification Code")
             else:
                 return render_template('reset.html', error="Password & Retyped Password Not Same")
     return render_template('reset.html')
@@ -251,18 +251,18 @@ def inv():
     if g.user:
         #If the user clicks on the 'VIEW' Button a POST request is generated
         if request.method == "POST":
-            print("ENTERED POST REQUEST")
+            #print("ENTERED POST REQUEST")
             #Get the variable name for the option the the user has entered
             stock_id = request.form['stocksym']
             stock_id = stock_id.upper()
-            print(stock_id)
+            #print(stock_id)
 
             #If the stock symbol is valid and exists
             if stock_id in symbols:
-                print(stock_id)
+                #print(stock_id)
                 #Fetch data into another dataframe
                 df_stock = yf.download(stock_id, start="1950-01-01", period='1d')
-                print(df_stock)
+                #print(df_stock)
             #If stock symbol is invalid   
             else:
                 #Return to page with error
@@ -282,7 +282,7 @@ def inv():
 
             #Format for plotting requires specific size for date so multiply by 1000
             df_stock['Date'] = df_stock['Date']*1000
-            print(df_stock.head())
+            #print(df_stock.head())
 
             #Gets a list of all files ending in _mod.json
             files = glob.glob("/home/nvombat/Desktop/Investment-WebApp/analysis/data/*_mod.json")
@@ -290,7 +290,7 @@ def inv():
             if len(files)!=0:
                 #Extract the file name of that particular file
                 file_rem = Path(files[0]).name
-                print("FILE BEING DELETED IS:", file_rem)
+                #print("FILE BEING DELETED IS:", file_rem)
                 #Get the path of that file
                 location = "/home/nvombat/Desktop/Investment-WebApp/analysis/data/"
                 path = os.path.join(location, file_rem)
@@ -335,7 +335,7 @@ def doc():
 @app.route('/trade', methods=["GET", "POST"])
 def trade():
     # Enters the page only if a user is signed in - g.user represents the current user
-    print(g.user)
+    #print(g.user)
     if g.user:
 
         '''
@@ -364,6 +364,7 @@ def trade():
                 Then the quantity is stored as an integer
                 The stock price api/stock price function is called to calculate the price of that particular stock
                 The total amount of money spent is then calculated using price and quantity
+                The format of price and total is adjusted to 2 decimal places
                 The STOCK TABLE is then updated with this data using the buy function
                 A mail is sent to the user alerting them of the transaction made
                 The user is now redirected back to the trade page - we use redirect to make sure a get request is generated
@@ -376,22 +377,25 @@ def trade():
                     date = date.strftime("%m/%d/%Y, %H:%M:%S")
 
                     quant = int(quant)
-                    print("AMOUNT", quant)
+                    #print("AMOUNT", quant)
                     #stock_price = getdata(close='close', symbol=symb)[0]
                     stock_price = get_current_price(symb)
-                    print("STOCK PRICE", stock_price)
+                    #print("STOCK PRICE", stock_price)
 
                     total = quant * stock_price
 
-                    print("You have spent $", total)
+                    stock_price = "{:.2f}".format(stock_price)
+                    total = "{:.2f}".format(total)
 
-                    print("USER EMAIL:", user_email)
+                    #print("You have spent $", total)
+
+                    #print("USER EMAIL:", user_email)
                     stock.buy("stock", (date, symb, stock_price, quant, user_email[0]), path)
 
                     data = (symb, stock_price, quant, total, user_email[0], date)
                     send_buy(data)
 
-                    print("TRANSACTIONS: ", transactions)
+                    #print("TRANSACTIONS: ", transactions)
                     # Redirect submits a get request (200) thus cancelling the usual post request generated by the
                     # browser when a page is refreshed
                     return redirect(url_for("trade"))
@@ -413,6 +417,7 @@ def trade():
                 Then the quantity is stored as an integer
                 The stock price api/stock price function is called to calculate the price of that particular stock
                 The total amount of money received is then calculated using price and quantity
+                The format of price and total is adjusted to 2 decimal places
                 The STOCK TABLE is then updated with this data using the sell function
                 A mail is sent to the user alerting them of the transaction made
                 The user is now redirected back to the trade page - we use redirect to make sure a get request is generated
@@ -420,16 +425,19 @@ def trade():
                 symb = symb.upper()
                 if symb in symbols:
                     print("SELLING")
-                    print("DELETING SYMBOL:", symb)
+                    #print("DELETING SYMBOL:", symb)
 
                     quant = int(quant)
-                    print("AMOUNT", quant)
+                    #print("AMOUNT", quant)
                     #stock_price = getdata(close='close', symbol=symb)[0]
                     stock_price = get_current_price(symb)
-                    print("STOCK PRICE", stock_price)
+                    #print("STOCK PRICE", stock_price)
 
                     total = quant * stock_price
-                    print("You have received $", total)
+                    #print("You have received $", total)
+
+                    stock_price = "{:.2f}".format(stock_price)
+                    total = "{:.2f}".format(total)
 
                     date = d.datetime.now()
                     date = date.strftime("%m/%d/%Y, %H:%M:%S")
@@ -457,6 +465,7 @@ def trade():
                 and the amount
                 The stock symbol entered is capitalised as all symbols are always capitalized
                 The API/Function fetches the price and then returns the value
+                The format of price and total is adjusted to 2 decimal places
                 The user is then given the price of that stock for the amount they entered
                 '''
                 sym = sym.upper()
@@ -465,15 +474,18 @@ def trade():
                     print("PRICE")
 
                     quant = int(quant)
-                    print("AMOUNT", quant)
+                    #print("AMOUNT", quant)
 
                     #price = getdata(close='close', symbol=sym)[0]
                     price = get_current_price(sym)
-                    print("PRICE:", price)
+                    #print("PRICE:", price)
                     price = float(price)
 
                     total = quant * price
-                    print("Total cost is $", total)
+                    #print("Total cost is $", total)
+
+                    price = "{:.2f}".format(price)
+                    total = "{:.2f}".format(total)
 
                     quant = str(quant)
                     price = str(price)
@@ -482,7 +494,7 @@ def trade():
                     # Message with price for amount entered and per unit as well
                     err_str = "The price for " + quant + " unit(s) of " + sym + " Stock is $ " + total + " at $ " + price + " per unit"
 
-                    print(transactions)
+                    #print(transactions)
                     # render template because we want the table to show and the message
                     return render_template('trade.html', transactions=transactions, error=err_str)
                 #If stock symbol is invalid
@@ -508,21 +520,21 @@ def contact():
         If the emails dont match it generates an error and if it does match then we insert data into contact table
         """
         if request.method == "POST":
-            print("Contact Us")
+            print("CONTACT US")
             email = request.form["email"]
-            print(email)
+            #print(email)
             msg = request.form["message"]
 
             user_email = g.user
             curr_user = user_email[0]
-            print(curr_user)
+            #print(curr_user)
 
             if users.check_contact_us(email, curr_user):
-                print("Correct Email")
+                #print("Correct Email")
                 contactus.insert(email, msg, path)
                 return render_template('contact.html', error="Thank you, We will get back to you shortly")
             else:
-                print("Incorrect Email")
+                #print("Incorrect Email")
                 return render_template('contact.html', error="Incorrect Email!")
 
         return render_template("contact.html")

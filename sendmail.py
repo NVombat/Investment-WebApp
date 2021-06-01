@@ -25,8 +25,8 @@ def send_mail(email : str):
     key = random.randint(1000,9999)
     #Inserts code into user table
     add_code(key, email)
-    print("VERIFICATION CODE:", key)
-    print("EMAIL:", email)
+    #print("VERIFICATION CODE:", key)
+    #print("EMAIL:", email)
 
     #RESET URL
     url = "http://localhost:8000/reset"
@@ -66,8 +66,8 @@ def send_link(email : str):
     key = random.randint(1000,9999)
     #Inserts code into user table
     add_code(key, email)
-    print("VERIFICATION CODE:", key)
-    print("EMAIL:", email)
+    #print("VERIFICATION CODE:", key)
+    #print("EMAIL:", email)
 
     # Create the plain-text and HTML version of your message
     text = f'''\
