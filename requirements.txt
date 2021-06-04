@@ -4,3 +4,4 @@ yfinance
 matplotlib
 justpy
 pytz
+pandas_datareader
