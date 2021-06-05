@@ -8,10 +8,10 @@ from flask import (
     redirect,
     url_for
 )
-from requests.api import get
 
 
 # Other libraries needed
+from requests.api import get
 from pathlib import Path
 import yfinance as yf
 import datetime as d
@@ -30,7 +30,7 @@ from models import users, contactus, stock
 from api import getdata
 
 
-# Path used for all tables
+# Path used for all tables in database
 path = "app.db"
 
 
@@ -42,7 +42,7 @@ app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
 
 # Creates all the tables in the database when the application is run
-users.create_user()
+users.create_user(path)
 contactus.create_tbl(path)
 stock.make_tbl(path)
 
@@ -80,7 +80,7 @@ Otherwise Exception is thrown
 def security():
     g.user = None
     if 'user_email' in session:
-        emails = users.getemail()
+        emails = users.getemail(path)
         try:
             useremail = [email for email in emails if email[0] == session['user_email']][0]
             g.user = useremail
@@ -115,9 +115,9 @@ def home():
         If the user doesnt exist then render back to login and give error message
         '''
         if password and not repeat_password:
-            if users.check_user_exist(email):
+            if users.check_user_exist(path, email):
                 print("LOGIN")
-                # if users.checkpwd(password, email):
+                # if users.checkpwd(path, password, email):
                 #     session['user_email'] = email
                 #     return redirect('/index')
                 '''
@@ -125,7 +125,7 @@ def home():
                 If it matches then user is in session and is redirected to the homepage
                 Else a flag is set and the user is shown an error message
                 '''
-                if users.check_hash(password, email):
+                if users.check_hash(path, password, email):
                     session['user_email'] = email
                     return redirect('/index')
                 else:
@@ -149,12 +149,12 @@ def home():
         '''
         if password and repeat_password:
             print("SIGN UP")
-            if not users.check_user_exist(email):
+            if not users.check_user_exist(path, email):
                 if password == repeat_password:
                     #Hash the users password and store the hashed password for security
                     password = users.hash_pwd(password)
                     #print("Hashed PWD: ", password)
-                    users.insert('user', (email, name, password, 0))
+                    users.insert(path, 'user', (email, name, password, 0))
                     #print("Inserted Hashed Password")
                     session['user_email'] = email
                     return render_template('login.html', error="Sign Up Complete - Login")
@@ -170,10 +170,10 @@ def home():
         If the user doesnt exist an error message is generated and the user is redirected back to the login page
         '''
         if not name and not password and email:
-            if users.check_user_exist(email):
+            if users.check_user_exist(path, email):
                 print("RESET PASSWORD:")
                 # session['user_email'] = email
-                reset_password(email)
+                reset_password(path, email)
                 return render_template('login.html',
                                        error="We have sent you a link to reset your password. Check your mailbox")
             else:
@@ -200,9 +200,9 @@ def index():
 Function to reset password
 Sends the mail for resetting password to user
 """
-def reset_password(email: str):
+def reset_password(path:str, email: str):
     #print(email)
-    send_mail(email)
+    send_mail(path, email)
 
 
 # RESET PASSWORD page
@@ -227,12 +227,12 @@ def reset():
         if pwd and repeat_pwd and ver_code:
             print("CHECKING")
             if pwd == repeat_pwd:
-                if users.check_code(ver_code):
+                if users.check_code(path, ver_code):
                     #Hash the new password and update db with hashed password
                     pwd = users.hash_pwd(pwd)
-                    users.reset_pwd(pwd, ver_code)
+                    users.reset_pwd(path, pwd, ver_code)
                     #print("Resetting password & Updating DB")
-                    users.reset_code(ver_code)
+                    users.reset_code(path, ver_code)
                     return redirect("/")
                     #return render_template('login.html', error="Password Reset Successfully")
                 else:
@@ -393,7 +393,7 @@ def trade():
                     stock.buy("stock", (date, symb, stock_price, quant, user_email[0]), path)
 
                     data = (symb, stock_price, quant, total, user_email[0], date)
-                    send_buy(data)
+                    send_buy(path, data)
 
                     #print("TRANSACTIONS: ", transactions)
                     # Redirect submits a get request (200) thus cancelling the usual post request generated by the
@@ -446,7 +446,7 @@ def trade():
                     stock.sell("stock", data, path)
 
                     mail_data = (symb, stock_price, quant, total, user_email[0], date)
-                    send_sell(mail_data)
+                    send_sell(path, mail_data)
                     return redirect(url_for("trade"))
                 #If stock symbol is invalid
                 else:
@@ -529,7 +529,7 @@ def contact():
             curr_user = user_email[0]
             #print(curr_user)
 
-            if users.check_contact_us(email, curr_user):
+            if users.check_contact_us(path, email, curr_user):
                 #print("Correct Email")
                 contactus.insert(email, msg, path)
                 return render_template('contact.html', error="Thank you, We will get back to you shortly")

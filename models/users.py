@@ -5,8 +5,8 @@ import sqlite3 as s
 
 
 #Creates a user table 
-def create_user():
-    conn = s.connect("app.db")
+def create_user(path: str):
+    conn = s.connect(path)
     cur = conn.cursor()
 
     #Command to create user table with 4 fields
@@ -18,8 +18,8 @@ def create_user():
 
 
 #Inserts user and related values into table when a user is created
-def insert(tablename: str, data: tuple):
-    conn = s.connect("app.db")
+def insert(path: str, tablename: str, data: tuple):
+    conn = s.connect(path)
     cur = conn.cursor()
 
     insrt = f'INSERT INTO {tablename} VALUES{data}'
@@ -28,8 +28,8 @@ def insert(tablename: str, data: tuple):
 
 
 #Checks password entered by user against the database
-def checkpwd(pwd: str, email: str):
-    conn = s.connect("app.db")
+def checkpwd(path: str, pwd: str, email: str):
+    conn = s.connect(path)
     cur = conn.cursor()
 
     #Queries table to fetch user with a particular password
@@ -44,8 +44,8 @@ def checkpwd(pwd: str, email: str):
 
 
 #Checks if the RESET PASSWORD option and SIGN UP is possible by seeing if the user exists
-def check_user_exist(email : str):
-    conn = s.connect("app.db")
+def check_user_exist(path: str, email : str):
+    conn = s.connect(path)
     cur = conn.cursor()
 
     #Queries the table to see if user with email id exists in the table for reset
@@ -62,8 +62,8 @@ def check_user_exist(email : str):
 
 
 #Resets password for a particular user
-def reset_pwd(pwd : str, code : int):
-    conn = s.connect("app.db")
+def reset_pwd(path: str, pwd : str, code : int):
+    conn = s.connect(path)
     cur = conn.cursor()
 
     #Updates the password for the particular user verified by the "CODE" sent to the users email id
@@ -73,8 +73,8 @@ def reset_pwd(pwd : str, code : int):
 
 
 #Adds the verification code for the user when a reset password request is made
-def add_code(key : int, email : str):
-    conn = s.connect("app.db")
+def add_code(path: str, key : int, email : str):
+    conn = s.connect(path)
     cur = conn.cursor()
 
     #After requesting to reset password the user receives a mail with a link to reset and a verification code
@@ -85,8 +85,8 @@ def add_code(key : int, email : str):
 
 
 #Checks if the verification code given by the user matches the one sent to their email
-def check_code(code : int):
-    conn = s.connect("app.db")
+def check_code(path: str, code : int):
+    conn = s.connect(path)
     cur = conn.cursor()
 
     #Checks the table to see if the code matches the code that is stored for that particular user
@@ -107,8 +107,8 @@ def check_code(code : int):
 
 #Resets the Verification code to 0 once the user has reset their password
 #To avoid duplicate verification codes
-def reset_code(code : int):
-    conn = s.connect("app.db")
+def reset_code(path: str, code : int):
+    conn = s.connect(path)
     cur = conn.cursor()
 
     #Updates the verification code to 0 wherever it matches a particular user verification code
@@ -118,9 +118,9 @@ def reset_code(code : int):
 
 
 #Gets name of user
-def getname(email: tuple):
+def getname(path: str, email: tuple):
     email = email[0];
-    conn = s.connect("app.db")
+    conn = s.connect(path)
 
     #Fetches name of particular user
     cur = conn.cursor()
@@ -131,8 +131,8 @@ def getname(email: tuple):
 
 
 #Fetches all the user emails from the user table
-def getemail():
-    conn = s.connect("app.db")
+def getemail(path: str):
+    conn = s.connect(path)
     cur = conn.cursor()
 
     gml = 'SELECT Email FROM user'
@@ -148,8 +148,8 @@ It checks if the email ID is in our database (the user exists)
 It also checks if the email ID mentioned is the same one as the current user
 If both these conditions are true the user is able to send a message otherwise an error message is displayed
 '''
-def check_contact_us(email : str, curr_user : str):
-    conn = s.connect("app.db")
+def check_contact_us(path: str, email : str, curr_user : str):
+    conn = s.connect(path)
     cur = conn.cursor()
 
     #Command to fetch from the table any data with that particular email
@@ -192,8 +192,8 @@ We then hash the current password which the user has entered
 We then compare the hashed password to the one stored in the db
 if they match we return true else we return false
 '''
-def check_hash(pwd : str, email : str):
-    conn = s.connect("app.db")
+def check_hash(path: str, pwd : str, email : str):
+    conn = s.connect(path)
     cur = conn.cursor()
 
     #Command to fetch all data for user with a particular email id

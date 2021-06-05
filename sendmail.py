@@ -1,15 +1,16 @@
-import smtplib,ssl
+#Import libraries
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from models.users import add_code
+import smtplib,ssl
 import sqlite3
 import random
 import os
-from models.users import add_code
 
 
 #Sends mail for resetting password to the user
-def send_mail(email : str):
-    conn= sqlite3.connect("app.db")
+def send_mail(path: str, email: str):
+    conn= sqlite3.connect(path)
     cur = conn.cursor()
 
     #by importing os, backmail_add and backmail_pwd are accessing the environment variable values
@@ -24,7 +25,7 @@ def send_mail(email : str):
     #Generates a 4 digit random verification code to verify the user while resetting the password
     key = random.randint(1000,9999)
     #Inserts code into user table
-    add_code(key, email)
+    add_code(path, key, email)
     #print("VERIFICATION CODE:", key)
     #print("EMAIL:", email)
 
@@ -42,8 +43,8 @@ def send_mail(email : str):
 
 
 #Sends the user an email with a reset link using html for the url
-def send_link(email : str):
-    conn= sqlite3.connect("app.db")
+def send_link(path: str, email: str):
+    conn= sqlite3.connect(path)
     cur = conn.cursor()
 
     #by importing os, backmail_add and backmail_pwd are accessing the environment variable values
@@ -65,7 +66,7 @@ def send_link(email : str):
     #Generates a 4 digit random verification code to verify the user while resetting the password
     key = random.randint(1000,9999)
     #Inserts code into user table
-    add_code(key, email)
+    add_code(path, key, email)
     #print("VERIFICATION CODE:", key)
     #print("EMAIL:", email)
 
@@ -117,7 +118,7 @@ def send_link(email : str):
 Sends a mail to the user when the user buys a stock
 Alerts the user with all the transaction details
 '''
-def send_buy(data : tuple):
+def send_buy(path: str, data: tuple):
     '''
     symbol = data[0]
     price = data[1]
@@ -126,7 +127,7 @@ def send_buy(data : tuple):
     email = data[4]
     date = data[5]
     '''
-    conn= sqlite3.connect("app.db")
+    conn= sqlite3.connect(path)
     cur = conn.cursor()
 
     #by importing os, backmail_add and backmail_pwd are accessing the environment variable values
@@ -152,7 +153,7 @@ def send_buy(data : tuple):
 Sends a mail to the user when the user sells a stock
 Alerts the user with all the transaction details
 '''
-def send_sell(data : tuple):
+def send_sell(path: str, data: tuple):
     '''
     symbol = data[0]
     price = data[1]
@@ -161,7 +162,7 @@ def send_sell(data : tuple):
     email = data[4]
     date = data[5]
     '''
-    conn= sqlite3.connect("app.db")
+    conn= sqlite3.connect(path)
     cur = conn.cursor()
 
     #by importing os, backmail_add and backmail_pwd are accessing the environment variable values
@@ -190,4 +191,4 @@ if __name__ == "__main__":
     # print("PASSWORD:", backemail_pwd)
     # key = random.randint(1000,9999)
     # print(key)
-    send_link("ronaldo72emiway@gmail.com")
+    send_link("app.db", "ronaldo72emiway@gmail.com")
