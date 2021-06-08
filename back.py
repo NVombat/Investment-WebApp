@@ -61,9 +61,7 @@ def get_current_price(symbol):
 '''
 For analysis and trading we need a list of stock symbols to see if the user has entered a valid stock symbol
 URL containing NASDAQ listings in csv format
-Get data from url in a variable
-Read data into dataframe
-Finally we store all stock symbols in a list
+Store all stock symbols in a list
 '''
 url="https://pkgstore.datahub.io/core/nasdaq-listings/nasdaq-listed_csv/data/7665719fb51081ba0bd834fde71ce822/nasdaq-listed_csv.csv"
 data = requests.get(url).content
@@ -121,7 +119,7 @@ def home():
                 #     session['user_email'] = email
                 #     return redirect('/index')
                 '''
-                If the password field is entered check the password againts the hashed password in the db
+                If the password field is entered check the password against the hashed password in the db
                 If it matches then user is in session and is redirected to the homepage
                 Else a flag is set and the user is shown an error message
                 '''
@@ -132,7 +130,6 @@ def home():
                     #If the flag variable is false -> user has entered the wrong password
                     flag = False
                     #print("WRONG PWD")
-                    #And is redirected to the login page
                     return render_template('login.html', error="Incorrect Email or Password")
             else:
                 #If the user doesnt exist
@@ -151,7 +148,7 @@ def home():
             print("SIGN UP")
             if not users.check_user_exist(path, email):
                 if password == repeat_password:
-                    #Hash the users password and store the hashed password for security
+                    #Hash the users password and store the hashed password
                     password = users.hash_pwd(password)
                     #print("Hashed PWD: ", password)
                     users.insert(path, 'user', (email, name, password, 0))
@@ -450,7 +447,6 @@ def trade():
                     return redirect(url_for("trade"))
                 #If stock symbol is invalid
                 else:
-                    #Return to page with error
                     return render_template('trade.html', error="Incorrect Stock Symbol. Please Enter Valid Symbol", transactions=transactions)
 
 
@@ -499,7 +495,6 @@ def trade():
                     return render_template('trade.html', transactions=transactions, error=err_str)
                 #If stock symbol is invalid
                 else:
-                    #Return to page with error
                     return render_template('trade.html', error="Incorrect Stock Symbol. Please Enter Valid Symbol", transactions=transactions)
                     
         return render_template('trade.html', transactions=transactions)
@@ -518,6 +513,7 @@ def contact():
         The email and message are fetched from the input fields
         The entered email is then checked with the database to make sure it matches the user and the user exists
         If the emails dont match it generates an error and if it does match then we insert data into contact table
+        Redirects to login page if g.user is empty -> No user signed in
         """
         if request.method == "POST":
             print("CONTACT US")
@@ -538,26 +534,24 @@ def contact():
                 return render_template('contact.html', error="Incorrect Email!")
 
         return render_template("contact.html")
-    # Redirects to login page if g.user is empty -> No user signed in
     return redirect('/')
 
 
-#Function sends data (in json format) to the plotting function
+'''
+Function sends data (in json format) to the plotting function
+Gets a list of all files in the data folder which have a _mod.json ending
+If there are no such files then plot AAPL as the default graph
+If there is such a file - sends json file containing data to be plotted
+'''
 @app.route('/pipe', methods=["GET", "POST"])
 def pipe():
-    #Get a list of all files in the data folder which have a _mod.json ending
     files = glob.glob("/home/nvombat/Desktop/Investment-WebApp/analysis/data/*_mod.json")
-    #If there are no such files then plot AAPL as the default graph
     if len(files) == 0:
         with open("/home/nvombat/Desktop/Investment-WebApp/analysis/data/AAPL.json") as f:
-            #Sends json file containing data to be plotted
             r = json.load(f)
             return {"res": r}
-    #If there is such a file
     else:
-        #Open that file and plot that data
         with open(files[0]) as f:
-            #Sends json file containing data to be plotted
             r = json.load(f)
             return {"res": r}
 
