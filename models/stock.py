@@ -6,8 +6,7 @@ def make_tbl(path: str):
     conn = s.connect(path)
     cur = conn.cursor()
 
-    #Command to create table if it doesnt exist
-    #Has 5 fields - DATE, STOCK SYMBOL, PRICE, QUANTITY & EMAIL ID
+    #Command to create table if it doesnt exist with DATE, STOCK SYMBOL, PRICE, QUANTITY & EMAIL ID
     tbl = "CREATE TABLE IF NOT EXISTS stock(Date Date, Stock_Symbol Text, Price real, Quantity int, Email Text)"
     cur.execute(tbl)
     conn.commit()
@@ -26,16 +25,14 @@ def buy(tablename: str, data: tuple, path: str):
     #Checks table to see if the user(email) already exists for the stock symbol that has been requested
     cmnd = f"SELECT * FROM {tablename} WHERE Stock_Symbol='{data[1]}' AND Email='{data[4]}'"
     cur.execute(cmnd)
-    #Fetches results in res
     res = cur.fetchall()
-    #If res is an empty array - User has not bought that particular stock thus insert into table as a new entry
+    #If res is empty - User has not bought that particular stock thus insert into table as a new entry
     if len(res) == 0:
         b1 = f"INSERT INTO {tablename} VALUES {data}"
         cur.execute(b1)
         conn.commit()
         #print("INSERTED NEW INTO TABLE - NO PREVIOUS VALUES")
-    #If res is not empty - User has already bought stocks with that symbol
-    #Update the quantity of that particular stock for that particular user
+    #If res is not empty - User has already bought stocks with that symbol thus update the quantity of that particular stock for user
     else:
         b2 = f"UPDATE {tablename} SET Quantity=Quantity+'{data[3]}' WHERE Stock_Symbol = '{data[1]}' AND Email = '{data[4]}'"
         cur.execute(b2)
@@ -51,11 +48,10 @@ def sell(tablename: str, data : tuple, path: str):
     #Checks table to see if the user(email) has stocks of that particular symbol
     rem = f"SELECT * FROM {tablename} WHERE Stock_Symbol='{data[0]}' AND Email = '{data[2]}'"
     cur.execute(rem)
-    #Query result stored in res array
     res = cur.fetchall()
     #print("SELLING RES: ", res)
 
-    #If res array is empty - The user doesnt own that stock thus cant sell it
+    #If res is empty - The user doesnt own that stock thus cant sell it
     if len(res) == 0:
         print("YOU DO NOT OWN THIS STOCK")
     else:
