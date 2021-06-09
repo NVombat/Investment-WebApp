@@ -1,6 +1,5 @@
-#libraries for salted hashing of password
+#Imports
 import hashlib, binascii, os
-#Sql library
 import sqlite3 as s
 
 

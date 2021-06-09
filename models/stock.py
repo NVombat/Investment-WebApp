@@ -32,7 +32,7 @@ def buy(tablename: str, data: tuple, path: str):
         cur.execute(b1)
         conn.commit()
         #print("INSERTED NEW INTO TABLE - NO PREVIOUS VALUES")
-    #If res is not empty - User has already bought stocks with that symbol thus update the quantity of that particular stock for user
+    #If res is not empty - User has already bought stocks with that symbol thus update the quantity of that particular stock
     else:
         b2 = f"UPDATE {tablename} SET Quantity=Quantity+'{data[3]}' WHERE Stock_Symbol = '{data[1]}' AND Email = '{data[4]}'"
         cur.execute(b2)
@@ -63,12 +63,12 @@ def sell(tablename: str, data : tuple, path: str):
             print("YOU ARE TRYING TO SELL MORE THAN YOU OWN")
         #If user owns the same amount as the amount he wants to sell
         elif data[1] - curr_quant == 0:
-            #Deletes the particular stock column from the table for that particular user
+            #Deletes the particular stock column from the table
             s1 = f"DELETE FROM {tablename} WHERE Stock_Symbol='{data[0]}' AND Email = '{data[2]}'"
             cur.execute(s1)
             conn.commit()
             #print("STOCK GONE - ALL SOLD")
-        #Deducts the amount the user wants to sell from the amount the user owns by updating table for that particular user
+        #Deducts the amount the user wants to sell from the amount the user owns
         else:
             s2 = f"UPDATE {tablename} SET Quantity=Quantity-'{data[1]}' WHERE Stock_Symbol='{data[0]}' AND Email = '{data[2]}'"
             cur.execute(s2)
