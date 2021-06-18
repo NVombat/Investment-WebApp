@@ -5,3 +5,13 @@ matplotlib
 justpy
 pytz
 pandas_datareader
+
+#To hide email id and password:
+#gedit .bash_profile
+#export USER="my_user_name"
+#export PASSWORD="my_password"
+
+#THEN IN CODE:
+#import os 
+#user_name = os.environ.get('USER')
+#password = os.environ.get('password')
