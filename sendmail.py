@@ -141,7 +141,7 @@ def send_buy(path: str, data: tuple):
 
     #user mail subject, body and format of the mail
     subject = 'Stock Transaction Receipt: IMP!'
-    body = f'Dear User\nHere is your transaction receipt for your {data[4]} account.\n\nYou purchased {data[2]} units of the {data[0]} stock on {data[5]} at a rate of {data[1]} $ per stock unit.\n\nYour total expenditure was {data[3]} $. Thank you for using "Code"vid19 Solutions.\n\nIf you did not make or authorize this transaction PLEASE CONTACT US IMMEDIATELY!\n\nThank you\nWarm Regards\nTeam "Code"Vid19'
+    body = f'Dear User\nHere is your transaction receipt for your {data[4]} account.\n\nYou purchased {data[2]} units of the {data[0]} stock on {data[5]} at a rate of $ {data[1]} per stock unit.\n\nYour total expenditure was $ {data[3]}. Thank you for using "Code"vid19 Solutions.\n\nIf you did not make or authorize this transaction PLEASE CONTACT US IMMEDIATELY!\n\nThank you\nWarm Regards\nTeam "Code"Vid19'
     msg = f'Subject: {subject}\n\n{body}'
 
     #Sends the mail with the data and quits the server
@@ -176,7 +176,7 @@ def send_sell(path: str, data: tuple):
 
     #user mail subject, body and format of the mail
     subject = 'Stock Transaction Receipt: IMP!'
-    body = f'Dear User\nHere is your transaction receipt for your {data[4]} account.\n\nYou sold {data[2]} units of the {data[0]} stock on {data[5]} at a rate of {data[1]} $ per stock unit.\n\nYour total earning was {data[3]} $. Thank you for using "Code"vid19 Solutions.\n\nIf you did not make or authorize this transaction PLEASE CONTACT US IMMEDIATELY!\n\nThank you\nWarm Regards\nTeam "Code"Vid19'
+    body = f'Dear User\nHere is your transaction receipt for your {data[4]} account.\n\nYou sold {data[2]} units of the {data[0]} stock on {data[5]} at a rate of $ {data[1]} per stock unit.\n\nYour total earning was $ {data[3]}. Thank you for using "Code"vid19 Solutions.\n\nIf you did not make or authorize this transaction PLEASE CONTACT US IMMEDIATELY!\n\nThank you\nWarm Regards\nTeam "Code"Vid19'
     msg = f'Subject: {subject}\n\n{body}'
 
     #Sends the mail with the data and quits the server
