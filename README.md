@@ -102,6 +102,12 @@ To run : Clone Repository & Run -> pip install -r requirements.txt -> python3 ba
 
 ![WhatsApp Image 2021-05-05 at 14 39 42](https://user-images.githubusercontent.com/63743496/117121715-9e817400-adb2-11eb-9de8-8bacea0f4665.jpeg)
 
+![Screenshot from 2021-08-02 11-27-56](https://user-images.githubusercontent.com/63743496/127811192-edbd2192-d691-4080-a775-c33dddb81085.png)
+
+![Screenshot from 2021-08-02 11-28-02](https://user-images.githubusercontent.com/63743496/127811271-f64d5268-18e4-4730-9ab0-68d0db258453.png)
+
+![Screenshot from 2021-08-02 11-28-07](https://user-images.githubusercontent.com/63743496/127811284-43f0267d-d5a9-4cfc-be6f-1dbc15ce64ee.png)
+
 
 
 [Back To The Top](#codevid19)
