@@ -17,6 +17,7 @@ import yfinance as yf
 import datetime as d
 import pandas as pd
 import requests
+import stripe
 import glob
 import json
 import time
@@ -26,8 +27,13 @@ import io
 
 # Import functions from other folders
 from sendmail import send_mail, send_buy, send_sell
-from models import users, contactus, stock
+from models import users, contactus, stock, stripe_prod
 from api import getdata
+
+
+# Import environment variables
+from dotenv import load_dotenv
+load_dotenv()
 
 
 # Path used for all tables in database
@@ -45,6 +51,7 @@ app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 users.create_user(path)
 contactus.create_tbl(path)
 stock.make_tbl(path)
+stripe_prod.create_prod_table(path)
 
 
 '''

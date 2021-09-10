@@ -5,6 +5,8 @@ matplotlib
 justpy
 pytz
 pandas_datareader
+stripe
+python-dotenv
 
 #To hide email id and password:
 #gedit .bash_profile
