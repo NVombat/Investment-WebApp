@@ -4,7 +4,7 @@ import sqlite3 as s
 
 
 #Creates a user table 
-def create_user(path: str):
+def create_user(path: str) -> None:
     conn = s.connect(path)
     cur = conn.cursor()
 
@@ -17,7 +17,7 @@ def create_user(path: str):
 
 
 #Inserts user and related values into table when a user is created
-def insert(path: str, tablename: str, data: tuple):
+def insert(path: str, tablename: str, data: tuple) -> None:
     conn = s.connect(path)
     cur = conn.cursor()
 
@@ -27,7 +27,7 @@ def insert(path: str, tablename: str, data: tuple):
 
 
 #Checks password entered by user against the database
-def checkpwd(path: str, pwd: str, email: str):
+def checkpwd(path: str, pwd: str, email: str) -> bool:
     conn = s.connect(path)
     cur = conn.cursor()
 
@@ -43,7 +43,7 @@ def checkpwd(path: str, pwd: str, email: str):
 
 
 #Checks if the RESET PASSWORD option and SIGN UP is possible by seeing if the user exists
-def check_user_exist(path: str, email : str):
+def check_user_exist(path: str, email : str) -> bool:
     conn = s.connect(path)
     cur = conn.cursor()
 
@@ -61,7 +61,7 @@ def check_user_exist(path: str, email : str):
 
 
 #Resets password for a particular user
-def reset_pwd(path: str, pwd : str, code : int):
+def reset_pwd(path: str, pwd : str, code : int) -> None:
     conn = s.connect(path)
     cur = conn.cursor()
 
@@ -72,7 +72,7 @@ def reset_pwd(path: str, pwd : str, code : int):
 
 
 #Adds the verification code for the user when a reset password request is made
-def add_code(path: str, key : int, email : str):
+def add_code(path: str, key : int, email : str) -> None:
     conn = s.connect(path)
     cur = conn.cursor()
 
@@ -84,7 +84,7 @@ def add_code(path: str, key : int, email : str):
 
 
 #Checks if the verification code given by the user matches the one sent to their email
-def check_code(path: str, code : int):
+def check_code(path: str, code : int) -> bool:
     conn = s.connect(path)
     cur = conn.cursor()
 
@@ -106,7 +106,7 @@ def check_code(path: str, code : int):
 
 #Resets the Verification code to 0 once the user has reset their password
 #To avoid duplicate verification codes
-def reset_code(path: str, code : int):
+def reset_code(path: str, code : int) -> None:
     conn = s.connect(path)
     cur = conn.cursor()
 
@@ -117,12 +117,12 @@ def reset_code(path: str, code : int):
 
 
 #Gets name of user
-def getname(path: str, email: tuple):
+def getname(path: str, email: tuple) -> str:
     email = email[0];
     conn = s.connect(path)
+    cur = conn.cursor()
 
     #Fetches name of particular user
-    cur = conn.cursor()
     cmnd = f"SELECT Name FROM user WHERE Email='{email}'"
     cur.execute(cmnd)
     res = cur.fetchall()
@@ -147,7 +147,7 @@ It checks if the email ID is in our database (the user exists)
 It also checks if the email ID mentioned is the same one as the current user
 If both these conditions are true the user is able to send a message otherwise an error message is displayed
 '''
-def check_contact_us(path: str, email : str, curr_user : str):
+def check_contact_us(path: str, email : str, curr_user : str) -> bool:
     conn = s.connect(path)
     cur = conn.cursor()
 
@@ -175,7 +175,7 @@ binascii can convert between binary and ascii encoded binary representations
 hexlify converts the binary data to hexadecimal
 Final hash is computed with salt and then decoded to ascii and returned
 '''
-def hash_pwd(pwd : str):
+def hash_pwd(pwd : str) -> str:
     salt = hashlib.sha256(os.urandom(60)).hexdigest().encode('ascii')
     #print("SALT1: ", salt)
     pwd_hash = hashlib.pbkdf2_hmac('sha512', pwd.encode('utf-8'), salt, 100000)
@@ -191,7 +191,7 @@ We then hash the current password which the user has entered
 We then compare the hashed password to the one stored in the db
 if they match we return true else we return false
 '''
-def check_hash(path: str, pwd : str, email : str):
+def check_hash(path: str, pwd : str, email : str) -> bool:
     conn = s.connect(path)
     cur = conn.cursor()
 
