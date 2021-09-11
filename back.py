@@ -25,10 +25,11 @@ import os
 import io
 
 
-# Import functions from other folders
-from sendmail import send_mail, send_buy, send_sell
+# Import functions & files from other locations
 from models import users, contactus, stock, stripe_prod
+from sendmail import send_mail, send_buy, send_sell
 from api import getdata
+import stripe_funcs
 
 
 # Import environment variables
@@ -390,8 +391,26 @@ def trade():
 
                     stock_price = "{:.2f}".format(stock_price)
                     total = "{:.2f}".format(total)
-
                     #print("You have spent $", total)
+
+                    if(stripe_prod.check_symbol(path, symb)):
+                        db_price_id = stripe_prod.get_price_id(path, symb)
+                        stored_price = stripe_funcs.get_price_value(db_price_id)
+                        if(stock_price == stored_price):
+                            pass #BUY
+                        else:
+                            prod_id = stripe_prod.get_prod_id(path, symb)
+                            price_id = stripe_funcs.create_price(prod_id, stock_price)['id']
+                            stripe_prod.update_price_id(path, price_id, symb)
+                            pass #BUY
+                    else:
+                        new_prod = stripe_funcs.create_prod(symb)
+                        new_prod_id = new_prod['id']
+                        new_price = stripe_funcs.create_price(new_prod_id, stock_price)
+                        new_price_id = new_price['id']
+                        data = (symb, new_prod_id, new_price_id)
+                        stripe_prod.insert(path, "prod_payment", data)
+                        pass #BUY
 
                     #print("USER EMAIL:", user_email)
                     stock.buy("stock", (date, symb, stock_price, quant, user_email[0]), path)
