@@ -18,9 +18,11 @@ def buy(tablename: str, data: tuple, path: str):
     conn = s.connect(path)
     cur = conn.cursor()
 
+    # print("DATA:", data)
     # print("SYMBOL FROM TUPLE: ", data[1])
+    # print("PRICE FROM TUPLE: ", data[2])
     # print("QUANTITY FROM TUPLE: ", data[3])
-    # print("EMAIL: ", data[4])
+    # print("EMAIL FROM TUPLE: ", data[4])
 
     #Checks table to see if the user(email) already exists for the stock symbol that has been requested
     cmnd = f"SELECT * FROM {tablename} WHERE Stock_Symbol='{data[1]}' AND Email='{data[4]}'"
@@ -34,7 +36,7 @@ def buy(tablename: str, data: tuple, path: str):
         #print("INSERTED NEW INTO TABLE - NO PREVIOUS VALUES")
     #If res is not empty - User has already bought stocks with that symbol thus update the quantity of that particular stock
     else:
-        b2 = f"UPDATE {tablename} SET Quantity=Quantity+'{data[3]}' WHERE Stock_Symbol = '{data[1]}' AND Email = '{data[4]}'"
+        b2 = f"UPDATE {tablename} SET Quantity=Quantity+'{data[3]}', Price='{data[2]}' WHERE Stock_Symbol = '{data[1]}' AND Email = '{data[4]}'"
         cur.execute(b2)
         conn.commit()
         #print("UPDATED VALUE IN TABLE - ALREADY EXISTED")
@@ -44,6 +46,8 @@ def buy(tablename: str, data: tuple, path: str):
 def sell(tablename: str, data : tuple, path: str):
     conn = s.connect(path)
     cur = conn.cursor()
+
+    #print("DATA: ", data)
 
     #Checks table to see if the user(email) has stocks of that particular symbol
     rem = f"SELECT * FROM {tablename} WHERE Stock_Symbol='{data[0]}' AND Email = '{data[2]}'"
@@ -70,7 +74,7 @@ def sell(tablename: str, data : tuple, path: str):
             #print("STOCK GONE - ALL SOLD")
         #Deducts the amount the user wants to sell from the amount the user owns
         else:
-            s2 = f"UPDATE {tablename} SET Quantity=Quantity-'{data[1]}' WHERE Stock_Symbol='{data[0]}' AND Email = '{data[2]}'"
+            s2 = f"UPDATE {tablename} SET Quantity=Quantity-'{data[1]}', Price='{data[3]}' WHERE Stock_Symbol='{data[0]}' AND Email = '{data[2]}'"
             cur.execute(s2)
             conn.commit()
             #print("SOLD - QUANTITY UPDATED")
