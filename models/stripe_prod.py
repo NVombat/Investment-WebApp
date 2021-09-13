@@ -68,3 +68,8 @@ def update_price_id(path: str, price_id: str, symbol: str) -> None:
     upd = f"UPDATE prod_payment SET Price_ID='{price_id}' WHERE Stock_Symbol='{symbol}'"
     cur.execute(upd)
     conn.commit()
+
+if __name__ == "__main__":
+    pass
+    #data = ("GOOGL", "prod_KDowNuIDvITlcA", "price_1JZNIGSAceEO9L8pPc6kkw1n")
+    #insert("/home/nvombat/Desktop/Investment-WebApp/app.db", "prod_payment", data)

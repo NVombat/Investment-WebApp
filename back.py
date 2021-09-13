@@ -31,7 +31,6 @@ import io
 from models import users, contactus, stock, stripe_prod
 from sendmail import send_mail, send_buy, send_sell
 from api import getdata
-import stripe_funcs
 
 
 # Import environment variables
@@ -341,71 +340,71 @@ def about():
 
 
 # Fetch the Checkout Session to display the JSON result on the success page
-# @app.route('/checkout-session', methods=['GET'])
-# def get_checkout_session():
-#     id = request.args.get('sessionId')
-#     checkout_session = stripe.checkout.Session.retrieve(id)
-#     return jsonify(checkout_session)
+@app.route('/checkout-session', methods=['GET'])
+def get_checkout_session():
+    id = request.args.get('sessionId')
+    checkout_session = stripe.checkout.Session.retrieve(id)
+    return jsonify(checkout_session)
 
 
-# @app.route('/create-checkout-session', methods=['POST'])
-# def create_checkout_session():
-#     domain_url = "http://localhost:8000"
-#     try:
-#         # Create new Checkout Session for the order
-#         # Other optional params include:
-#         # For full details see https:#stripe.com/docs/api/checkout/sessions/create
-#         # ?session_id={CHECKOUT_SESSION_ID} means the redirect will have the session ID set as a query param
-#         checkout_session = stripe.checkout.Session.create(
-#             success_url=domain_url + '/success.html?session_id={CHECKOUT_SESSION_ID}',
-#             cancel_url=domain_url + '/canceled.html',
-#             payment_method_types=('card').split(','),
-#             mode='payment',
-#             line_items=[{
-#                 'price': os.getenv('PRICE'),
-#                 'quantity': 1,
-#             }]
-#         )
-#         return redirect(checkout_session.url, code=303)
-#     except Exception as e:
-#         return jsonify(error=str(e)), 403
+@app.route('/create-checkout-session', methods=['POST'])
+def create_checkout_session():
+    domain_url = "http://localhost:8000"
+    try:
+        # Create new Checkout Session for the order
+        # Other optional params include:
+        # For full details see https:#stripe.com/docs/api/checkout/sessions/create
+        # ?session_id={CHECKOUT_SESSION_ID} means the redirect will have the session ID set as a query param
+        checkout_session = stripe.checkout.Session.create(
+            success_url=domain_url + '/success.html?session_id={CHECKOUT_SESSION_ID}',
+            cancel_url=domain_url + '/canceled.html',
+            payment_method_types=('card').split(','),
+            mode='payment',
+            line_items=[{
+                'price': os.getenv('PRICE'),
+                'quantity': 1,
+            }]
+        )
+        return redirect(checkout_session.url, code=303)
+    except Exception as e:
+        return jsonify(error=str(e)), 403
 
 
-# @app.route('/webhook', methods=['POST'])
-# def webhook_received():
-#     # You can use webhooks to receive information about asynchronous payment events.
-#     webhook_secret = os.getenv('STRIPE_WEBHOOK_SECRET')
-#     request_data = json.loads(request.data)
+@app.route('/webhook', methods=['POST'])
+def webhook_received():
+    # You can use webhooks to receive information about asynchronous payment events.
+    webhook_secret = os.getenv('STRIPE_WEBHOOK_SECRET')
+    request_data = json.loads(request.data)
 
-#     if webhook_secret:
-#         # Retrieve the event by verifying the signature using the raw body and secret if webhook signing is configured.
-#         signature = request.headers.get('stripe-signature')
-#         try:
-#             event = stripe.Webhook.construct_event(
-#                 payload=request.data, sig_header=signature, secret=webhook_secret)
-#             data = event['data']
-#         except Exception as e:
-#             return e
-#         # Get the type of webhook event sent - used to check the status of PaymentIntents.
-#         event_type = event['type']
-#     else:
-#         data = request_data['data']
-#         event_type = request_data['type']
-#     data_object = data['object']
+    if webhook_secret:
+        # Retrieve the event by verifying the signature using the raw body and secret if webhook signing is configured.
+        signature = request.headers.get('stripe-signature')
+        try:
+            event = stripe.Webhook.construct_event(
+                payload=request.data, sig_header=signature, secret=webhook_secret)
+            data = event['data']
+        except Exception as e:
+            return e
+        # Get the type of webhook event sent - used to check the status of PaymentIntents.
+        event_type = event['type']
+    else:
+        data = request_data['data']
+        event_type = request_data['type']
+    data_object = data['object']
 
-#     print('event ' + event_type)
+    print('event ' + event_type)
 
-#     if event_type == 'checkout.session.completed':
-#         print('🔔 Payment succeeded!')
-#         # Note: If you need access to the line items, for instance to
-#         # automate fullfillment based on the the ID of the Price, you'll
-#         # need to refetch the Checkout Session here, and expand the line items:
-#         #
-#         # session = stripe.checkout.Session.retrieve(
-#         #     data['object']['id'], expand=['line_items'])
-#         #
-#         # line_items = session.line_items
-#     return jsonify({'status': 'success'})
+    if event_type == 'checkout.session.completed':
+        print('🔔 Payment succeeded!')
+        # Note: If you need access to the line items, for instance to
+        # automate fullfillment based on the the ID of the Price, you'll
+        # need to refetch the Checkout Session here, and expand the line items:
+        #
+        # session = stripe.checkout.Session.retrieve(
+        #     data['object']['id'], expand=['line_items'])
+        #
+        # line_items = session.line_items
+    return jsonify({'status': 'success'})
 
     
 # TRADING GUIDE page
@@ -475,28 +474,115 @@ def trade():
 
                         total = quant * stock_price
 
+                        stock_price_int = int(stock_price)
+                        stock_price_int *= 100
+                        print("INT VAL OF STOCK PRICE: ", stock_price_int)
+
                         stock_price = "{:.2f}".format(stock_price)
                         total = "{:.2f}".format(total)
                         #print("You have spent $", total)
 
-                        # if(stripe_prod.check_symbol(path, symb)):
-                        #     db_price_id = stripe_prod.get_price_id(path, symb)
-                        #     stored_price = stripe_funcs.get_price_value(db_price_id)
-                        #     if(stock_price == stored_price):
-                        #         pass #BUY
-                        #     else:
-                        #         prod_id = stripe_prod.get_prod_id(path, symb)
-                        #         price_id = stripe_funcs.create_price(prod_id, stock_price)['id']
-                        #         stripe_prod.update_price_id(path, price_id, symb)
-                        #         pass #BUY
-                        # else:
-                        #     new_prod = stripe_funcs.create_prod(symb)
-                        #     new_prod_id = new_prod['id']
-                        #     new_price = stripe_funcs.create_price(new_prod_id, stock_price)
-                        #     new_price_id = new_price['id']
-                        #     data = (symb, new_prod_id, new_price_id)
-                        #     stripe_prod.insert(path, "prod_payment", data)
-                        #     pass #BUY
+                        if(stripe_prod.check_symbol(path, symb)):
+                            print("Stock symbol in PROD_PAYMENT table")
+                            db_price_id = stripe_prod.get_price_id(path, symb)
+                            print("Stored PRICE_ID:", db_price_id)
+
+                            price_obj = stripe.Price.retrieve(
+                                db_price_id,
+                            )
+                            print("PRICE OBJECT:", price_obj)
+                            stored_price = price_obj['unit_amount']/100
+                            print("STRIPE PRICE:", stored_price)
+                            if(stock_price == stored_price):
+                                print("PRICE SAME")
+                                domain_url = "http://localhost:8000"
+                                try:
+                                    # Create new Checkout Session for the order
+                                    # ?session_id={CHECKOUT_SESSION_ID} means the redirect will have the session ID set as a query param
+                                    checkout_session = stripe.checkout.Session.create(
+                                        success_url=domain_url + '/success.html?session_id={CHECKOUT_SESSION_ID}',
+                                        cancel_url=domain_url + '/canceled.html',
+                                        payment_method_types=["card"],
+                                        mode='payment',
+                                        line_items=[{
+                                            'price': db_price_id,
+                                            'quantity': quant,
+                                        }]
+                                    )
+                                    return redirect(checkout_session.url, code=303)
+                                except Exception as e:
+                                    return jsonify(error=str(e)), 403
+                                
+                            else:
+                                print("PRICE CHANGE")
+                                prod_id = stripe_prod.get_prod_id(path, symb)
+                                print("Stored PROD_ID:", prod_id)
+
+                                price = stripe.Price.create(
+                                    unit_amount = stock_price_int,
+                                    currency = "inr",
+                                    product = prod_id,
+                                )
+                                print("PRICE OBJECT:", price)
+                                price_id = price['id']
+                                print("NEW PRICE_ID:", price_id)
+                                stripe_prod.update_price_id(path, price_id, symb)
+                                
+                                domain_url = "http://localhost:8000"
+                                try:
+                                    # Create new Checkout Session for the order
+                                    # ?session_id={CHECKOUT_SESSION_ID} means the redirect will have the session ID set as a query param
+                                    checkout_session = stripe.checkout.Session.create(
+                                        success_url=domain_url + '/success.html?session_id={CHECKOUT_SESSION_ID}',
+                                        cancel_url=domain_url + '/canceled.html',
+                                        payment_method_types=["card"],
+                                        mode='payment',
+                                        line_items=[{
+                                            'price': price_id,
+                                            'quantity': quant,
+                                        }]
+                                    )
+                                    return redirect(checkout_session.url, code=303)
+                                except Exception as e:
+                                    return jsonify(error=str(e)), 403
+
+                        else:
+                            print("Stock symbol NOT IN PROD_PAYMENT table")
+                            new_prod = stripe.Product.create(
+                                name = symb
+                            )
+                            print("NEW PRODUCT CREATED")
+                            print(new_prod)
+                            new_prod_id = new_prod['id']
+                            print("NEW PROD_ID:", new_prod_id)
+                            new_price = stripe.Price.create(
+                                unit_amount = stock_price_int,
+                                currency = "inr",
+                                product = new_prod_id,
+                            )
+                            print("NEW PRICE OBJECT:", new_price)
+                            new_price_id = new_price['id']
+                            print("NEW PRICE_ID:", new_price_id)
+                            data = (symb, new_prod_id, new_price_id)
+                            stripe_prod.insert(path, "prod_payment", data)
+                            
+                            domain_url = "http://localhost:8000"
+                            try:
+                                # Create new Checkout Session for the order
+                                # ?session_id={CHECKOUT_SESSION_ID} means the redirect will have the session ID set as a query param
+                                checkout_session = stripe.checkout.Session.create(
+                                    success_url=domain_url + '/success.html?session_id={CHECKOUT_SESSION_ID}',
+                                    cancel_url=domain_url + '/canceled.html',
+                                    payment_method_types=["card"],
+                                    mode='payment',
+                                    line_items=[{
+                                        'price': new_price_id,
+                                        'quantity': quant,
+                                    }]
+                                )
+                                return redirect(checkout_session.url, code=303)
+                            except Exception as e:
+                                return jsonify(error=str(e)), 403
 
                         #print("USER EMAIL:", user_email)
                         stock.buy("stock", (date, symb, stock_price, quant, user_email[0]), path)
