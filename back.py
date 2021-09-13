@@ -431,6 +431,7 @@ def trade():
         '''
         user_email = g.user
         transactions = stock.query(user_email[0], path)
+        #print("TRANSACTIONS: ", transactions)
 
         if request.method == "POST":
 
@@ -470,7 +471,7 @@ def trade():
                         #stock_price = getdata(close='close', symbol=symb)[0]
                         #stock_price = get_current_price(symb)
                         stock_price = get_current_stock_price(symb)
-                        print("STOCK PRICE", stock_price)
+                        #print("STOCK PRICE", stock_price)
 
                         total = quant * stock_price
 
@@ -555,7 +556,7 @@ def trade():
                         date = d.datetime.now()
                         date = date.strftime("%m/%d/%Y, %H:%M:%S")
 
-                        data = (symb, quant, user_email[0])
+                        data = (symb, quant, user_email[0], stock_price)
                         stock.sell("stock", data, path)
 
                         mail_data = (symb, stock_price, quant, total, user_email[0], date)
