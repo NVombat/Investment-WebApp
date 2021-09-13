@@ -1,12 +1,13 @@
 # Import the flask library functions
 from flask import (
-    Flask,
-    session,
-    g,
     render_template,
-    request,
     redirect,
-    url_for
+    request,
+    jsonify,
+    session,
+    url_for,
+    Flask,
+    g
 )
 
 
@@ -15,6 +16,7 @@ from requests.api import get
 from pathlib import Path
 import yfinance as yf
 import datetime as d
+import pynance as pn
 import pandas as pd
 import requests
 import stripe
@@ -35,6 +37,7 @@ import stripe_funcs
 # Import environment variables
 from dotenv import load_dotenv
 load_dotenv()
+stripe.api_key = os.getenv('STRIPE_SECRET_KEY')
 
 
 # Path used for all tables in database
@@ -64,6 +67,17 @@ def get_current_price(symbol):
     ticker = yf.Ticker(symbol)
     todays_data = ticker.history(period='1d')
     return todays_data['Close'][0]
+
+
+'''
+SUBSTITUTE FOR JSON DECODE ERROR
+Function to get the current price of any stock
+Takes symbol as input and gets stock data of the current day
+Extracts the closing price and returns it
+'''
+def get_current_stock_price(symbol):
+    data = pn.data.get(symbol, start=None, end=None)
+    return data['Close'][0]
 
 
 '''
@@ -326,6 +340,74 @@ def about():
     return redirect('/')
 
 
+# Fetch the Checkout Session to display the JSON result on the success page
+# @app.route('/checkout-session', methods=['GET'])
+# def get_checkout_session():
+#     id = request.args.get('sessionId')
+#     checkout_session = stripe.checkout.Session.retrieve(id)
+#     return jsonify(checkout_session)
+
+
+# @app.route('/create-checkout-session', methods=['POST'])
+# def create_checkout_session():
+#     domain_url = "http://localhost:8000"
+#     try:
+#         # Create new Checkout Session for the order
+#         # Other optional params include:
+#         # For full details see https:#stripe.com/docs/api/checkout/sessions/create
+#         # ?session_id={CHECKOUT_SESSION_ID} means the redirect will have the session ID set as a query param
+#         checkout_session = stripe.checkout.Session.create(
+#             success_url=domain_url + '/success.html?session_id={CHECKOUT_SESSION_ID}',
+#             cancel_url=domain_url + '/canceled.html',
+#             payment_method_types=('card').split(','),
+#             mode='payment',
+#             line_items=[{
+#                 'price': os.getenv('PRICE'),
+#                 'quantity': 1,
+#             }]
+#         )
+#         return redirect(checkout_session.url, code=303)
+#     except Exception as e:
+#         return jsonify(error=str(e)), 403
+
+
+# @app.route('/webhook', methods=['POST'])
+# def webhook_received():
+#     # You can use webhooks to receive information about asynchronous payment events.
+#     webhook_secret = os.getenv('STRIPE_WEBHOOK_SECRET')
+#     request_data = json.loads(request.data)
+
+#     if webhook_secret:
+#         # Retrieve the event by verifying the signature using the raw body and secret if webhook signing is configured.
+#         signature = request.headers.get('stripe-signature')
+#         try:
+#             event = stripe.Webhook.construct_event(
+#                 payload=request.data, sig_header=signature, secret=webhook_secret)
+#             data = event['data']
+#         except Exception as e:
+#             return e
+#         # Get the type of webhook event sent - used to check the status of PaymentIntents.
+#         event_type = event['type']
+#     else:
+#         data = request_data['data']
+#         event_type = request_data['type']
+#     data_object = data['object']
+
+#     print('event ' + event_type)
+
+#     if event_type == 'checkout.session.completed':
+#         print('🔔 Payment succeeded!')
+#         # Note: If you need access to the line items, for instance to
+#         # automate fullfillment based on the the ID of the Price, you'll
+#         # need to refetch the Checkout Session here, and expand the line items:
+#         #
+#         # session = stripe.checkout.Session.retrieve(
+#         #     data['object']['id'], expand=['line_items'])
+#         #
+#         # line_items = session.line_items
+#     return jsonify({'status': 'success'})
+
+    
 # TRADING GUIDE page
 @app.route('/doc')
 def doc():
@@ -383,40 +465,45 @@ def trade():
 
                     quant = int(quant)
                     #print("AMOUNT", quant)
-                    #stock_price = getdata(close='close', symbol=symb)[0]
-                    stock_price = get_current_price(symb)
-                    #print("STOCK PRICE", stock_price)
 
-                    total = quant * stock_price
+                    try:
+                        #stock_price = getdata(close='close', symbol=symb)[0]
+                        #stock_price = get_current_price(symb)
+                        stock_price = get_current_stock_price(symb)
+                        print("STOCK PRICE", stock_price)
 
-                    stock_price = "{:.2f}".format(stock_price)
-                    total = "{:.2f}".format(total)
-                    #print("You have spent $", total)
+                        total = quant * stock_price
 
-                    if(stripe_prod.check_symbol(path, symb)):
-                        db_price_id = stripe_prod.get_price_id(path, symb)
-                        stored_price = stripe_funcs.get_price_value(db_price_id)
-                        if(stock_price == stored_price):
-                            pass #BUY
-                        else:
-                            prod_id = stripe_prod.get_prod_id(path, symb)
-                            price_id = stripe_funcs.create_price(prod_id, stock_price)['id']
-                            stripe_prod.update_price_id(path, price_id, symb)
-                            pass #BUY
-                    else:
-                        new_prod = stripe_funcs.create_prod(symb)
-                        new_prod_id = new_prod['id']
-                        new_price = stripe_funcs.create_price(new_prod_id, stock_price)
-                        new_price_id = new_price['id']
-                        data = (symb, new_prod_id, new_price_id)
-                        stripe_prod.insert(path, "prod_payment", data)
-                        pass #BUY
+                        stock_price = "{:.2f}".format(stock_price)
+                        total = "{:.2f}".format(total)
+                        #print("You have spent $", total)
 
-                    #print("USER EMAIL:", user_email)
-                    stock.buy("stock", (date, symb, stock_price, quant, user_email[0]), path)
+                        # if(stripe_prod.check_symbol(path, symb)):
+                        #     db_price_id = stripe_prod.get_price_id(path, symb)
+                        #     stored_price = stripe_funcs.get_price_value(db_price_id)
+                        #     if(stock_price == stored_price):
+                        #         pass #BUY
+                        #     else:
+                        #         prod_id = stripe_prod.get_prod_id(path, symb)
+                        #         price_id = stripe_funcs.create_price(prod_id, stock_price)['id']
+                        #         stripe_prod.update_price_id(path, price_id, symb)
+                        #         pass #BUY
+                        # else:
+                        #     new_prod = stripe_funcs.create_prod(symb)
+                        #     new_prod_id = new_prod['id']
+                        #     new_price = stripe_funcs.create_price(new_prod_id, stock_price)
+                        #     new_price_id = new_price['id']
+                        #     data = (symb, new_prod_id, new_price_id)
+                        #     stripe_prod.insert(path, "prod_payment", data)
+                        #     pass #BUY
 
-                    data = (symb, stock_price, quant, total, user_email[0], date)
-                    send_buy(path, data)
+                        #print("USER EMAIL:", user_email)
+                        stock.buy("stock", (date, symb, stock_price, quant, user_email[0]), path)
+
+                        data = (symb, stock_price, quant, total, user_email[0], date)
+                        send_buy(path, data)
+                    except json.JSONDecodeError:
+                        print("Invalid JSON Data -> ERROR IN BUYING")
 
                     #print("TRANSACTIONS: ", transactions)
                     # Redirect submits a get request (200) thus cancelling the usual post request generated by the
@@ -452,24 +539,30 @@ def trade():
 
                     quant = int(quant)
                     #print("AMOUNT", quant)
-                    #stock_price = getdata(close='close', symbol=symb)[0]
-                    stock_price = get_current_price(symb)
-                    #print("STOCK PRICE", stock_price)
 
-                    total = quant * stock_price
-                    #print("You have received $", total)
+                    try:
+                        #stock_price = getdata(close='close', symbol=symb)[0]
+                        #stock_price = get_current_price(symb)
+                        stock_price = get_current_stock_price(symb)
+                        #print("STOCK PRICE", stock_price)
 
-                    stock_price = "{:.2f}".format(stock_price)
-                    total = "{:.2f}".format(total)
+                        total = quant * stock_price
+                        #print("You have received $", total)
 
-                    date = d.datetime.now()
-                    date = date.strftime("%m/%d/%Y, %H:%M:%S")
+                        stock_price = "{:.2f}".format(stock_price)
+                        total = "{:.2f}".format(total)
 
-                    data = (symb, quant, user_email[0])
-                    stock.sell("stock", data, path)
+                        date = d.datetime.now()
+                        date = date.strftime("%m/%d/%Y, %H:%M:%S")
 
-                    mail_data = (symb, stock_price, quant, total, user_email[0], date)
-                    send_sell(path, mail_data)
+                        data = (symb, quant, user_email[0])
+                        stock.sell("stock", data, path)
+
+                        mail_data = (symb, stock_price, quant, total, user_email[0], date)
+                        send_sell(path, mail_data)
+                    except json.JSONDecodeError:
+                        print("Invalid JSON Data -> ERROR IN FINDING PRICE")
+
                     return redirect(url_for("trade"))
                 #If stock symbol is invalid
                 else:
@@ -498,23 +591,27 @@ def trade():
                     quant = int(quant)
                     #print("AMOUNT", quant)
 
-                    #price = getdata(close='close', symbol=sym)[0]
-                    price = get_current_price(sym)
-                    #print("PRICE:", price)
-                    price = float(price)
+                    try:
+                        #price = getdata(close='close', symbol=sym)[0]
+                        #price = get_current_price(sym)
+                        price = get_current_stock_price(sym)
+                        #print("PRICE:", price)
+                        price = float(price)
 
-                    total = quant * price
-                    #print("Total cost is $", total)
+                        total = quant * price
+                        #print("Total cost is $", total)
 
-                    price = "{:.2f}".format(price)
-                    total = "{:.2f}".format(total)
+                        price = "{:.2f}".format(price)
+                        total = "{:.2f}".format(total)
 
-                    quant = str(quant)
-                    price = str(price)
-                    total = str(total)
+                        quant = str(quant)
+                        price = str(price)
+                        total = str(total)
 
-                    # Message with price for amount entered and per unit as well
-                    err_str = "The price for " + quant + " unit(s) of " + sym + " Stock is $ " + total + " at $ " + price + " per unit"
+                        # Message with price for amount entered and per unit as well
+                        err_str = "The price for " + quant + " unit(s) of " + sym + " Stock is $ " + total + " at $ " + price + " per unit"
+                    except json.JSONDecodeError:
+                        print("Invalid JSON Data -> ERROR IN SELLING")
 
                     #print(transactions)
                     # render template because we want the table to show and the message
