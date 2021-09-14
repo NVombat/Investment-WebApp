@@ -50,6 +50,15 @@ def get_price_id(path: str, symbol: str) -> str:
 
 # Gets Product ID
 def get_prod_id(path: str, symbol: str) -> str:
+    """Insert user into collection
+
+    Args:
+        path: Path to database
+        symbol: Stock Symbol
+
+    Returns:
+            str: Product ID for the particular Symbol
+    """
     conn = s.connect(path)
     cur = conn.cursor()
 
@@ -60,8 +69,17 @@ def get_prod_id(path: str, symbol: str) -> str:
     return res[0][0]
 
 
-# Udates Price ID
 def update_price_id(path: str, price_id: str, symbol: str) -> None:
+    """Updates the price ID for a particular stock symbol
+
+    Args:
+        path: Path to database
+        price_id: Price ID for that particular Stock Symbol
+        symbol: Stock Symbol
+
+    Returns:
+            None: Updates the price_id field in the table
+    """
     conn = s.connect(path)
     cur = conn.cursor()
 

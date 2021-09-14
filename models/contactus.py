@@ -1,19 +1,34 @@
 import sqlite3 as s
 
 
-#Creates the table in the database
-def create_tbl(path : str):
+def create_tbl(path: str):
+    """Creates the contact_us table in the database
+
+    Args:
+        path: Path to database
+
+    Returns:
+            None: Table is created if it doesnt already exist
+    """
     conn = s.connect(path)
     cur = conn.cursor()
 
-    #Command to create table if it doesnt exist
     tbl = 'CREATE TABLE IF NOT EXISTS contact_us(Email TEXT, Message TEXT)'
     cur.execute(tbl)
     conn.commit()
 
 
-#Inserts message and email id from Contact_Us Page 
-def insert(email : str, message : str, path : str):
+def insert(email: str, message: str, path: str):
+    """Inserts message and email id from Contact_Us Page 
+
+    Args:
+        email: User Email ID
+        message: User Feedback Message
+        path: Path to database
+
+    Returns:
+            None: Inserts data into table
+    """
     conn = s.connect(path)
     cur = conn.cursor()
 

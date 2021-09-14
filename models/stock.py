@@ -1,19 +1,34 @@
 import sqlite3 as s
 
 
-#Creates the stock table in database
 def make_tbl(path: str):
+    """Creates the stock table in the database
+
+    Args:
+        path: Path to database
+
+    Returns:
+            None: Table is created if it doesnt already exist
+    """
     conn = s.connect(path)
     cur = conn.cursor()
 
-    #Command to create table if it doesnt exist with DATE, STOCK SYMBOL, PRICE, QUANTITY & EMAIL ID
     tbl = "CREATE TABLE IF NOT EXISTS stock(Date Date, Stock_Symbol Text, Price real, Quantity int, Email Text)"
     cur.execute(tbl)
     conn.commit()
 
 
-#Buy Function INSERTS into table when user buys stocks
 def buy(tablename: str, data: tuple, path: str):
+    """Updates table when user BUYS stocks
+
+    Args:
+        tablename: Tablename
+        data: Contains data related to transaction -> price, quantity, symbol etc.
+        path: Path to database
+
+    Returns:
+            None
+    """
     # print(tablename, data, path)
     conn = s.connect(path)
     cur = conn.cursor()
@@ -24,7 +39,6 @@ def buy(tablename: str, data: tuple, path: str):
     # print("QUANTITY FROM TUPLE: ", data[3])
     # print("EMAIL FROM TUPLE: ", data[4])
 
-    #Checks table to see if the user(email) already exists for the stock symbol that has been requested
     cmnd = f"SELECT * FROM {tablename} WHERE Stock_Symbol='{data[1]}' AND Email='{data[4]}'"
     cur.execute(cmnd)
     res = cur.fetchall()
@@ -42,20 +56,28 @@ def buy(tablename: str, data: tuple, path: str):
         #print("UPDATED VALUE IN TABLE - ALREADY EXISTED")
 
 
-#Sell function DELETES from table when user sells stocks
-def sell(tablename: str, data : tuple, path: str):
+def sell(tablename: str, data : tuple, path: str) -> None:
+    """Updates table when user SELLS stocks
+
+    Args:
+        tablename: Tablename
+        data: Contains data related to transaction -> price, quantity, symbol etc.
+        path: Path to database
+
+    Returns:
+            None
+    """
     conn = s.connect(path)
     cur = conn.cursor()
 
     #print("DATA: ", data)
 
-    #Checks table to see if the user(email) has stocks of that particular symbol
     rem = f"SELECT * FROM {tablename} WHERE Stock_Symbol='{data[0]}' AND Email = '{data[2]}'"
     cur.execute(rem)
     res = cur.fetchall()
     #print("SELLING RES: ", res)
 
-    #If res is empty - The user doesnt own that stock thus cant sell it
+    # If The user doesnt own that stock
     if len(res) == 0:
         print("YOU DO NOT OWN THIS STOCK")
     else:
@@ -80,8 +102,16 @@ def sell(tablename: str, data : tuple, path: str):
             #print("SOLD - QUANTITY UPDATED")
 
 
-#Queries stock table to fetch all stocks purchased by a particular user
-def query(email: str, path: str):
+def query(email: str, path: str) -> list:
+    """Queries stock table to fetch all stocks purchased by a particular user
+
+    Args:
+        email: Email ID of user
+        path: Path to database
+
+    Returns:
+            List: Containing all transactions made by the user
+    """
     conn = s.connect(path)
     cur = conn.cursor()
 
