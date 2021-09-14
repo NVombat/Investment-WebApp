@@ -79,6 +79,24 @@ def get_current_stock_price(symbol):
     return data['Close'][0]
 
 
+#Currency Conversion
+class Currency_Conversion:
+    # Store the conversion rates
+    rates = {} 
+    def __init__(self, url):
+        data = requests.get(url).json()
+        # Extracting only the rates from the json data
+        self.rates = data["rates"] 
+
+    def convert(self, from_currency, to_currency, amount):
+        initial_amount = amount
+        if from_currency != 'EUR' :
+            amount = amount / self.rates[from_currency]
+
+        amount = round(amount * self.rates[to_currency], 2)
+        return amount
+
+
 '''
 For analysis and trading we need a list of stock symbols to see if the user has entered a valid stock symbol
 URL containing NASDAQ listings in csv format
@@ -347,27 +365,25 @@ def get_checkout_session():
     return jsonify(checkout_session)
 
 
-@app.route('/create-checkout-session', methods=['POST'])
-def create_checkout_session():
-    domain_url = "http://localhost:8000"
-    try:
-        # Create new Checkout Session for the order
-        # Other optional params include:
-        # For full details see https:#stripe.com/docs/api/checkout/sessions/create
-        # ?session_id={CHECKOUT_SESSION_ID} means the redirect will have the session ID set as a query param
-        checkout_session = stripe.checkout.Session.create(
-            success_url=domain_url + '/success.html?session_id={CHECKOUT_SESSION_ID}',
-            cancel_url=domain_url + '/canceled.html',
-            payment_method_types=('card').split(','),
-            mode='payment',
-            line_items=[{
-                'price': os.getenv('PRICE'),
-                'quantity': 1,
-            }]
-        )
-        return redirect(checkout_session.url, code=303)
-    except Exception as e:
-        return jsonify(error=str(e)), 403
+# @app.route('/create-checkout-session', methods=['POST'])
+# def create_checkout_session():
+#     domain_url = "http://localhost:8000"
+#     try:
+#         # Create new Checkout Session for the order
+#         # ?session_id={CHECKOUT_SESSION_ID} means the redirect will have the session ID set as a query param
+#         checkout_session = stripe.checkout.Session.create(
+#             success_url=domain_url + '/success.html?session_id={CHECKOUT_SESSION_ID}',
+#             cancel_url=domain_url + '/canceled.html',
+#             payment_method_types=('card').split(','),
+#             mode='payment',
+#             line_items=[{
+#                 'price': os.getenv('PRICE'),
+#                 'quantity': 1,
+#             }]
+#         )
+#         return redirect(checkout_session.url, code=303)
+#     except Exception as e:
+#         return jsonify(error=str(e)), 403
 
 
 @app.route('/webhook', methods=['POST'])
@@ -433,6 +449,12 @@ def trade():
         #print("TRANSACTIONS: ", transactions)
 
         if request.method == "POST":
+            #To convert Dollars to Rupees
+            url = str.__add__('http://data.fixer.io/api/latest?access_key=', os.getenv("CURRENCY_ACCESS_KEY"))  
+            c = Currency_Conversion(url)
+            from_country = "USD"
+            to_country = "INR"
+            # c.convert(from_country, to_country, amount)
 
             '''
             If a post request is generated (button clicked) the user wants to buy or sell stocks
@@ -474,7 +496,8 @@ def trade():
 
                         total = quant * stock_price
 
-                        stock_price_int = int(stock_price)
+                        stock_price_rupees = c.convert(from_country, to_country, stock_price)
+                        stock_price_int = int(stock_price_rupees)
                         stock_price_int *= 100
                         print("INT VAL OF STOCK PRICE: ", stock_price_int)
 
@@ -492,8 +515,10 @@ def trade():
                             )
                             print("PRICE OBJECT:", price_obj)
                             stored_price = price_obj['unit_amount']/100
+                            stored_price_dollars = int(c.convert("INR", "USD", stored_price))
                             print("STRIPE PRICE:", stored_price)
-                            if(stock_price == stored_price):
+                            print("STRIPE PRICE IN DOLLARS:", stored_price_dollars)
+                            if(int(stock_price) == stored_price_dollars):
                                 print("PRICE SAME")
                                 domain_url = "http://localhost:8000"
                                 try:
@@ -633,6 +658,9 @@ def trade():
                         stock_price = get_current_stock_price(symb)
                         #print("STOCK PRICE", stock_price)
 
+                        # stock_price_rupees = c.convert(from_country, to_country, stock_price)
+                        # print("CONVERTED AMOUNT: ", stock_price_rupees)
+
                         total = quant * stock_price
                         #print("You have received $", total)
 
@@ -687,6 +715,9 @@ def trade():
 
                         total = quant * price
                         #print("Total cost is $", total)
+
+                        # stock_price_rupees = c.convert(from_country, to_country, price)
+                        # print("CONVERTED PRICE: ", stock_price_rupees)
 
                         price = "{:.2f}".format(price)
                         total = "{:.2f}".format(total)
