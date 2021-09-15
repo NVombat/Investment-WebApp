@@ -3,7 +3,7 @@ import pyinputplus as pyip
 
 #To test various inputs with no user prompts:
 number = pyip.inputNum()
-email = pyip.inputEmail() 
+email = pyip.inputEmail()
 filepath = pyip.inputFilepath()
 password = pyip.inputPassword()
 #date_time = pyip.inputDatetime()

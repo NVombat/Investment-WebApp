@@ -13,13 +13,13 @@ def create_tbl(path: str):
     conn = s.connect(path)
     cur = conn.cursor()
 
-    tbl = 'CREATE TABLE IF NOT EXISTS contact_us(Email TEXT, Message TEXT)'
+    tbl = "CREATE TABLE IF NOT EXISTS contact_us(Email TEXT, Message TEXT)"
     cur.execute(tbl)
     conn.commit()
 
 
 def insert(email: str, message: str, path: str):
-    """Inserts message and email id from Contact_Us Page 
+    """Inserts message and email id from Contact_Us Page
 
     Args:
         email: User Email ID

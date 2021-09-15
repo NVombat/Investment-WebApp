@@ -3,14 +3,14 @@ import hashlib, binascii, os
 import sqlite3 as s
 
 
-#Creates a user table 
+#Creates a user table
 def create_user(path: str) -> None:
     conn = s.connect(path)
     cur = conn.cursor()
 
     #Command to create user table with 4 fields
     #EMAIL, NAME, PWD, CODE
-    #CODE FIELD ONLY FOR RESET PASSWORD 
+    #CODE FIELD ONLY FOR RESET PASSWORD
     tbl = 'CREATE TABLE IF NOT EXISTS user(Email TEXT, Name TEXT, Password TEXT, Code INT)'
     cur.execute(tbl)
     conn.commit()
@@ -142,7 +142,7 @@ def getemail(path: str):
 
 '''
 For the contact us function:
-If the user types a message and an email ID - 
+If the user types a message and an email ID -
 It checks if the email ID is in our database (the user exists)
 It also checks if the email ID mentioned is the same one as the current user
 If both these conditions are true the user is able to send a message otherwise an error message is displayed
@@ -187,7 +187,7 @@ def hash_pwd(pwd : str) -> str:
 '''
 First we extract the stored hashed password from the database
 Then from that we extract the password part and the salt part
-We then hash the current password which the user has entered 
+We then hash the current password which the user has entered
 We then compare the hashed password to the one stored in the db
 if they match we return true else we return false
 '''
@@ -211,12 +211,12 @@ def check_hash(path: str, pwd : str, email : str) -> bool:
     #print("SALT2: ", salt)
     dbpwd = dbpwd[64:]
     #print("Stored password hash: ", dbpwd)
-    
+
     #PASSWORD HASH FOR PASSWORD THAT USER HAS CURRENTLY ENTERED
     pwd_hash = hashlib.pbkdf2_hmac('sha512', pwd.encode('utf-8'), salt.encode('ascii'), 100000)
     pwd_hash = binascii.hexlify(pwd_hash).decode('ascii')
     #print("pwd_hash: ", pwd_hash)
-    
+
     if pwd_hash==dbpwd:
         return True
     else:
