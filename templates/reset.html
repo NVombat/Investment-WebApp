@@ -23,17 +23,14 @@
     <section>
         <div class="flex-wrap">
             <form method="post">
-                <input type="radio" name="rg" id="reset" checked />        
-
-                <label for="reset">Reset</label>  
-        
+                <input type="radio" name="rg" id="reset" checked />
+                <label for="reset">Reset</label>
                 <input class="reset" type="password" placeholder ="New Password" name="npassword" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" title="must contain at least one  number and one uppercase and lowercase letter, and at least 8 or more characters" required/>
                 <input class="reset" type="password" placeholder ="Repeat New Password" name="rnpassword" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" title="must contain at least one  number and one uppercase and lowercase letter, and at least 8 or more characters" required/>
                 <input class="reset" type="password" placeholder ="Verification Code" name="vcode" required/>
-                
                 <p id="error-msg"> {{error}} </p>
 
-                <button>Submit</button>         
+                <button>Submit</button>
             </form>
         </div>
     </section>
