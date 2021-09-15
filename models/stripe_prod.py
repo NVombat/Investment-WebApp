@@ -1,43 +1,74 @@
 import sqlite3 as s
 
+
 def create_prod_table(path: str) -> None:
+    """Creates prod_payment table in database
+
+    Args:
+        path: Path to database
+
+    Returns:
+            None
+    """
     conn = s.connect(path)
     cur = conn.cursor()
 
-    tbl = 'CREATE TABLE IF NOT EXISTS prod_payment(Stock_Symbol TEXT, Prod_ID TEXT, Price_ID TEXT)'
+    tbl = "CREATE TABLE IF NOT EXISTS prod_payment(Stock_Symbol TEXT, Prod_ID TEXT, Price_ID TEXT)"
     cur.execute(tbl)
     conn.commit()
 
 
-#Inserts data into table when product and price are created
 def insert(path: str, tablename: str, data: tuple) -> None:
+    """Inserts data into table when product and price are created
+
+    Args:
+        path: Path to database
+        tablename: Tablename
+        data: Data to be inserted
+
+    Returns:
+            None
+    """
     conn = s.connect(path)
     cur = conn.cursor()
 
-    insrt = f'INSERT INTO {tablename} VALUES{data}'
+    insrt = f"INSERT INTO {tablename} VALUES{data}"
     cur.execute(insrt)
     conn.commit()
 
 
-# Checks if stock symbol is present in the table
 def check_symbol(path: str, symbol: str) -> bool:
+    """Checks if stock symbol is present in the table
+
+    Args:
+        path: Path to database
+        symbol: Stock symbol to be checked
+
+    Returns:
+            bool
+    """
     conn = s.connect(path)
     cur = conn.cursor()
-    
+
     chk = f"SELECT * FROM prod_payment WHERE Stock_Symbol='{symbol}'"
     cur.execute(chk)
-    # Fetches results in array
     res = cur.fetchall()
-    # If the array is empty then symbol is not in table
-    if len(res)==0:
+    if len(res) == 0:
         return False
-    # If array is not empty then symbol is in table
     else:
         return True
 
 
-# Gets Price ID
 def get_price_id(path: str, symbol: str) -> str:
+    """Gets Price_ID for a particular symbol
+
+    Args:
+        path: Path to database
+        symbol: Stock symbol
+
+    Returns:
+            str
+    """
     conn = s.connect(path)
     cur = conn.cursor()
 
@@ -48,16 +79,16 @@ def get_price_id(path: str, symbol: str) -> str:
     return res[0][0]
 
 
-# Gets Product ID
+
 def get_prod_id(path: str, symbol: str) -> str:
-    """Insert user into collection
+    """Gets Prod_ID for a particular symbol
 
     Args:
         path: Path to database
         symbol: Stock Symbol
 
     Returns:
-            str: Product ID for the particular Symbol
+            str
     """
     conn = s.connect(path)
     cur = conn.cursor()
@@ -78,7 +109,7 @@ def update_price_id(path: str, price_id: str, symbol: str) -> None:
         symbol: Stock Symbol
 
     Returns:
-            None: Updates the price_id field in the table
+            None
     """
     conn = s.connect(path)
     cur = conn.cursor()
@@ -87,7 +118,8 @@ def update_price_id(path: str, price_id: str, symbol: str) -> None:
     cur.execute(upd)
     conn.commit()
 
+
 if __name__ == "__main__":
     pass
-    #data = ("GOOGL", "prod_KDowNuIDvITlcA", "price_1JZNIGSAceEO9L8pPc6kkw1n")
-    #insert("/home/nvombat/Desktop/Investment-WebApp/app.db", "prod_payment", data)
+    # data = ("GOOGL", "prod_KDowNuIDvITlcA", "price_1JZNIGSAceEO9L8pPc6kkw1n")
+    # insert("/home/nvombat/Desktop/Investment-WebApp/app.db", "prod_payment", data)

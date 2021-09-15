@@ -1,4 +1,4 @@
-# Import the flask library functions
+# Imports
 from flask import (
     render_template,
     redirect,
@@ -10,8 +10,7 @@ from flask import (
     g
 )
 
-
-# Other libraries needed
+from dotenv import load_dotenv
 from requests.api import get
 from pathlib import Path
 import yfinance as yf
@@ -26,21 +25,24 @@ import time
 import os
 import io
 
-
-# Import functions & files from other locations
 from models import users, contactus, stock, stripe_prod
 from sendmail import send_mail, send_buy, send_sell
 from api import getdata
 
 
 # Import environment variables
-from dotenv import load_dotenv
 load_dotenv()
 stripe.api_key = os.getenv('STRIPE_SECRET_KEY')
 
 
 # Path used for all tables in database
 path = "app.db"
+
+
+# To pass data from one page to another
+class state:
+    ...
+s = state()
 
 
 # App configuration
@@ -57,40 +59,57 @@ stock.make_tbl(path)
 stripe_prod.create_prod_table(path)
 
 
-'''
-Function to get the current price of any stock
-Takes symbol as input and uses Ticker Method to get stock data of the current day
-Extracts the closing price and returns it
-'''
-def get_current_price(symbol):
+def get_current_price(symbol) -> float:
+    """Gets current closing price of any stock using Ticker method
+
+    Args:
+        symbol: Stock Symbol
+
+    Returns:
+        float: Closing Stock price
+    """
     ticker = yf.Ticker(symbol)
     todays_data = ticker.history(period='1d')
     return todays_data['Close'][0]
 
 
-'''
-SUBSTITUTE FOR JSON DECODE ERROR
-Function to get the current price of any stock
-Takes symbol as input and gets stock data of the current day
-Extracts the closing price and returns it
-'''
-def get_current_stock_price(symbol):
+def get_current_stock_price(symbol) -> float:
+    """Gets current closing price of any stock
+    (Substitute for init function error)
+
+    Args:
+        symbol: Stock Symbol
+
+    Returns:
+        float: Closing Stock price
+    """
     data = pn.data.get(symbol, start=None, end=None)
     return data['Close'][0]
 
 
-#Currency Conversion
+# API Class for currency conversion
 class Currency_Conversion:
     # Store the conversion rates
-    rates = {} 
+    rates = {}
+
     def __init__(self, url):
         data = requests.get(url).json()
         # Extracting only the rates from the json data
-        self.rates = data["rates"] 
+        self.rates = data["rates"]
 
-    def convert(self, from_currency, to_currency, amount):
+    def convert(self, from_currency, to_currency, amount) -> float:
+        """Converts one currency to another
+
+        Args:
+            from_currency: Currency to be converted from
+            to_cuurency: Currency to be converted to
+            amount: amount to be converted
+
+        Returns:
+            float: Converted amount
+        """
         initial_amount = amount
-        if from_currency != 'EUR' :
+        if from_currency != 'EUR':
             amount = amount / self.rates[from_currency]
 
         amount = round(amount * self.rates[to_currency], 2)
@@ -98,11 +117,10 @@ class Currency_Conversion:
 
 
 '''
-For analysis and trading we need a list of stock symbols to see if the user has entered a valid stock symbol
+List of stock symbols to see if the user has entered a valid stock symbol
 URL containing NASDAQ listings in csv format
-Store all stock symbols in a list
 '''
-url="https://pkgstore.datahub.io/core/nasdaq-listings/nasdaq-listed_csv/data/7665719fb51081ba0bd834fde71ce822/nasdaq-listed_csv.csv"
+url = "https://pkgstore.datahub.io/core/nasdaq-listings/nasdaq-listed_csv/data/7665719fb51081ba0bd834fde71ce822/nasdaq-listed_csv.csv"
 data = requests.get(url).content
 df_data = pd.read_csv(io.StringIO(data.decode('utf-8')))
 symbols = df_data['Symbol'].to_list()
@@ -119,7 +137,8 @@ def security():
     if 'user_email' in session:
         emails = users.getemail(path)
         try:
-            useremail = [email for email in emails if email[0] == session['user_email']][0]
+            useremail = [email for email in emails if email[0]
+                         == session['user_email']][0]
             g.user = useremail
         except Exception as e:
             print("Failed")
@@ -166,12 +185,12 @@ def home():
                     session['user_email'] = email
                     return redirect('/index')
                 else:
-                    #If the flag variable is false -> user has entered the wrong password
+                    # If the flag variable is false -> user has entered the wrong password
                     flag = False
                     #print("WRONG PWD")
                     return render_template('login.html', error="Incorrect Email or Password")
             else:
-                #If the user doesnt exist
+                # If the user doesnt exist
                 return render_template('login.html', error="User Doesnt Exist")
 
         '''
@@ -187,7 +206,7 @@ def home():
             print("SIGN UP")
             if not users.check_user_exist(path, email):
                 if password == repeat_password:
-                    #Hash the users password and store the hashed password
+                    # Hash the users password and store the hashed password
                     password = users.hash_pwd(password)
                     #print("Hashed PWD: ", password)
                     users.insert(path, 'user', (email, name, password, 0))
@@ -216,10 +235,10 @@ def home():
                 print("User Doesnt Exist")
                 return render_template('login.html', error="This Email Doesnt Exist - Please Sign Up")
 
-    #If the flag variable is true then the user has entered the correct password and is redirected to the login page
-    #FLAG VALUE IS TRUE INITIALLY
+    # If the flag variable is true then the user has entered the correct password and is redirected to the login page
+    # FLAG VALUE IS TRUE INITIALLY
     if flag:
-        return render_template('login.html')    
+        return render_template('login.html')
 
 
 # HOME page
@@ -236,8 +255,8 @@ def index():
 Function to reset password
 Sends the mail for resetting password to user
 """
-def reset_password(path:str, email: str):
-    #print(email)
+def reset_password(path: str, email: str):
+    # print(email)
     send_mail(path, email)
 
 
@@ -258,22 +277,22 @@ def reset():
         repeat_pwd = request.form['rnpassword']
         ver_code = request.form['vcode']
         ver_code = int(ver_code)
-        #print(ver_code)
+        # print(ver_code)
 
         if pwd and repeat_pwd and ver_code:
             print("CHECKING")
             if pwd == repeat_pwd:
                 if users.check_code(path, ver_code):
-                    #Hash the new password and update db with hashed password
+                    # Hash the new password and update db with hashed password
                     pwd = users.hash_pwd(pwd)
                     users.reset_pwd(path, pwd, ver_code)
                     #print("Resetting password & Updating DB")
                     users.reset_code(path, ver_code)
                     return redirect("/")
-                    #return render_template('login.html', error="Password Reset Successfully")
+                    # return render_template('login.html', error="Password Reset Successfully")
                 else:
                     #print("Verification Code Doesnt Match")
-                    #return redirect("/")
+                    # return redirect("/")
                     return render_template('reset.html', error="Incorrect Verification Code")
             else:
                 return render_template('reset.html', error="Password & Retyped Password Not Same")
@@ -285,61 +304,65 @@ def reset():
 def inv():
     # Enters the page only if a user is signed in - g.user represents the current user
     if g.user:
-        #If the user clicks on the 'VIEW' Button a POST request is generated
+        # If the user clicks on the 'VIEW' Button a POST request is generated
         if request.method == "POST":
             #print("ENTERED POST REQUEST")
-            #Get the variable name for the option the the user has entered
+            # Get the variable name for the option the the user has entered
             stock_id = request.form['stocksym']
             stock_id = stock_id.upper()
-            #print(stock_id)
+            # print(stock_id)
 
-            #If the stock symbol is valid and exists
+            # If the stock symbol is valid and exists
             if stock_id in symbols:
-                #print(stock_id)
-                #Fetch data into another dataframe
-                df_stock = yf.download(stock_id, start="1950-01-01", period='1d')
-                #print(df_stock)
-            #If stock symbol is invalid   
+                # print(stock_id)
+                # Fetch data into another dataframe
+                df_stock = yf.download(
+                    stock_id, start="1950-01-01", period='1d')
+                # print(df_stock)
+            # If stock symbol is invalid
             else:
-                #Return to page with error
+                # Return to page with error
                 return render_template('inv.html', error="Incorrect Stock Symbol. Please Enter Valid Symbol")
-            
-            #Drop the 'Adj Close' column as we dont need it to plot data 
+
+            # Drop the 'Adj Close' column as we dont need it to plot data
             df_stock.drop('Adj Close', axis='columns', inplace=True)
 
-            #Reset index makes sure the dataframe has indexing of its own and converts the date index to a column
+            # Reset index makes sure the dataframe has indexing of its own and converts the date index to a column
             df_stock.reset_index(inplace=True)
 
-            #Convert the date to a datetime object (gets converted to a specialised type of datetime object)
+            # Convert the date to a datetime object (gets converted to a specialised type of datetime object)
             df_stock['Date'] = pd.to_datetime(df_stock['Date'])
 
-            #Convert date to epoch datetime format
-            df_stock['Date'] = (df_stock['Date'] - d.datetime(1970,1,1)).dt.total_seconds()
+            # Convert date to epoch datetime format
+            df_stock['Date'] = (df_stock['Date'] -
+                                d.datetime(1970, 1, 1)).dt.total_seconds()
 
-            #Format for plotting requires specific size for date so multiply by 1000
+            # Format for plotting requires specific size for date so multiply by 1000
             df_stock['Date'] = df_stock['Date']*1000
-            #print(df_stock.head())
+            # print(df_stock.head())
 
-            #Gets a list of all files ending in _mod.json
-            files = glob.glob("/home/nvombat/Desktop/Investment-WebApp/analysis/data/*_mod.json")
-            #If there is such a file (list is not empty)
-            if len(files)!=0:
-                #Extract the file name of that particular file
+            # Gets a list of all files ending in _mod.json
+            files = glob.glob(
+                "/home/nvombat/Desktop/Investment-WebApp/analysis/data/*_mod.json")
+            # If there is such a file (list is not empty)
+            if len(files) != 0:
+                # Extract the file name of that particular file
                 file_rem = Path(files[0]).name
                 #print("FILE BEING DELETED IS:", file_rem)
-                #Get the path of that file
+                # Get the path of that file
                 location = "/home/nvombat/Desktop/Investment-WebApp/analysis/data/"
                 path = os.path.join(location, file_rem)
-                #Delete the file
+                # Delete the file
                 os.remove(path)
-            
-            #We delete the file to make sure that at any given time there is only one file that can be plotted
-            #As the plotting function chooses the first file from the directory (files[0])
-            #Thus if we have more than one file we may not end up plotting the correct data
 
-            #Convert to json format and make sure its converted as json with arrays thus orient = values
-            df_stock.to_json("/home/nvombat/Desktop/Investment-WebApp/analysis/data/"+stock_id+"_mod.json", orient='values')
-            #return redirect(url_for("inv"))
+            # We delete the file to make sure that at any given time there is only one file that can be plotted
+            # As the plotting function chooses the first file from the directory (files[0])
+            # Thus if we have more than one file we may not end up plotting the correct data
+
+            # Convert to json format and make sure its converted as json with arrays thus orient = values
+            df_stock.to_json(
+                "/home/nvombat/Desktop/Investment-WebApp/analysis/data/"+stock_id+"_mod.json", orient='values')
+            # return redirect(url_for("inv"))
             return render_template('inv.html', name=stock_id)
 
         return render_template('inv.html')
@@ -357,72 +380,6 @@ def about():
     return redirect('/')
 
 
-# Fetch the Checkout Session to display the JSON result on the success page
-@app.route('/checkout-session', methods=['GET'])
-def get_checkout_session():
-    id = request.args.get('sessionId')
-    checkout_session = stripe.checkout.Session.retrieve(id)
-    return jsonify(checkout_session)
-
-
-# @app.route('/create-checkout-session', methods=['POST'])
-# def create_checkout_session():
-#     domain_url = "http://localhost:8000"
-#     try:
-#         # Create new Checkout Session for the order
-#         # ?session_id={CHECKOUT_SESSION_ID} means the redirect will have the session ID set as a query param
-#         checkout_session = stripe.checkout.Session.create(
-#             success_url=domain_url + '/success.html?session_id={CHECKOUT_SESSION_ID}',
-#             cancel_url=domain_url + '/canceled.html',
-#             payment_method_types=('card').split(','),
-#             mode='payment',
-#             line_items=[{
-#                 'price': os.getenv('PRICE'),
-#                 'quantity': 1,
-#             }]
-#         )
-#         return redirect(checkout_session.url, code=303)
-#     except Exception as e:
-#         return jsonify(error=str(e)), 403
-
-
-@app.route('/webhook', methods=['POST'])
-def webhook_received():
-    # You can use webhooks to receive information about asynchronous payment events.
-    webhook_secret = os.getenv('STRIPE_WEBHOOK_SECRET')
-    request_data = json.loads(request.data)
-
-    if webhook_secret:
-        # Retrieve the event by verifying the signature using the raw body and secret if webhook signing is configured.
-        signature = request.headers.get('stripe-signature')
-        try:
-            event = stripe.Webhook.construct_event(
-                payload=request.data, sig_header=signature, secret=webhook_secret)
-            data = event['data']
-        except Exception as e:
-            return e
-        # Get the type of webhook event sent - used to check the status of PaymentIntents.
-        event_type = event['type']
-    else:
-        data = request_data['data']
-        event_type = request_data['type']
-    data_object = data['object']
-
-    print('event ' + event_type)
-
-    if event_type == 'checkout.session.completed':
-        print('🔔 Payment succeeded!')
-        # Note: If you need access to the line items, for instance to
-        # automate fullfillment based on the the ID of the Price, you'll
-        # need to refetch the Checkout Session here, and expand the line items:
-        #
-        # session = stripe.checkout.Session.retrieve(
-        #     data['object']['id'], expand=['line_items'])
-        #
-        # line_items = session.line_items
-    return jsonify({'status': 'success'})
-
-    
 # TRADING GUIDE page
 @app.route('/doc')
 def doc():
@@ -433,11 +390,79 @@ def doc():
     return redirect('/')
 
 
+# # Fetch the Checkout Session to display the JSON result on the success page
+# @app.route('/checkout-session', methods=['GET'])
+# def get_checkout_session():
+#     id = request.args.get('sessionId')
+#     checkout_session = stripe.checkout.Session.retrieve(id)
+#     return jsonify(checkout_session)
+
+
+@app.route('/create-checkout-session', methods=['POST'])
+def create_checkout_session():
+    domain_url = "http://localhost:8000"
+    if hasattr(s, "price_id") and hasattr(s, "quantity"):
+        try:
+            # Create new Checkout Session for the order
+            # ?session_id={CHECKOUT_SESSION_ID} means the redirect will have the session ID set as a query param
+            checkout_session = stripe.checkout.Session.create(
+                success_url=domain_url + '/success.html',
+                cancel_url=domain_url + '/canceled.html',
+                payment_method_types=['card', ],
+                mode='payment',
+                line_items=[{
+                    'price': s.price_id,
+                    'quantity': s.quantity,
+                }]
+            )
+            return redirect(checkout_session.url, code=303)
+        except Exception as e:
+            print("Error")
+            return jsonify(error=str(e)), 403
+    else:
+        print("Error - Object S Has No Properties")
+
+
+# @app.route('/webhook', methods=['POST'])
+# def webhook_received():
+#     # You can use webhooks to receive information about asynchronous payment events.
+#     webhook_secret = os.getenv('STRIPE_WEBHOOK_SECRET')
+#     request_data = json.loads(request.data)
+
+#     if webhook_secret:
+#         # Retrieve the event by verifying the signature using the raw body and secret if webhook signing is configured.
+#         signature = request.headers.get('stripe-signature')
+#         try:
+#             event = stripe.Webhook.construct_event(
+#                 payload=request.data, sig_header=signature, secret=webhook_secret)
+#             data = event['data']
+#         except Exception as e:
+#             return e
+#         # Get the type of webhook event sent - used to check the status of PaymentIntents.
+#         event_type = event['type']
+#     else:
+#         data = request_data['data']
+#         event_type = request_data['type']
+#     data_object = data['object']
+#     print('event ' + event_type)
+#     if event_type == 'checkout.session.completed':
+#         print('🔔 Payment succeeded!')
+#         # Note: If you need access to the line items, for instance to
+#         # automate fullfillment based on the the ID of the Price, you'll
+#         # need to refetch the Checkout Session here, and expand the line items:
+#         #
+#         # session = stripe.checkout.Session.retrieve(
+#         #     data['object']['id'], expand=['line_items'])
+#         #
+#         # line_items = session.line_items
+#     return jsonify({'status': 'success'})
+
+
 # TRADE page
 @app.route('/trade', methods=["GET", "POST"])
 def trade():
     # Enters the page only if a user is signed in - g.user represents the current user
-    #print(g.user)
+    # print(g.user)
     if g.user:
 
         '''
@@ -449,8 +474,9 @@ def trade():
         #print("TRANSACTIONS: ", transactions)
 
         if request.method == "POST":
-            #To convert Dollars to Rupees
-            url = str.__add__('http://data.fixer.io/api/latest?access_key=', os.getenv("CURRENCY_ACCESS_KEY"))  
+            # To convert Dollars to Rupees
+            url = str.__add__(
+                'http://data.fixer.io/api/latest?access_key=', os.getenv("CURRENCY_ACCESS_KEY"))
             c = Currency_Conversion(url)
             from_country = "USD"
             to_country = "INR"
@@ -480,7 +506,7 @@ def trade():
                 '''
                 print("BUYING")
                 symb = symb.upper()
-                #Check if the stock symbol is valid
+                # Check if the stock symbol is valid
                 if symb in symbols:
                     date = d.datetime.now()
                     date = date.strftime("%m/%d/%Y, %H:%M:%S")
@@ -494,9 +520,12 @@ def trade():
                         stock_price = get_current_stock_price(symb)
                         #print("STOCK PRICE", stock_price)
 
+                        stock_price_float = float(stock_price)
+
                         total = quant * stock_price
 
-                        stock_price_rupees = c.convert(from_country, to_country, stock_price)
+                        stock_price_rupees = c.convert(
+                            from_country, to_country, stock_price_float)
                         stock_price_int = int(stock_price_rupees)
                         stock_price_int *= 100
                         print("INT VAL OF STOCK PRICE: ", stock_price_int)
@@ -515,104 +544,131 @@ def trade():
                             )
                             print("PRICE OBJECT:", price_obj)
                             stored_price = price_obj['unit_amount']/100
-                            stored_price_dollars = int(c.convert("INR", "USD", stored_price))
-                            print("STRIPE PRICE:", stored_price)
-                            print("STRIPE PRICE IN DOLLARS:", stored_price_dollars)
-                            if(int(stock_price) == stored_price_dollars):
-                                print("PRICE SAME")
-                                domain_url = "http://localhost:8000"
-                                try:
-                                    # Create new Checkout Session for the order
-                                    # ?session_id={CHECKOUT_SESSION_ID} means the redirect will have the session ID set as a query param
-                                    checkout_session = stripe.checkout.Session.create(
-                                        success_url=domain_url + '/success.html?session_id={CHECKOUT_SESSION_ID}',
-                                        cancel_url=domain_url + '/canceled.html',
-                                        payment_method_types=["card"],
-                                        mode='payment',
-                                        line_items=[{
-                                            'price': db_price_id,
-                                            'quantity': quant,
-                                        }]
-                                    )
-                                    return redirect(checkout_session.url, code=303)
-                                except Exception as e:
-                                    return jsonify(error=str(e)), 403
-                                
+                            stored_price_dollars = c.convert(
+                                "INR", "USD", stored_price)
+
+                            print(
+                                "STRIPE PRICE IN RUPEES (ACTUAL PRICE):", stored_price)
+                            print("STRIPE PRICE IN DOLLARS:",
+                                  stored_price_dollars)
+
+                            # If stored price is same or if difference is less than 5 dollars -> Keep same price
+                            if((stock_price_float == stored_price_dollars) or abs(stock_price_float-stored_price_dollars) <= 5):
+                                print("PRICE SAME/UNCHANGED")
+                                # domain_url = "http://localhost:8000"
+                                # try:
+                                #     # Create new Checkout Session for the order
+                                #     # ?session_id={CHECKOUT_SESSION_ID} means the redirect will have the session ID set as a query param
+                                #     checkout_session = stripe.checkout.Session.create(
+                                #         success_url=domain_url + '/success.html?session_id={CHECKOUT_SESSION_ID}',
+                                #         cancel_url=domain_url + '/canceled.html',
+                                #         payment_method_types=["card"],
+                                #         mode='payment',
+                                #         line_items=[{
+                                #             'price': db_price_id,
+                                #             'quantity': quant,
+                                #         }]
+                                #     )
+                                #     return redirect(checkout_session.url, code=303)
+                                # except Exception as e:
+                                #     return jsonify(error=str(e)), 403
+
+                                # os.environ['PRICE_ID'] = db_price_id
+                                # os.environ['QUANTITY'] = str(quant)
+
+                                s.price_id = db_price_id
+                                s.quantity = str(quant)
+
                             else:
                                 print("PRICE CHANGE")
                                 prod_id = stripe_prod.get_prod_id(path, symb)
                                 print("Stored PROD_ID:", prod_id)
 
                                 price = stripe.Price.create(
-                                    unit_amount = stock_price_int,
-                                    currency = "inr",
-                                    product = prod_id,
+                                    unit_amount=stock_price_int,
+                                    currency="inr",
+                                    product=prod_id,
                                 )
                                 print("PRICE OBJECT:", price)
                                 price_id = price['id']
                                 print("NEW PRICE_ID:", price_id)
-                                stripe_prod.update_price_id(path, price_id, symb)
-                                
-                                domain_url = "http://localhost:8000"
-                                try:
-                                    # Create new Checkout Session for the order
-                                    # ?session_id={CHECKOUT_SESSION_ID} means the redirect will have the session ID set as a query param
-                                    checkout_session = stripe.checkout.Session.create(
-                                        success_url=domain_url + '/success.html?session_id={CHECKOUT_SESSION_ID}',
-                                        cancel_url=domain_url + '/canceled.html',
-                                        payment_method_types=["card"],
-                                        mode='payment',
-                                        line_items=[{
-                                            'price': price_id,
-                                            'quantity': quant,
-                                        }]
-                                    )
-                                    return redirect(checkout_session.url, code=303)
-                                except Exception as e:
-                                    return jsonify(error=str(e)), 403
+                                stripe_prod.update_price_id(
+                                    path, price_id, symb)
+
+                                # domain_url = "http://localhost:8000"
+                                # try:
+                                #     # Create new Checkout Session for the order
+                                #     # ?session_id={CHECKOUT_SESSION_ID} means the redirect will have the session ID set as a query param
+                                #     checkout_session = stripe.checkout.Session.create(
+                                #         success_url=domain_url + '/success.html?session_id={CHECKOUT_SESSION_ID}',
+                                #         cancel_url=domain_url + '/canceled.html',
+                                #         payment_method_types=["card"],
+                                #         mode='payment',
+                                #         line_items=[{
+                                #             'price': price_id,
+                                #             'quantity': quant,
+                                #         }]
+                                #     )
+                                #     return redirect(checkout_session.url, code=303)
+                                # except Exception as e:
+                                #     return jsonify(error=str(e)), 403
+
+                                # os.environ['PRICE_ID'] = price_id
+                                # os.environ['QUANTITY'] = str(quant)
+
+                                s.price_id = price_id
+                                s.quantity = str(quant)
 
                         else:
                             print("Stock symbol NOT IN PROD_PAYMENT table")
                             new_prod = stripe.Product.create(
-                                name = symb
+                                name=symb
                             )
                             print("NEW PRODUCT CREATED")
                             print(new_prod)
                             new_prod_id = new_prod['id']
                             print("NEW PROD_ID:", new_prod_id)
                             new_price = stripe.Price.create(
-                                unit_amount = stock_price_int,
-                                currency = "inr",
-                                product = new_prod_id,
+                                unit_amount=stock_price_int,
+                                currency="inr",
+                                product=new_prod_id,
                             )
                             print("NEW PRICE OBJECT:", new_price)
                             new_price_id = new_price['id']
                             print("NEW PRICE_ID:", new_price_id)
                             data = (symb, new_prod_id, new_price_id)
                             stripe_prod.insert(path, "prod_payment", data)
-                            
-                            domain_url = "http://localhost:8000"
-                            try:
-                                # Create new Checkout Session for the order
-                                # ?session_id={CHECKOUT_SESSION_ID} means the redirect will have the session ID set as a query param
-                                checkout_session = stripe.checkout.Session.create(
-                                    success_url=domain_url + '/success.html?session_id={CHECKOUT_SESSION_ID}',
-                                    cancel_url=domain_url + '/canceled.html',
-                                    payment_method_types=["card"],
-                                    mode='payment',
-                                    line_items=[{
-                                        'price': new_price_id,
-                                        'quantity': quant,
-                                    }]
-                                )
-                                return redirect(checkout_session.url, code=303)
-                            except Exception as e:
-                                return jsonify(error=str(e)), 403
+
+                            # domain_url = "http://localhost:8000"
+                            # try:
+                            #     # Create new Checkout Session for the order
+                            #     # ?session_id={CHECKOUT_SESSION_ID} means the redirect will have the session ID set as a query param
+                            #     checkout_session = stripe.checkout.Session.create(
+                            #         success_url=domain_url + '/success.html?session_id={CHECKOUT_SESSION_ID}',
+                            #         cancel_url=domain_url + '/canceled.html',
+                            #         payment_method_types=["card"],
+                            #         mode='payment',
+                            #         line_items=[{
+                            #             'price': new_price_id,
+                            #             'quantity': quant,
+                            #         }]
+                            #     )
+                            #     return redirect(checkout_session.url, code=303)
+                            # except Exception as e:
+                            #     return jsonify(error=str(e)), 403
+
+                            # os.environ['PRICE_ID'] = new_price_id
+                            # os.environ['QUANTITY'] = str(quant)
+
+                            s.price_id = new_price_id
+                            s.quantity = str(quant)
 
                         #print("USER EMAIL:", user_email)
-                        stock.buy("stock", (date, symb, stock_price, quant, user_email[0]), path)
+                        stock.buy("stock", (date, symb, stock_price,
+                                  quant, user_email[0]), path)
 
-                        data = (symb, stock_price, quant, total, user_email[0], date)
+                        data = (symb, stock_price, quant,
+                                total, user_email[0], date)
                         send_buy(path, data)
                     except json.JSONDecodeError:
                         print("Invalid JSON Data -> ERROR IN BUYING")
@@ -621,11 +677,10 @@ def trade():
                     # Redirect submits a get request (200) thus cancelling the usual post request generated by the
                     # browser when a page is refreshed
                     return redirect(url_for("trade"))
-                #If stock symbol is invalid
+                # If stock symbol is invalid
                 else:
-                    #Return to page with error
+                    # Return to page with error
                     return render_template('trade.html', error="Incorrect Stock Symbol. Please Enter Valid Symbol", transactions=transactions)
-
 
             # SELLING
             elif request.form.get("s1"):
@@ -673,16 +728,16 @@ def trade():
                         data = (symb, quant, user_email[0], stock_price)
                         stock.sell("stock", data, path)
 
-                        mail_data = (symb, stock_price, quant, total, user_email[0], date)
+                        mail_data = (symb, stock_price, quant,
+                                     total, user_email[0], date)
                         send_sell(path, mail_data)
                     except json.JSONDecodeError:
                         print("Invalid JSON Data -> ERROR IN FINDING PRICE")
 
                     return redirect(url_for("trade"))
-                #If stock symbol is invalid
+                # If stock symbol is invalid
                 else:
                     return render_template('trade.html', error="Incorrect Stock Symbol. Please Enter Valid Symbol", transactions=transactions)
-
 
             # FIND PRICE
             elif request.form.get("p1"):
@@ -699,7 +754,7 @@ def trade():
                 The user is then given the price of that stock for the amount they entered
                 '''
                 sym = sym.upper()
-                #First we check if the stock symbol is valid
+                # First we check if the stock symbol is valid
                 if sym in symbols:
                     print("PRICE")
 
@@ -727,17 +782,19 @@ def trade():
                         total = str(total)
 
                         # Message with price for amount entered and per unit as well
-                        err_str = "The price for " + quant + " unit(s) of " + sym + " Stock is $ " + total + " at $ " + price + " per unit"
+                        err_str = "The price for " + quant + \
+                            " unit(s) of " + sym + " Stock is $ " + \
+                            total + " at $ " + price + " per unit"
                     except json.JSONDecodeError:
                         print("Invalid JSON Data -> ERROR IN SELLING")
 
-                    #print(transactions)
+                    # print(transactions)
                     # render template because we want the table to show and the message
                     return render_template('trade.html', transactions=transactions, error=err_str)
-                #If stock symbol is invalid
+                # If stock symbol is invalid
                 else:
                     return render_template('trade.html', error="Incorrect Stock Symbol. Please Enter Valid Symbol", transactions=transactions)
-                    
+
         return render_template('trade.html', transactions=transactions)
     # Redirects to login page if g.user is empty -> No user signed in
     return redirect('/')
@@ -748,7 +805,7 @@ def trade():
 def contact():
     # Enters the page only if a user is signed in - g.user represents the current user
     if g.user:
-        
+
         """
         If a post request is generated (when user clicks submit)
         The email and message are fetched from the input fields
@@ -759,12 +816,12 @@ def contact():
         if request.method == "POST":
             print("CONTACT US")
             email = request.form["email"]
-            #print(email)
+            # print(email)
             msg = request.form["message"]
 
             user_email = g.user
             curr_user = user_email[0]
-            #print(curr_user)
+            # print(curr_user)
 
             if users.check_contact_us(path, email, curr_user):
                 #print("Correct Email")
@@ -786,7 +843,8 @@ If there is such a file - sends json file containing data to be plotted
 '''
 @app.route('/pipe', methods=["GET", "POST"])
 def pipe():
-    files = glob.glob("/home/nvombat/Desktop/Investment-WebApp/analysis/data/*_mod.json")
+    files = glob.glob(
+        "/home/nvombat/Desktop/Investment-WebApp/analysis/data/*_mod.json")
     if len(files) == 0:
         with open("/home/nvombat/Desktop/Investment-WebApp/analysis/data/AAPL.json") as f:
             r = json.load(f)

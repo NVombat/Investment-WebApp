@@ -1,77 +1,77 @@
-#Import libraries
+# Import libraries
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from models.users import add_code
-import smtplib,ssl
+import smtplib, ssl
 import sqlite3
 import random
 import os
 
 
-#Sends mail for resetting password to the user
+# Sends mail for resetting password to the user
 def send_mail(path: str, email: str):
-    conn= sqlite3.connect(path)
+    conn = sqlite3.connect(path)
     cur = conn.cursor()
 
-    #by importing os, backmail_add and backmail_pwd are accessing the environment variable values
-    #backend_mail and backend_pwd are environment variables
-    backemail_add = os.environ.get('backend_mail')
-    backemail_pwd = os.environ.get('backend_pwd')
-    
-    #Starts a server on port 465 and logs into senders email id so it can send the mail
-    server = smtplib.SMTP_SSL("smtp.gmail.com",465)
-    server.login(backemail_add,backemail_pwd)
+    # by importing os, backmail_add and backmail_pwd are accessing the environment variable values
+    # backend_mail and backend_pwd are environment variables
+    backemail_add = os.environ.get("backend_mail")
+    backemail_pwd = os.environ.get("backend_pwd")
 
-    #Generates a 4 digit random verification code to verify the user while resetting the password
-    key = random.randint(1000,9999)
-    #Inserts code into user table
+    # Starts a server on port 465 and logs into senders email id so it can send the mail
+    server = smtplib.SMTP_SSL("smtp.gmail.com", 465)
+    server.login(backemail_add, backemail_pwd)
+
+    # Generates a 4 digit random verification code to verify the user while resetting the password
+    key = random.randint(1000, 9999)
+    # Inserts code into user table
     add_code(path, key, email)
-    #print("VERIFICATION CODE:", key)
-    #print("EMAIL:", email)
+    # print("VERIFICATION CODE:", key)
+    # print("EMAIL:", email)
 
-    #RESET URL
+    # RESET URL
     url = "http://localhost:8000/reset"
 
-    #user mail subject, body and format of the mail
-    subject = 'RESET YOUR PASSWORD:'
+    # user mail subject, body and format of the mail
+    subject = "RESET YOUR PASSWORD:"
     body = f'Dear User\nPlease Click on the Link Below to Reset your "Code"Vid19 Password for your {email} account.\n\nThis is your 4 Digit Verification Code: {key} \n\nLink: {url} \n\nIf you didnt ask to reset your password please IGNORE this email!\n\nThank you\nWarm Regards\nTeam "Code"Vid19'
-    msg = f'Subject: {subject}\n\n{body}'
+    msg = f"Subject: {subject}\n\n{body}"
 
-    #Sends the mail with the data and quits the server
-    server.sendmail(backemail_add,email,msg)
+    # Sends the mail with the data and quits the server
+    server.sendmail(backemail_add, email, msg)
     server.quit()
 
 
-#Sends the user an email with a reset link using html for the url
+# Sends the user an email with a reset link using html for the url
 def send_link(path: str, email: str):
-    conn= sqlite3.connect(path)
+    conn = sqlite3.connect(path)
     cur = conn.cursor()
 
-    #by importing os, backmail_add and backmail_pwd are accessing the environment variable values
-    #backend_mail and backend_pwd are environment variables
-    backemail_add = os.environ.get('backend_mail')
-    backemail_pwd = os.environ.get('backend_pwd')
-    
-    #Details to log into the server and the email id of the recepient
+    # by importing os, backmail_add and backmail_pwd are accessing the environment variable values
+    # backend_mail and backend_pwd are environment variables
+    backemail_add = os.environ.get("backend_mail")
+    backemail_pwd = os.environ.get("backend_pwd")
+
+    # Details to log into the server and the email id of the recepient
     sender_email = backemail_add
     receiver_email = email
     password = backemail_pwd
 
-    #Uses a function to first generate the parts of the mail and then later combines them to form the mail
+    # Uses a function to first generate the parts of the mail and then later combines them to form the mail
     message = MIMEMultipart("alternative")
     message["Subject"] = "RESET YOUR PASSWORD"
     message["From"] = sender_email
     message["To"] = receiver_email
 
-    #Generates a 4 digit random verification code to verify the user while resetting the password
-    key = random.randint(1000,9999)
-    #Inserts code into user table
+    # Generates a 4 digit random verification code to verify the user while resetting the password
+    key = random.randint(1000, 9999)
+    # Inserts code into user table
     add_code(path, key, email)
-    #print("VERIFICATION CODE:", key)
-    #print("EMAIL:", email)
+    # print("VERIFICATION CODE:", key)
+    # print("EMAIL:", email)
 
     # Create the plain-text and HTML version of your message
-    text = f'''\
+    text = f"""\
     Dear User,
     Please follow this link to reset your "Code"Vid19 Password for the {email} account:
     This is your 4 Digit Verification Code: {key}
@@ -80,7 +80,7 @@ def send_link(path: str, email: str):
     Thank You,
     Warm Regards,
     Team "Code"Vid19
-    '''
+    """
     html = """\
     <html>
     <body>
@@ -114,73 +114,77 @@ def send_link(path: str, email: str):
         server.quit()
 
 
-'''
+"""
 Sends a mail to the user when the user buys a stock
 Alerts the user with all the transaction details
-'''
+"""
+
+
 def send_buy(path: str, data: tuple):
-    '''
+    """
     symbol = data[0]
     price = data[1]
     quant = data[2]
     total = data[3]
     email = data[4]
     date = data[5]
-    '''
-    conn= sqlite3.connect(path)
+    """
+    conn = sqlite3.connect(path)
     cur = conn.cursor()
 
-    #by importing os, backmail_add and backmail_pwd are accessing the environment variable values
-    #backend_mail and backend_pwd are environment variables
-    backemail_add = os.environ.get('backend_mail')
-    backemail_pwd = os.environ.get('backend_pwd')
-    
-    #Starts a server on port 465 and logs into senders email id so it can send the mail
-    server = smtplib.SMTP_SSL("smtp.gmail.com",465)
-    server.login(backemail_add,backemail_pwd)
+    # by importing os, backmail_add and backmail_pwd are accessing the environment variable values
+    # backend_mail and backend_pwd are environment variables
+    backemail_add = os.environ.get("backend_mail")
+    backemail_pwd = os.environ.get("backend_pwd")
 
-    #user mail subject, body and format of the mail
-    subject = 'Stock Transaction Receipt: IMP!'
+    # Starts a server on port 465 and logs into senders email id so it can send the mail
+    server = smtplib.SMTP_SSL("smtp.gmail.com", 465)
+    server.login(backemail_add, backemail_pwd)
+
+    # user mail subject, body and format of the mail
+    subject = "Stock Transaction Receipt: IMP!"
     body = f'Dear User\nHere is your transaction receipt for your {data[4]} account.\n\nYou purchased {data[2]} units of the {data[0]} stock on {data[5]} at a rate of $ {data[1]} per stock unit.\n\nYour total expenditure was $ {data[3]}. Thank you for using "Code"vid19 Solutions.\n\nIf you did not make or authorize this transaction PLEASE CONTACT US IMMEDIATELY!\n\nThank you\nWarm Regards\nTeam "Code"Vid19'
-    msg = f'Subject: {subject}\n\n{body}'
+    msg = f"Subject: {subject}\n\n{body}"
 
-    #Sends the mail with the data and quits the server
-    server.sendmail(backemail_add,data[4],msg)
+    # Sends the mail with the data and quits the server
+    server.sendmail(backemail_add, data[4], msg)
     server.quit()
 
 
-'''
+"""
 Sends a mail to the user when the user sells a stock
 Alerts the user with all the transaction details
-'''
+"""
+
+
 def send_sell(path: str, data: tuple):
-    '''
+    """
     symbol = data[0]
     price = data[1]
     quant = data[2]
     total = data[3]
     email = data[4]
     date = data[5]
-    '''
-    conn= sqlite3.connect(path)
+    """
+    conn = sqlite3.connect(path)
     cur = conn.cursor()
 
-    #by importing os, backmail_add and backmail_pwd are accessing the environment variable values
-    #backend_mail and backend_pwd are environment variables
-    backemail_add = os.environ.get('backend_mail')
-    backemail_pwd = os.environ.get('backend_pwd')
-    
-    #Starts a server on port 465 and logs into senders email id so it can send the mail
-    server = smtplib.SMTP_SSL("smtp.gmail.com",465)
-    server.login(backemail_add,backemail_pwd)
+    # by importing os, backmail_add and backmail_pwd are accessing the environment variable values
+    # backend_mail and backend_pwd are environment variables
+    backemail_add = os.environ.get("backend_mail")
+    backemail_pwd = os.environ.get("backend_pwd")
 
-    #user mail subject, body and format of the mail
-    subject = 'Stock Transaction Receipt: IMP!'
+    # Starts a server on port 465 and logs into senders email id so it can send the mail
+    server = smtplib.SMTP_SSL("smtp.gmail.com", 465)
+    server.login(backemail_add, backemail_pwd)
+
+    # user mail subject, body and format of the mail
+    subject = "Stock Transaction Receipt: IMP!"
     body = f'Dear User\nHere is your transaction receipt for your {data[4]} account.\n\nYou sold {data[2]} units of the {data[0]} stock on {data[5]} at a rate of $ {data[1]} per stock unit.\n\nYour total earning was $ {data[3]}. Thank you for using "Code"vid19 Solutions.\n\nIf you did not make or authorize this transaction PLEASE CONTACT US IMMEDIATELY!\n\nThank you\nWarm Regards\nTeam "Code"Vid19'
-    msg = f'Subject: {subject}\n\n{body}'
+    msg = f"Subject: {subject}\n\n{body}"
 
-    #Sends the mail with the data and quits the server
-    server.sendmail(backemail_add,data[4],msg)
+    # Sends the mail with the data and quits the server
+    server.sendmail(backemail_add, data[4], msg)
     server.quit()
 
 
