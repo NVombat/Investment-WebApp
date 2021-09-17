@@ -1,0 +1,24 @@
+{
+   "amount": 100,
+   "currency": "INR",
+   "accept_partial": false,
+   "first_min_partial_amount": 100,
+   "expire_by": 1691097057,
+   "reference_id": "",
+   "description": "Stock Transaction",
+   "customer": {
+     "name": "",
+     "contact": "",
+     "email": ""
+   },
+   "notify": {
+     "sms": true,
+     "email": true
+   },
+   "reminder_enable": true,
+   "notes": {
+     "policy_name": "Investment WebApp"
+   },
+   "callback_url": "https://localhost:8000/trade",
+   "callback_method": "get"
+}
