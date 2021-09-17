@@ -1,8 +1,10 @@
-import configparser
+import os
 import json
 import requests
 import datetime as d
+from dotenv import load_dotenv
 
+load_dotenv()
 
 def apicall(
     key: int, symbol: str, date_from: str, date_to: str, limit: int = 1
@@ -67,9 +69,7 @@ def getdata(
     """
     values = []
 
-    cfg: configparser.ConfigParser = configparser.ConfigParser()
-    cfg.read("configuration.cfg")
-    key = cfg.get("API KEY", "key")
+    key = os.getenv('PRICE_API_KEY')
 
     data_list: list = apicall(key, symbol, date_from=date_from, date_to=date_to)["data"]
     # print(data_list)
