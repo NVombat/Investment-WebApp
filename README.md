@@ -26,7 +26,7 @@ USAGE:
 
 SERVICES:
 1. The registered user can enter any stock symbol and view their current prices, which are fetched with the help of an API/function
-2. Under the "Trade" option, the user can either buy or sell their desired quantities of stocks by entering the respective stock symbols and the amount. The Stripe API is used to create a payment gateway for the transactions
+2. Under the "Trade" option, the user can either buy or sell their desired quantities of stocks by entering the respective stock symbols and the amount. The Razorpay API is used to create a payment gateway/link for the transactions
 3. Each user has a unique dashboard maintained which enlists the current holdings of various stocks that they own
 4. With each transaction, a confirmation mail is sent to notify the user
 5. Under the "Analysis" section, we provide a graphical analysis of any company and their stocks, which will help the user get an idea as to how successful companies are performing and an insight into the variation of stock prices and volume with respect to time
