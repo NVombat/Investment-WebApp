@@ -35,7 +35,7 @@ payment_data = json.load(open("payment_data.json"))
 
 
 # Path used for all tables in database
-path = "app.db"
+path = os.getenv("DB_PATH")
 
 
 # To pass data from one page to another
@@ -57,7 +57,7 @@ contactus.create_tbl(path)
 stock.make_tbl(path)
 
 
-def get_current_price(symbol) -> float:
+def get_current_price(symbol: str) -> float:
     """Gets current closing price of any stock using Ticker method
 
     Args:
@@ -71,7 +71,7 @@ def get_current_price(symbol) -> float:
     return todays_data["Close"][0]
 
 
-def get_current_stock_price(symbol) -> float:
+def get_current_stock_price(symbol: str) -> float:
     """Gets current closing price of any stock
     (Substitute for init function error)
 
