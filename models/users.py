@@ -221,3 +221,8 @@ def check_hash(path: str, pwd : str, email : str) -> bool:
         return True
     else:
         return False
+
+
+if __name__ == "__main__":
+    test_path = "../test.db"
+    create_user(test_path)

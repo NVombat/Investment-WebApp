@@ -1,7 +1,7 @@
 import sqlite3 as s
 
 
-def make_tbl(path: str):
+def make_tbl(path: str) -> None:
     """Creates the stock table in the database
 
     Args:
@@ -18,7 +18,7 @@ def make_tbl(path: str):
     conn.commit()
 
 
-def buy(tablename: str, data: tuple, path: str):
+def buy(tablename: str, data: tuple, path: str) -> None:
     """Updates table when user BUYS stocks
 
     Args:
@@ -122,7 +122,12 @@ def query(email: str, path: str) -> list:
 
 
 if __name__ == "__main__":
-    path = "../app.db"
-    make_tbl("../app.db")
-    # buy("stock", ("19-9-2000", "NVDI", 354.9, 14, "ronaldo72emiway@gmail.com"), path)
-    # buy("stock", ("23-7-2002", "AAPL", 162.4, 10, "ronaldo72emiway@gmail.com"), path)
+    test_path = "../test.db"
+    print(make_tbl(test_path))
+    print("TABLE CREATED...")
+    print("BUYING...")
+    print(buy("stock", ("19-9-2000", "NVDI", 354.9, 1, "test@gmail.com"), test_path))
+    print(buy("stock", ("23-7-2002", "AAPL", 162.4, 2, "test@gmail.com"), test_path))
+    print("SELLING...")
+    print(sell("stock", ("NVDI", 1, "test@gmail.com", 354.9), test_path))
+    print(sell("stock", ("AAPL", 2, "test@gmail.com", 162.4), test_path))

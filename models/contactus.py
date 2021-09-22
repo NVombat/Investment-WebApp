@@ -1,7 +1,7 @@
 import sqlite3 as s
 
 
-def create_tbl(path: str):
+def create_tbl(path: str) -> None:
     """Creates the contact_us table in the database
 
     Args:
@@ -18,7 +18,7 @@ def create_tbl(path: str):
     conn.commit()
 
 
-def insert(email: str, message: str, path: str):
+def insert(email: str, message: str, path: str) -> None:
     """Inserts message and email id from Contact_Us Page
 
     Args:
@@ -35,3 +35,8 @@ def insert(email: str, message: str, path: str):
     insrt = f"INSERT INTO contact_us VALUES('{email}','{message}')"
     cur.execute(insrt)
     conn.commit()
+
+
+if __name__ == "__main__":
+    test_path = "../test.db"
+    create_tbl(test_path)
