@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+
 def apicall(
     key: int, symbol: str, date_from: str, date_to: str, limit: int = 1
 ) -> dict:
@@ -69,7 +70,7 @@ def getdata(
     """
     values = []
 
-    key = os.getenv('PRICE_API_KEY')
+    key = os.getenv("PRICE_API_KEY")
 
     data_list: list = apicall(key, symbol, date_from=date_from, date_to=date_to)["data"]
     # print(data_list)
