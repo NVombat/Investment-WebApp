@@ -41,6 +41,8 @@ path = os.getenv("DB_PATH")
 # To pass data from one page to another
 class state:
     ...
+
+
 s = state()
 
 
@@ -129,6 +131,8 @@ Sets the current user - g.user to none and then checks if the user is in session
 If the user is in session then their email is fetched and g.user is updated to that email
 Otherwise Exception is thrown
 """
+
+
 @app.before_request
 def security():
     g.user = None

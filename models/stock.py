@@ -20,7 +20,9 @@ def make_tbl(path: str) -> None:
     conn.commit()
 
 
-def buy(tablename: str, data: Tuple[datetime.date, str, float, int, str], path: str) -> None:
+def buy(
+    tablename: str, data: Tuple[datetime.date, str, float, int, str], path: str
+) -> None:
     """Updates table when user BUYS stocks
 
     Args:

@@ -2,11 +2,11 @@ from pytz import utc
 import justpy as jp
 import pandas as pd
 
-df = pd.read_csv("data/AAPL.csv", parse_dates=['Date'])
-df['Month'] = df['Date'].dt.strftime("%Y-%m")
-df_mon = df.groupby(['Month']).mean()
+df = pd.read_csv("data/AAPL.csv", parse_dates=["Date"])
+df["Month"] = df["Date"].dt.strftime("%Y-%m")
+df_mon = df.groupby(["Month"]).mean()
 
-aapl_chart = '''
+aapl_chart = """
 {
     chart: {
         type: 'spline',
@@ -65,7 +65,8 @@ aapl_chart = '''
             [50, -2.5], [60, -27.7], [70, -55.7], [80, -76.5]]
     }]
 }
-'''
+"""
+
 
 def app():
     wp = jp.QuasarPage(dark=True)
@@ -74,5 +75,6 @@ def app():
     hc1.options.series[0].data = list(df_mon["High"])
 
     return wp
+
 
 jp.justpy(app)
