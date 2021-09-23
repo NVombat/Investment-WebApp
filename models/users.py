@@ -1,5 +1,6 @@
 #Imports
 import hashlib, binascii, os
+from typing import Tuple
 import sqlite3 as s
 
 
@@ -17,7 +18,7 @@ def create_user(path: str) -> None:
 
 
 #Inserts user and related values into table when a user is created
-def insert(path: str, tablename: str, data: tuple) -> None:
+def insert(path: str, tablename: str, data: Tuple[str, str, str, int]) -> None:
     conn = s.connect(path)
     cur = conn.cursor()
 

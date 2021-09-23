@@ -21,6 +21,7 @@ class TestDatabase(unittest.TestCase):
                         data.test_data["price"], data.test_data["quantity"],
                         data.test_data["email"]), data.test_data['path']))
 
+        # ADD CHECK TO REFUSE ANYTHING BUT INT
         # self.assertIsNone(st.buy(data.test_data["tablename"],
         #                 (data.test_data["date"], "XYZ",
         #                 data.test_data["price"], "quant",

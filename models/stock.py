@@ -1,3 +1,5 @@
+from datetime import datetime
+from typing import Tuple
 import sqlite3 as s
 
 
@@ -18,7 +20,7 @@ def make_tbl(path: str) -> None:
     conn.commit()
 
 
-def buy(tablename: str, data: tuple, path: str) -> None:
+def buy(tablename: str, data: Tuple[datetime.date, str, float, int, str], path: str) -> None:
     """Updates table when user BUYS stocks
 
     Args:
@@ -56,7 +58,7 @@ def buy(tablename: str, data: tuple, path: str) -> None:
         # print("UPDATED VALUE IN TABLE - ALREADY EXISTED")
 
 
-def sell(tablename: str, data: tuple, path: str) -> None:
+def sell(tablename: str, data: Tuple[str, int, str, float], path: str) -> None:
     """Updates table when user SELLS stocks
 
     Args:
