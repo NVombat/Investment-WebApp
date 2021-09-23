@@ -1,6 +1,19 @@
 from datetime import datetime
 from typing import Tuple
 import sqlite3 as s
+import pandas as pd
+import requests
+import io
+
+
+"""
+List of stock symbols to see if the user has entered a valid stock symbol
+URL containing NASDAQ listings in csv format
+"""
+url = "https://pkgstore.datahub.io/core/nasdaq-listings/nasdaq-listed_csv/data/7665719fb51081ba0bd834fde71ce822/nasdaq-listed_csv.csv"
+data = requests.get(url).content
+df_data = pd.read_csv(io.StringIO(data.decode("utf-8")))
+symbols = df_data["Symbol"].to_list()
 
 
 def make_tbl(path: str) -> None:
@@ -21,8 +34,8 @@ def make_tbl(path: str) -> None:
 
 
 def buy(
-    tablename: str, data: Tuple[datetime.date, str, float, int, str], path: str
-) -> None:
+    tablename: str, data: Tuple[str, str, float, int, str], path: str
+) -> bool:
     """Updates table when user BUYS stocks
 
     Args:
@@ -31,36 +44,45 @@ def buy(
         path: Path to database
 
     Returns:
-            None
+            bool
     """
-    # print(tablename, data, path)
-    conn = s.connect(path)
-    cur = conn.cursor()
+    if not (isinstance(data[1], str)):
+        raise TypeError("Invalid Type")
 
-    # print("DATA:", data)
-    # print("SYMBOL FROM TUPLE: ", data[1])
-    # print("PRICE FROM TUPLE: ", data[2])
-    # print("QUANTITY FROM TUPLE: ", data[3])
-    # print("EMAIL FROM TUPLE: ", data[4])
+    elif data[1].upper() in symbols:
+        # print(tablename, data, path)
+        conn = s.connect(path)
+        cur = conn.cursor()
 
-    cmnd = f"SELECT * FROM {tablename} WHERE Stock_Symbol='{data[1]}' AND Email='{data[4]}'"
-    cur.execute(cmnd)
-    res = cur.fetchall()
-    # If res is empty - User has not bought that particular stock thus insert into table as a new entry
-    if len(res) == 0:
-        b1 = f"INSERT INTO {tablename} VALUES {data}"
-        cur.execute(b1)
-        conn.commit()
-        # print("INSERTED NEW INTO TABLE - NO PREVIOUS VALUES")
-    # If res is not empty - User has already bought stocks with that symbol thus update the quantity of that particular stock
+        # print("DATA:", data)
+        # print("SYMBOL FROM TUPLE: ", data[1])
+        # print("PRICE FROM TUPLE: ", data[2])
+        # print("QUANTITY FROM TUPLE: ", data[3])
+        # print("EMAIL FROM TUPLE: ", data[4])
+
+        cmnd = f"SELECT * FROM {tablename} WHERE Stock_Symbol='{data[1]}' AND Email='{data[4]}'"
+        cur.execute(cmnd)
+        res = cur.fetchall()
+        # If res is empty - User has not bought that particular stock thus insert into table as a new entry
+        if len(res) == 0:
+            b1 = f"INSERT INTO {tablename} VALUES {data}"
+            cur.execute(b1)
+            conn.commit()
+            # print("INSERTED NEW INTO TABLE - NO PREVIOUS VALUES")
+            return True
+
+        # If res is not empty - User has already bought stocks with that symbol thus update the quantity of that particular stock
+        else:
+            b2 = f"UPDATE {tablename} SET Quantity=Quantity+'{data[3]}', Price='{data[2]}' WHERE Stock_Symbol = '{data[1]}' AND Email = '{data[4]}'"
+            cur.execute(b2)
+            conn.commit()
+            # print("UPDATED VALUE IN TABLE - ALREADY EXISTED")
+            return True
     else:
-        b2 = f"UPDATE {tablename} SET Quantity=Quantity+'{data[3]}', Price='{data[2]}' WHERE Stock_Symbol = '{data[1]}' AND Email = '{data[4]}'"
-        cur.execute(b2)
-        conn.commit()
-        # print("UPDATED VALUE IN TABLE - ALREADY EXISTED")
+        return False
 
 
-def sell(tablename: str, data: Tuple[str, int, str, float], path: str) -> None:
+def sell(tablename: str, data: Tuple[str, int, str, float], path: str) -> bool:
     """Updates table when user SELLS stocks
 
     Args:
@@ -69,41 +91,50 @@ def sell(tablename: str, data: Tuple[str, int, str, float], path: str) -> None:
         path: Path to database
 
     Returns:
-            None
+            bool
     """
-    conn = s.connect(path)
-    cur = conn.cursor()
+    if not (isinstance(data[0], str)):
+        raise TypeError("Invalid Type")
+    elif data[0].upper() in symbols:
+        conn = s.connect(path)
+        cur = conn.cursor()
 
-    # print("DATA: ", data)
+        # print("DATA: ", data)
 
-    rem = f"SELECT * FROM {tablename} WHERE Stock_Symbol='{data[0]}' AND Email = '{data[2]}'"
-    cur.execute(rem)
-    res = cur.fetchall()
-    # print("SELLING RES: ", res)
+        rem = f"SELECT * FROM {tablename} WHERE Stock_Symbol='{data[0]}' AND Email = '{data[2]}'"
+        cur.execute(rem)
+        res = cur.fetchall()
+        # print("SELLING RES: ", res)
 
-    # If The user doesnt own that stock
-    if len(res) == 0:
-        print("YOU DO NOT OWN THIS STOCK")
-    else:
-        # Curr_Quant stores quantity of that particular stock the user owns currently
-        curr_quant = int(res[0][3])
-        # print(curr_quant)
-        # Rejects request if user wants to sell more than the amount he owns
-        if data[1] > curr_quant:
-            print("YOU ARE TRYING TO SELL MORE THAN YOU OWN")
-        # If user owns the same amount as the amount he wants to sell
-        elif data[1] - curr_quant == 0:
-            # Deletes the particular stock column from the table
-            s1 = f"DELETE FROM {tablename} WHERE Stock_Symbol='{data[0]}' AND Email = '{data[2]}'"
-            cur.execute(s1)
-            conn.commit()
-            # print("STOCK GONE - ALL SOLD")
-        # Deducts the amount the user wants to sell from the amount the user owns
+        # If The user doesnt own that stock
+        if len(res) == 0:
+            # print("YOU DO NOT OWN THIS STOCK")
+            return False
         else:
-            s2 = f"UPDATE {tablename} SET Quantity=Quantity-'{data[1]}', Price='{data[3]}' WHERE Stock_Symbol='{data[0]}' AND Email = '{data[2]}'"
-            cur.execute(s2)
-            conn.commit()
-            # print("SOLD - QUANTITY UPDATED")
+            # Curr_Quant stores quantity of that particular stock the user owns currently
+            curr_quant = int(res[0][3])
+            # print(curr_quant)
+            # Rejects request if user wants to sell more than the amount he owns
+            if data[1] > curr_quant:
+                # print("YOU ARE TRYING TO SELL MORE THAN YOU OWN")
+                return False
+            # If user owns the same amount as the amount he wants to sell
+            elif data[1] - curr_quant == 0:
+                # Deletes the particular stock column from the table
+                s1 = f"DELETE FROM {tablename} WHERE Stock_Symbol='{data[0]}' AND Email = '{data[2]}'"
+                cur.execute(s1)
+                conn.commit()
+                # print("STOCK GONE - ALL SOLD")
+                return True
+            # Deducts the amount the user wants to sell from the amount the user owns
+            else:
+                s2 = f"UPDATE {tablename} SET Quantity=Quantity-'{data[1]}', Price='{data[3]}' WHERE Stock_Symbol='{data[0]}' AND Email = '{data[2]}'"
+                cur.execute(s2)
+                conn.commit()
+                # print("SOLD - QUANTITY UPDATED")
+                return True
+    else:
+        return False
 
 
 def query(email: str, path: str) -> list:

@@ -35,7 +35,7 @@ payment_data = json.load(open("payment_data.json"))
 
 
 # Path used for all tables in database
-path = os.getenv("DB_PATH")
+path = "app.db"
 
 
 # To pass data from one page to another
@@ -577,14 +577,21 @@ def trade():
 
                     date = d.datetime.now()
                     date = date.strftime("%m/%d/%Y, %H:%M:%S")
+                    # print(type(date))
 
                     data = (symb, quant, user_email[0], stock_price)
-                    stock.sell("stock", data, path)
 
-                    mail_data = (symb, stock_price, quant, total, user_email[0], date)
-                    send_sell(path, mail_data)
+                    if(stock.sell("stock", data, path)):
+                        mail_data = (symb, stock_price, quant, total, user_email[0], date)
+                        send_sell(path, mail_data)
+                        return redirect(url_for("trade"))
+                    else:
+                        return render_template(
+                        "trade.html",
+                        error="You either DO NOT own this stock or are trying to sell more than you own! Please check again!",
+                        transactions=transactions,
+                    )
 
-                    return redirect(url_for("trade"))
                 # If stock symbol is invalid
                 else:
                     return render_template(
