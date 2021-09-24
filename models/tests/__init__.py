@@ -48,4 +48,5 @@ class Base:
             "quantity": 1,
             "price": test_price,
             "date": "19-09-2021",
+            "code": 0
         }

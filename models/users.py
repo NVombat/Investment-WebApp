@@ -1,5 +1,6 @@
 # Imports
 import hashlib, binascii, os
+from sqlite3.dbapi2 import Error
 from typing import Tuple
 import sqlite3 as s
 
@@ -25,22 +26,6 @@ def insert(path: str, tablename: str, data: Tuple[str, str, str, int]) -> None:
     insrt = f"INSERT INTO {tablename} VALUES{data}"
     cur.execute(insrt)
     conn.commit()
-
-
-# Checks password entered by user against the database
-def checkpwd(path: str, pwd: str, email: str) -> bool:
-    conn = s.connect(path)
-    cur = conn.cursor()
-
-    # Queries table to fetch user with a particular password
-    check = f"SELECT * FROM user where Password='{pwd}' AND Email='{email}'"
-    cur.execute(check)
-    # If query returns a match then passwords match
-    res = cur.fetchall()
-    if len(res) > 0:
-        return True
-    # If query results in an empty array then passwords dont match
-    return False
 
 
 # Checks if the RESET PASSWORD option and SIGN UP is possible by seeing if the user exists
@@ -77,11 +62,14 @@ def add_code(path: str, key: int, email: str) -> None:
     conn = s.connect(path)
     cur = conn.cursor()
 
-    # After requesting to reset password the user receives a mail with a link to reset and a verification code
-    # This same code is added to the table so that when the user resets the password the user can be verified
-    cmnd = f"UPDATE user SET Code='{key}' WHERE Email='{email}'"
-    cur.execute(cmnd)
-    conn.commit()
+    if isinstance(key, int):
+        # After requesting to reset password the user receives a mail with a link to reset and a verification code
+        # This same code is added to the table so that when the user resets the password the user can be verified
+        cmnd = f"UPDATE user SET Code='{key}' WHERE Email='{email}'"
+        cur.execute(cmnd)
+        conn.commit()
+    else:
+        raise TypeError
 
 
 # Checks if the verification code given by the user matches the one sent to their email
@@ -89,20 +77,23 @@ def check_code(path: str, code: int) -> bool:
     conn = s.connect(path)
     cur = conn.cursor()
 
-    # Checks the table to see if the code matches the code that is stored for that particular user
-    chk = f"SELECT * FROM user WHERE Code='{code}'"
-    cur.execute(chk)
-    res = cur.fetchall()
-    # print("RES", res)
-    # If code doesnt match then res will be empty
-    if len(res) == 0:
-        return False
-    else:
-        # Res array stores a tuple of the user details - code is the 4th field
-        if res[0][3] == code:
-            return True
-        else:
+    if isinstance(code, int):
+        # Checks the table to see if the code matches the code that is stored for that particular user
+        chk = f"SELECT * FROM user WHERE Code='{code}'"
+        cur.execute(chk)
+        res = cur.fetchall()
+        # print("RES", res)
+        # If code doesnt match then res will be empty
+        if len(res) == 0:
             return False
+        else:
+            # Res array stores a tuple of the user details - code is the 4th field
+            if res[0][3] == code:
+                return True
+            else:
+                return False
+    else:
+        raise TypeError
 
 
 # Resets the Verification code to 0 once the user has reset their password
@@ -111,10 +102,13 @@ def reset_code(path: str, code: int) -> None:
     conn = s.connect(path)
     cur = conn.cursor()
 
-    # Updates the verification code to 0 wherever it matches a particular user verification code
-    rstcd = f"UPDATE user SET Code=0 WHERE Code='{code}'"
-    cur.execute(rstcd)
-    conn.commit()
+    if isinstance(code, int):
+        # Updates the verification code to 0 wherever it matches a particular user verification code
+        rstcd = f"UPDATE user SET Code=0 WHERE Code='{code}'"
+        cur.execute(rstcd)
+        conn.commit()
+    else:
+        raise TypeError
 
 
 # Gets name of user
@@ -141,16 +135,14 @@ def getemail(path: str):
     return emails
 
 
-"""
-For the contact us function:
-If the user types a message and an email ID -
-It checks if the email ID is in our database (the user exists)
-It also checks if the email ID mentioned is the same one as the current user
-If both these conditions are true the user is able to send a message otherwise an error message is displayed
-"""
-
-
 def check_contact_us(path: str, email: str, curr_user: str) -> bool:
+    """
+    For the contact us function:
+    If the user types a message and an email ID -
+    It checks if the email ID is in our database (the user exists)
+    It also checks if the email ID mentioned is the same one as the current user
+    If both these conditions are true the user is able to send a message otherwise an error message is displayed
+    """
     conn = s.connect(path)
     cur = conn.cursor()
 
@@ -168,19 +160,17 @@ def check_contact_us(path: str, email: str, curr_user: str) -> bool:
         return False
 
 
-"""
-Hashes the password entered by the user using the SHA256 HASH FUNCTION
-First It generates salt using the urandom lib for CSPRNG
-Then it converts the salt to hexadecimal and then encodes it in ASCII format
-Then we use the Password based Key definition function which derives the secret key using the password and a HMAC pseudo-random function
-It is also hashed with the salt and put through 100,000 iterations
-binascii can convert between binary and ascii encoded binary representations
-hexlify converts the binary data to hexadecimal
-Final hash is computed with salt and then decoded to ascii and returned
-"""
-
-
 def hash_pwd(pwd: str) -> str:
+    """
+    Hashes the password entered by the user using the SHA256 HASH FUNCTION
+    First It generates salt using the urandom lib for CSPRNG
+    Then it converts the salt to hexadecimal and then encodes it in ASCII format
+    Then we use the Password based Key definition function which derives the secret key using the password and a HMAC pseudo-random function
+    It is also hashed with the salt and put through 100,000 iterations
+    binascii can convert between binary and ascii encoded binary representations
+    hexlify converts the binary data to hexadecimal
+    Final hash is computed with salt and then decoded to ascii and returned
+    """
     salt = hashlib.sha256(os.urandom(60)).hexdigest().encode("ascii")
     # print("SALT1: ", salt)
     pwd_hash = hashlib.pbkdf2_hmac("sha512", pwd.encode("utf-8"), salt, 100000)
@@ -189,16 +179,14 @@ def hash_pwd(pwd: str) -> str:
     return final_hashed_pwd
 
 
-"""
-First we extract the stored hashed password from the database
-Then from that we extract the password part and the salt part
-We then hash the current password which the user has entered
-We then compare the hashed password to the one stored in the db
-if they match we return true else we return false
-"""
-
-
 def check_hash(path: str, pwd: str, email: str) -> bool:
+    """
+    First we extract the stored hashed password from the database
+    Then from that we extract the password part and the salt part
+    We then hash the current password which the user has entered
+    We then compare the hashed password to the one stored in the db
+    if they match we return true else we return false
+    """
     conn = s.connect(path)
     cur = conn.cursor()
 
@@ -234,4 +222,8 @@ def check_hash(path: str, pwd: str, email: str) -> bool:
 
 if __name__ == "__main__":
     test_path = "../test.db"
-    create_user(test_path)
+    # create_user(test_path)
+    # insert(test_path, "user", ("test2@gmail.com", "Karan", "test456", 1111))
+    # add_code(test_path, 1234, "test@gmail.com")
+    # reset_pwd(test_path, "test456", 1111)
+    # reset_pwd(test_path, "test123", 1234)
