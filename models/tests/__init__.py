@@ -34,6 +34,7 @@ class Base:
             "email": "ronaldo72emiway@gmail.com",
             "name": "Nikhill Vombatkere",
             "password": user_pwd,
+            "checkpwd": "abc123ABC",
             "code": 0,
         }
 
@@ -48,4 +49,5 @@ class Base:
             "quantity": 1,
             "price": test_price,
             "date": "19-09-2021",
+            "code": 0
         }

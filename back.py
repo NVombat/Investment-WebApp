@@ -126,15 +126,12 @@ df_data = pd.read_csv(io.StringIO(data.decode("utf-8")))
 symbols = df_data["Symbol"].to_list()
 
 
-"""
-Sets the current user - g.user to none and then checks if the user is in session
-If the user is in session then their email is fetched and g.user is updated to that email
-Otherwise Exception is thrown
-"""
-
-
 @app.before_request
 def security():
+    """
+    Sets the current user - g.user to none and checks if the user is in session
+    If user is in session then their email is fetched and g.user is updated to that email
+    """
     g.user = None
     if "user_email" in session:
         emails = users.getemail(path)
@@ -166,36 +163,27 @@ def home():
         password = request.form["password"]
         repeat_password = request.form["rpassword"]
 
-        """
-        If the password field has a password, and the repeat password is empty the user is trying to login
-        First the user is verified -> Check if user exists
-        Then the password is verified by checking the database for that user
-        If the password matches the user is added to the session otherwise the flag variable is set to false
-        If the user doesnt exist then render back to login and give error message
-        """
         if password and not repeat_password:
+            """
+            LOGIN -> Check if user exists
+            """
             if users.check_user_exist(path, email):
-                print("LOGIN")
-                # if users.checkpwd(path, password, email):
-                #     session['user_email'] = email
-                #     return redirect('/index')
                 """
-                If the password field is entered check the password against the hashed password in the db
-                If it matches then user is in session and is redirected to the homepage
-                Else a flag is set and the user is shown an error message
+                Check the password against the hashed password in the db
+                If it matches, user is in session and is redirected to the homepage
+                Else flag is set and the user is shown an error message
                 """
                 if users.check_hash(path, password, email):
                     session["user_email"] = email
                     return redirect("/index")
                 else:
-                    # If the flag variable is false -> user has entered the wrong password
+                    # User has entered the wrong password
                     flag = False
-                    # print("WRONG PWD")
                     return render_template(
                         "login.html", error="Incorrect Email or Password"
                     )
             else:
-                # If the user doesnt exist
+                # User doesnt exist
                 return render_template("login.html", error="User Doesnt Exist")
 
         """
@@ -266,13 +254,11 @@ def index():
     return redirect("/")
 
 
-"""
-Function to reset password
-Sends the mail for resetting password to user
-"""
-
-
 def reset_password(path: str, email: str):
+    """
+    Reset password
+    Sends the mail for resetting password to user
+    """
     # print(email)
     send_mail(path, email)
 
@@ -293,7 +279,10 @@ def reset():
         pwd = request.form["npassword"]
         repeat_pwd = request.form["rnpassword"]
         ver_code = request.form["vcode"]
-        ver_code = int(ver_code)
+        try:
+            ver_code = int(ver_code)
+        except:
+            raise TypeError
         # print(ver_code)
 
         if pwd and repeat_pwd and ver_code:
@@ -709,16 +698,14 @@ def contact():
     return redirect("/")
 
 
-"""
-Function sends data (in json format) to the plotting function
-Gets a list of all files in the data folder which have a _mod.json ending
-If there are no such files then plot AAPL as the default graph
-If there is such a file - sends json file containing data to be plotted
-"""
-
-
 @app.route("/pipe", methods=["GET", "POST"])
 def pipe():
+    """
+    Function sends data (in json format) to the plotting function
+    Gets a list of all files in the data folder which have a _mod.json ending
+    If there are no such files then plot AAPL as the default graph
+    If there is such a file - sends json file containing data to be plotted
+    """
     files = glob.glob(
         "/home/nvombat/Desktop/Investment-WebApp/analysis/data/*_mod.json"
     )
