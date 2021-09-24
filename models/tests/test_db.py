@@ -206,5 +206,54 @@ class TestDatabase(unittest.TestCase):
         assert type(us.getemail(data.test_data["path"])) == list
 
 
+    def test_user_contact_us(self):
+        self.assertTrue(
+            us.check_contact_us(
+                data.user_data["path"],
+                data.user_data["email"],
+                data.user_data["email"]
+            )
+        )
+
+        self.assertFalse(
+            us.check_contact_us(
+                data.user_data["path"],
+                data.test_data["email"],
+                data.user_data["email"]
+            )
+        )
+
+
+    def test_user_hash_pwd(self):
+        assert type(us.hash_pwd("testpwd123")) == str
+        self.assertNotEqual("testpwd123", us.hash_pwd("testpwd123"))
+
+
+    def test_user_check_hash(self):
+        self.assertTrue(
+            us.check_hash(
+                data.user_data["path"],
+                data.user_data["checkpwd"],
+                data.user_data["email"]
+            )
+        )
+
+        self.assertFalse(
+            us.check_hash(
+                data.user_data["path"],
+                data.user_data["password"],
+                data.user_data["email"]
+            )
+        )
+
+        self.assertFalse(
+            us.check_hash(
+                data.test_data["path"],
+                data.test_data["password"],
+                data.test_data["email"]
+            )
+        )
+
+
 if __name__ == "__main__":
     unittest.main()

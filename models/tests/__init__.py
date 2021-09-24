@@ -34,6 +34,7 @@ class Base:
             "email": "ronaldo72emiway@gmail.com",
             "name": "Nikhill Vombatkere",
             "password": user_pwd,
+            "checkpwd": "abc123ABC",
             "code": 0,
         }
 
