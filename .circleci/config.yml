@@ -1,0 +1,21 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/python:3.8
+    working_directory: ~/repo
+
+    steps:
+      - checkout
+      - run:
+          name: install dependencies
+          command: |
+            python3 -m venv rain
+            . rain/bin/activate
+            /home/circleci/repo/rain/bin/python3 -m pip install --upgrade pip
+            pip install -r requirements.txt
+      - run:
+          name: run tests
+          command: |
+            . rain/bin/activate
+            . ./test_handler.sh
