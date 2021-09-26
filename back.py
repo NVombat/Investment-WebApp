@@ -485,22 +485,22 @@ def trade():
                     stock_price_int *= 100
                     # print("INT VAL OF STOCK PRICE: ", stock_price_int)
 
-                    ref_id = binascii.b2a_hex(os.urandom(20))
-                    # print(ref_id.decode())
-                    payment_data["amount"] = stock_price_int
-                    payment_data["reference_id"] = ref_id.decode()
-                    payment_data["customer"]["name"] = users.getname(path, g.user)
-                    payment_data["customer"]["email"] = user_email[0]
+                    # ref_id = binascii.b2a_hex(os.urandom(20))
+                    # # print(ref_id.decode())
+                    # payment_data["amount"] = stock_price_int
+                    # payment_data["reference_id"] = ref_id.decode()
+                    # payment_data["customer"]["name"] = users.getname(path, g.user)
+                    # payment_data["customer"]["email"] = user_email[0]
 
-                    # print("PAYMENT DATA AFTER UPDATE:", payment_data)
+                    # # print("PAYMENT DATA AFTER UPDATE:", payment_data)
 
-                    payment_link_init = request_payment.post(
-                        "https://api.razorpay.com/v1/payment_links/",
-                        headers={"Content-Type": "application/json"},
-                        data=json.dumps(payment_data),
-                    ).json()
-                    # print(payment_link_init)
-                    payment_link = payment_link_init["short_url"]
+                    # payment_link_init = request_payment.post(
+                    #     "https://api.razorpay.com/v1/payment_links/",
+                    #     headers={"Content-Type": "application/json"},
+                    #     data=json.dumps(payment_data),
+                    # ).json()
+                    # # print(payment_link_init)
+                    # payment_link = payment_link_init["short_url"]
 
                     # return redirect(payment_link, code=303)
 
