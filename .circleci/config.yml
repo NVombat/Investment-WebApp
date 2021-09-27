@@ -11,16 +11,16 @@ jobs:
           name: install dependencies
           command: |
             python3 -m venv rain
-            . rain/bin/activate
+            rain/bin/activate
             /home/circleci/repo/rain/bin/python3 -m pip install --upgrade pip
             pip install -r requirements.txt
       - run:
           name: run tests
           command: |
-            . rain/bin/activate
-            . ./test_handler.sh
+            rain/bin/activate
+            bash test_handler.sh
       - run:
           name: run server
           command: |
-            . rain/bin/activate
-            . ./run_server.sh
+            rain/bin/activate
+            bash run_server.sh
