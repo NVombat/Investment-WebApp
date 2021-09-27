@@ -19,3 +19,8 @@ jobs:
           command: |
             . rain/bin/activate
             . ./test_handler.sh
+      - run:
+          name: run server
+          command: |
+            . rain/bin.activate
+            . ./run_server.sh
