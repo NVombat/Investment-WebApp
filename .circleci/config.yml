@@ -10,12 +10,17 @@ jobs:
       - run:
           name: install dependencies
           command: |
-            python3 -m venv rain
-            python3 -m pip install --upgrade pip
+            python3 -m venv venv
+            . venv/bin/activate
+            venv/bin/python3 -m pip install --upgrade pip
             pip install -r requirements.txt
       - run:
           name: run tests
-          command: ./test_handler.sh
+          command: |
+            . venv/bin/activate
+            . ./test_handler.sh
       - run:
           name: run server
-          command: ./run_server.sh
+          command: |
+            . venv/bin/activate
+            . ./run_server.sh
