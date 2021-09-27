@@ -1,4 +1,6 @@
 import unittest
+import requests
+import warnings
 import pytest
 
 from back import (
@@ -11,8 +13,10 @@ data = Base()
 
 
 class TestServer(unittest.TestCase):
-    # def test_get_current_stock_price(self):
-    #     assert type(get_current_stock_price(data.stock_data["stock_symbol"])) == float
+    def test_stock_price(self):
+        warnings.filterwarnings(action="ignore", message="unclosed", category=ResourceWarning)
+        assert type(get_current_stock_price(data.stock_data["stock_symbol"])) == float
 
-    def test_smth(self):
-        self.assertEqual("Hello", "Hello")
+
+if __name__ == "__main__":
+    unittest.main()

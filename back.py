@@ -70,7 +70,7 @@ def get_current_price(symbol: str) -> float:
     """
     ticker = yf.Ticker(symbol)
     todays_data = ticker.history(period="1d")
-    return todays_data["Close"][0]
+    return float(todays_data["Close"][0])
 
 
 def get_current_stock_price(symbol: str) -> float:
