@@ -9,6 +9,7 @@ python-dotenv
 black
 pytest
 pynance
+black[jupyter]
 
 #To hide email id and password:
 #gedit .bash_profile
