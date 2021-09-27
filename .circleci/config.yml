@@ -18,9 +18,9 @@ jobs:
           name: run tests
           command: |
             . rain/bin/activate
-            . bash test_handler.sh
+            . ./test_handler.sh
       - run:
           name: run server
           command: |
             . rain/bin/activate
-            . bash run_server.sh
+            . ./run_server.sh
