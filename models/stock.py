@@ -33,9 +33,7 @@ def make_tbl(path: str) -> None:
     conn.commit()
 
 
-def buy(
-    tablename: str, data: Tuple[str, str, float, int, str], path: str
-) -> bool:
+def buy(tablename: str, data: Tuple[str, str, float, int, str], path: str) -> bool:
     """Updates table when user BUYS stocks
 
     Args:

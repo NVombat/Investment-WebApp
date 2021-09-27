@@ -84,7 +84,7 @@ def get_current_stock_price(symbol: str) -> float:
         float: Closing Stock price
     """
     data = pn.data.get(symbol, start=None, end=None)
-    return data["Close"][0]
+    return float(data["Close"][0])
 
 
 # API Class for currency conversion
@@ -477,9 +477,8 @@ def trade():
                     total = "{:.2f}".format(total)
                     # print("You have spent $", total)
 
-                    stock_price_float = float(stock_price)
                     stock_price_rupees = c.convert(
-                        from_country, to_country, stock_price_float
+                        from_country, to_country, stock_price
                     )
                     stock_price_int = int(stock_price_rupees)
                     stock_price_int *= 100
@@ -570,16 +569,23 @@ def trade():
 
                     data = (symb, quant, user_email[0], stock_price)
 
-                    if(stock.sell("stock", data, path)):
-                        mail_data = (symb, stock_price, quant, total, user_email[0], date)
+                    if stock.sell("stock", data, path):
+                        mail_data = (
+                            symb,
+                            stock_price,
+                            quant,
+                            total,
+                            user_email[0],
+                            date,
+                        )
                         send_sell(path, mail_data)
                         return redirect(url_for("trade"))
                     else:
                         return render_template(
-                        "trade.html",
-                        error="You either DO NOT own this stock or are trying to sell more than you own! Please check again!",
-                        transactions=transactions,
-                    )
+                            "trade.html",
+                            error="You either DO NOT own this stock or are trying to sell more than you own! Please check again!",
+                            transactions=transactions,
+                        )
 
                 # If stock symbol is invalid
                 else:
