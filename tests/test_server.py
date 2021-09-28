@@ -20,10 +20,14 @@ class TestServer(unittest.TestCase):
 
     def test_currency_conversion(self):
         load_dotenv()
-        url = str.__add__(
-            "http://data.fixer.io/api/latest?access_key=",
-            os.getenv("CURRENCY_ACCESS_KEY"),
-        )
+        try:
+            url = str.__add__(
+                "http://data.fixer.io/api/latest?access_key=",
+                os.getenv("CURRENCY_ACCESS_KEY"),
+            )
+        except Exception as e:
+            print("Error")
+            return False
         c = Currency_Conversion(url)
         from_country = "USD"
         to_country = "INR"
