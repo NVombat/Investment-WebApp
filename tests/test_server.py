@@ -16,7 +16,12 @@ class TestServer(unittest.TestCase):
         warnings.filterwarnings(
             action="ignore", message="unclosed", category=ResourceWarning
         )
-        assert type(get_current_stock_price(data.stock_data["stock_symbol"])) == float
+        try:
+            assert (
+                type(get_current_stock_price(data.stock_data["stock_symbol"])) == float
+            )
+        except Exception as e:
+            return False
 
     def test_currency_conversion(self):
         load_dotenv()
@@ -26,7 +31,6 @@ class TestServer(unittest.TestCase):
                 os.getenv("CURRENCY_ACCESS_KEY"),
             )
         except Exception as e:
-            print("Error")
             return False
         c = Currency_Conversion(url)
         from_country = "USD"
