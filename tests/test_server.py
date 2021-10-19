@@ -1,7 +1,4 @@
 import unittest
-import requests
-import warnings
-import pytest
 import os
 
 from back import get_current_stock_price, Currency_Conversion
@@ -13,15 +10,6 @@ data = Base()
 
 class TestServer(unittest.TestCase):
     def test_stock_price(self):
-        # warnings.filterwarnings(
-        #     action="ignore", message="unclosed", category=ResourceWarning
-        # )
-        # try:
-        #     assert (
-        #         type(get_current_stock_price(data.stock_data["stock_symbol"])) == float
-        #     )
-        # except Exception as e:
-        #     return False
         with self.assertWarns(ResourceWarning):
             try:
                 assert (

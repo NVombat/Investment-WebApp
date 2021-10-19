@@ -8,7 +8,7 @@ def create_tbl(path: str) -> None:
         path: Path to database
 
     Returns:
-            None: Table is created if it doesnt already exist
+        None
     """
     conn = s.connect(path)
     cur = conn.cursor()
@@ -27,7 +27,7 @@ def insert(email: str, message: str, path: str) -> None:
         path: Path to database
 
     Returns:
-            None: Inserts data into table
+        None
     """
     conn = s.connect(path)
     cur = conn.cursor()

@@ -18,8 +18,6 @@ import io
 
 from sendmail import send_mail, send_buy, send_sell
 from models import users, contactus, stock
-from api import getdata
-
 
 # Import environment variables
 load_dotenv()

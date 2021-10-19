@@ -1,9 +1,7 @@
 import unittest
 import sqlite3
-import pytest
 import os
 
-import models.contactus as ct
 import models.stock as st
 import models.users as us
 
@@ -15,23 +13,6 @@ data = Base()
 class TestDatabase(unittest.TestCase):
     def test_path(self):
         self.assertEqual("True", str(os.path.exists(data.contact_us_data["path"])))
-        self.assertEqual("False", str(os.path.exists("apq.db")))
-
-    def test_stock_data(self):
-        assert type(data.stock_data["stock_symbol"]) == str
-        assert type(data.stock_data["quantity"]) == int
-        assert type(data.stock_data["price"]) == float
-
-    def test_user_data(self):
-        assert type(data.user_data["password"]) == str
-        assert type(data.user_data["email"]) == str
-        assert type(data.user_data["name"]) == str
-        assert type(data.user_data["code"]) == int
-
-    def test_data(self):
-        assert type(data.contact_us_data["message"]) == str
-        assert type(data.stock_data["date"]) == str
-        assert type(data.user_data["path"]) == str
 
     def test_stock_buy(self):
         self.assertTrue(
