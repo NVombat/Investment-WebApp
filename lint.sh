@@ -12,7 +12,7 @@ if [ $var -eq 0 ];
 then
     echo "$execution All clean!"
 else
-    black[jupyter] analysis/ --diff
+    black analysis/ --diff
     exit 1
 fi
 
