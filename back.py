@@ -84,6 +84,7 @@ class Currency_Conversion:
     """
     API Class for currency conversion
     """
+
     rates = {}
 
     def __init__(self, url):
@@ -107,7 +108,6 @@ class Currency_Conversion:
 
         amount = round(amount * self.rates[to_currency], 2)
         return amount
-
 
 
 # List of stock symbols from URL containing NASDAQ listings
