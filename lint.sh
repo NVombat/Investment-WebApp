@@ -1,4 +1,5 @@
-#from https://github.com/Aradhya-Tripathi/fire-watch/blob/main/lint.sh
+#from https://github.com/Aradhya-Tripathi/fire-watch
+
 #!bin/bash
 
 error="\e[1;31m[ERROR]\e[0m"
