@@ -1,9 +1,9 @@
-from typing import Tuple
+import io
 import sqlite3 as s
+from typing import Tuple
+
 import pandas as pd
 import requests
-import io
-
 
 # List of stock symbols from URL containing NASDAQ listings
 url = "https://pkgstore.datahub.io/core/nasdaq-listings/nasdaq-listed_csv/data/7665719fb51081ba0bd834fde71ce822/nasdaq-listed_csv.csv"

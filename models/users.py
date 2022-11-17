@@ -1,7 +1,9 @@
 # Imports
-import hashlib, binascii, os
-from typing import Tuple
+import binascii
+import hashlib
+import os
 import sqlite3 as s
+from typing import Tuple
 
 
 def create_user(path: str) -> None:

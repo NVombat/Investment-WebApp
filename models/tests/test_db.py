@@ -1,6 +1,6 @@
-import unittest
-import sqlite3
 import os
+import sqlite3
+import unittest
 
 import models.stock as st
 import models.users as us
